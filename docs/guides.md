@@ -26,9 +26,9 @@ Each Agent should be configured with a (preferably JSON, or you will need to con
   interval_delta: 5
 }
 ```
-servers - Defines an array of C2 servers that the Agent should connect to. It is your decision on the failover process.
-interval - The base number of seconds that an Agent should sleep for.
-interval_delta - The maximum value that can be added or subtracted from the interval for randomization. This means that the actual interval delta should be calculated as interval + Random.Range(-interval_delta, interval_delta) where Random.Range would return a floating point value between the two parameters given (inclusive).
+servers - Defines an array of C2 servers that the Agent should connect to. It is your decision on the failover process.<br>
+interval - The base number of seconds that an Agent should sleep for.<br>
+interval_delta - The maximum value that can be added or subtracted from the interval for randomization. This means that the actual interval delta should be calculated as interval + Random.Range(-interval_delta, interval_delta) where Random.Range would return a floating point value between the two parameters given (inclusive).<br>
 
 #### Action ID Tracking
 When a Red Teamer wishes to run a command or perform some other action on the Target system, they queue an Action with the Arsenal Teamserver. Upon creation, that Action is given a unique identifier. Agents should receive this information with every command that they run, and upon completion, ensure that the Response also includes this Action identifier. Without this information, the Arsenal Teamserver cannot associate the given Response with an Action.
@@ -76,8 +76,8 @@ The existing Arsenal HTTP C2 utilizes JSON as a communication Format. The JSON t
   }
 }
 ```
-session_id - Must be empty string or not present in the initial beacon. The C2 will respond with a session_id that the Agent should keep track of, and send with all future call backs.
-facts - A dictionary containing facts about the target system. The only two required facts are hostname and interfaces, which should be provided in the format shown above, however it is recommended that you collect at least the 'min' subset on initial beacon (Which can be found under the target section of database.md Documentation).
+session_id - Must be empty string or not present in the initial beacon. The C2 will respond with a session_id that the Agent should keep track of, and send with all future call backs.<br>
+facts - A dictionary containing facts about the target system. The only two required facts are hostname and interfaces, which should be provided in the format shown above, however it is recommended that you collect at least the 'min' subset on initial beacon (Which can be found under the target section of database.md Documentation).<br>
 
 #### Standard Beacon
 After the session has been initialized, it should respond with the format below:
@@ -98,16 +98,16 @@ facts: {}
 }
 config: {}
 ```
-session_id - Represents the unique session identifier given by the C2.
-responses - An array of Response dictionaries. 
-  action_id - Each Response should correspond to the given action_id.
-  start_time - The timestamp on the local system that the action started.
-  end_time - The timestamp on the local system that the action completed.
-  stdout - The output of the command run. If the action_type does not require a response, just leave this empty.
+session_id - Represents the unique session identifier given by the C2.<br>
+responses - An array of Response dictionaries. <br>
+  action_id - Each Response should correspond to the given action_id.<br>
+  start_time - The timestamp on the local system that the action started.<br>
+  end_time - The timestamp on the local system that the action completed.<br>
+  stdout - The output of the command run. If the action_type does not require a response, just leave this empty.<br>
   stderr - The error output of the command run. If there is no error, or the action_type does not require a response, just leave this empty.
-  error - This is a boolean that represents whether the action sucessfully completed or not.
-facts - Any key / value pairs in this dictionary will override existing key / value pairs associated with the target. This should be returned whenever a change occurs, or in response to the 'gather' action_type.
-config - This should only be included when a change has been made to the Agent's configuration, and will be used to verify that the Agent has the correct configuration. It is never required that this field be sent.
+  error - This is a boolean that represents whether the action sucessfully completed or not.<br>
+facts - Any key / value pairs in this dictionary will override existing key / value pairs associated with the target. This should be returned whenever a change occurs, or in response to the 'gather' action_type.<br>
+config - This should only be included when a change has been made to the Agent's configuration, and will be used to verify that the Agent has the correct configuration. It is never required that this field be sent.<br>
 
 ### Standard Response
 The following is sent in response to an Agent's beacon. The same response format is used for both initial and standard beacons.
@@ -133,11 +133,11 @@ The following is sent in response to an Agent's beacon. The same response format
 
 }
 ```
-session_id - The unique identifier of the session.
-actions - An array of Action dictionaries.
-  action_id - The unique identifier of the Action. Use this when generating a Response dictionary for the Action.
-  action_type - The integer identifier of the type of action being performed. See the above table, or the Action section in database.md for more information.
-  command - This is a parameter for several action types, and may not always be included. Please see the Action section in database.md for more information on how Action types should be handled.
-  args - This is a parameter for several action types, and may not always be included. Please see the Action section in database.md for more information on how Action types should be handled.
-  config - Any key / value pairs in this dictionary should override the Agent's existing configuration settings. It is the Agent's responsibility to validate that these configuration options are valid. Please see the Action section in database.md for more information on how Action types should be handled.
+session_id - The unique identifier of the session.<br>
+actions - An array of Action dictionaries.<br>
+  action_id - The unique identifier of the Action. Use this when generating a Response dictionary for the Action.<br>
+  action_type - The integer identifier of the type of action being performed. See the above table, or the Action section in database.md for more information.<br>
+  command - This is a parameter for several action types, and may not always be included. Please see the Action section in database.md for more information on how Action types should be handled.<br>
+  args - This is a parameter for several action types, and may not always be included. Please see the Action section in database.md for more information on how Action types should be handled.<br>
+  config - Any key / value pairs in this dictionary should override the Agent's existing configuration settings. It is the Agent's responsibility to validate that these configuration options are valid. Please see the Action section in database.md for more information on how Action types should be handled.<br>
 
