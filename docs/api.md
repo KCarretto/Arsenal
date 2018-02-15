@@ -3,176 +3,176 @@
 Read here about how to interact with the teamserver's API.
 
 ## Web Hooks
-###RegisterWebhook
+### RegisterWebhook
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###RemoveWebhook 
+### RemoveWebhook 
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###ListWebhooks
+### ListWebhooks
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
 
 ## API Tokens
-###CreateAPIToken
+### CreateAPIToken
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###DeleteAPIToken
+### DeleteAPIToken
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
 
 ## Targets
-###CreateTarget 
+### CreateTarget 
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###GetTarget
+### GetTarget
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###SetTargetFacts
+### SetTargetFacts
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###ArchiveTarget 
+### ArchiveTarget 
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###ListTargets
+### ListTargets
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
 
 ## Sessions
-###CreateSession 
+### CreateSession 
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###GetSession 
+### GetSession 
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###SessionCheckin
+### SessionCheckin
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###ListSessions
+### ListSessions
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
 
 ## Actions
-###CreateAction
+### CreateAction
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###CreateGroupAction 
+### CreateGroupAction 
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###GetAction
+### GetAction
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###CancelAction
+### CancelAction
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###CancelGroupAction
+### CancelGroupAction
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###ListActions
+### ListActions
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
 
 ## Groups
-###CreateGroup 
+### CreateGroup 
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###GetGroup
+### GetGroup
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###AddGroupMembers
+### AddGroupMembers
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###RemoveGroupMembers
+### RemoveGroupMembers
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###ListGroups
+### ListGroups
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###DeleteGroup
+### DeleteGroup
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
 
 ## Credentials
-###CreateCredentials
+### CreateCredentials
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###GetValidCredentials
+### GetValidCredentials
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###InvalidateCredentials
+### InvalidateCredentials
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###ListCredentials
+### ListCredentials
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
 
 ## Logs
-###CreateLog
+### CreateLog
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
-###ListLogs
+### ListLogs
 #### Overview
 #### Parameters
 #### Example Request
