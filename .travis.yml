@@ -13,7 +13,7 @@ install:
 
 before_script:
   # Ensure program passes lint tests
-  - pylint --output-format=text teamserver/teamserver.py
+    - find teamserver/ -name "*.py" -exec pylint --output-format=text --reports=y --disable=invalid-name '{}' +
 
 script:
   # Run all unit tests
