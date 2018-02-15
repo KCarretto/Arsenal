@@ -2,6 +2,23 @@
 
 This documentation file will provide you with any guides necessary in extending / customizing this framework.
 
+## Table of Contents
+- [Guides](#guides)
+  * [Creating an Agent](#creating-an-agent)
+    + [Overview](#overview)
+    + [Agent Requirements](#agent-requirements)
+      - [Target Identification Information](#target-identification-information)
+      - [Session ID Tracking](#session-id-tracking)
+      - [Config Tracking](#config-tracking)
+      - [Action ID Tracking](#action-id-tracking)
+      - [Action Types](#action-types)
+      - [Fact Collection](#fact-collection)
+    + [Working with the Arsenal HTTP C2](#working-with-the-arsenal-http-c2)
+      - [Initial Beacon](#initial-beacon)
+      - [Standard Beacon](#standard-beacon)
+    + [Standard Response](#standard-response)
+
+
 ## Creating an Agent
 
 ### Overview
@@ -10,8 +27,8 @@ An Agent is a program that will be run on a target system, and will callback to 
 ### Agent Requirements
 #### Target Identification Information
 When an Agent calls back to a C2, it is important that the Teamserver is able to identify what machine / target the Agent is running on. IP Addresses alone cannot accurately identify a system, because NAT would cause many systems to appear the same from the C2's perspective. To solve this asset management problem, Arsenal utilizes a combination of the following information:
-  - Hostname
   - All MAC Addresses
+  - External IP Address (Collected by the C2)
 When a Session calls back with that criteria, identical to an already existing Target, the Session is associated with the already existing Target. If no Target with the given criteria exists, a new Target is created and is given an automatically generated name. Target naming rules may be created to assign Target names in an automated fashion. The order of the array of MAC Addresses does not matter.
 
 #### Session ID Tracking
@@ -77,7 +94,7 @@ The existing Arsenal HTTP C2 utilizes JSON as a communication Format. The JSON t
 }
 ```
 **session_id** - Must be empty string or not present in the initial beacon. The C2 will respond with a session_id that the Agent should keep track of, and send with all future call backs.<br>
-**facts** - A dictionary containing facts about the target system. The only two required facts are hostname and interfaces, which should be provided in the format shown above, however it is recommended that you collect at least the 'min' subset on initial beacon (Which can be found under the target section of database.md Documentation).<br>
+**facts** - A dictionary containing facts about the target system. The only required fact is 'interfaces', which should be provided in the format shown above, however it is recommended that you collect at least the 'min' subset on initial beacon (Which can be found under the target section of database.md Documentation). It is also likely that the 'hostname' fact will be used for target auto-naming, so it is highly recommended that you collect this fact as well.<br>
 
 #### Standard Beacon
 After the session has been initialized, it should respond with the format below:
