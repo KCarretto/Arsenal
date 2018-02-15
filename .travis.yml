@@ -8,16 +8,13 @@ before_install:
 
 install:
   # Install requirements
-  - pip install -r teamserver/requirements.txt
+  - pip install -r teamserver/requirements/dev.txt
 
 before_script:
   # Ensure program passes lint tests
   - pylint --output-format=text teamserver/teamserver.py
 
-  # Start test teamserver
-  - python teamserver/teamserver.py &
-
 script:
-  # Check teamserver status
-  - curl http://127.0.0.1:5000/status | grep "200"
+  # Run all unit tests
+  - python -m unittest discover -s teamserver/tests -p '*_test.py'
 
