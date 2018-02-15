@@ -6,9 +6,10 @@ before_install:
   # Make sure everything's up to date.
   - sudo apt-get update -qq
 
-#install:
-#  - pip install -r requirements.txt
-#  - pip install ansible-lint
+install:
+  - pip install -r teamserver/requirements.txt
+  - pip install ansible-lint
 
 script:
-  - echo 0
+  - python teamserver/teamserver.py &
+  - curl http://127.0.0.1:5000/status | grep "200"
