@@ -1,1 +1,14 @@
-echo 0
+---
+language: python
+python: "3.6"
+
+before_install:
+  # Make sure everything's up to date.
+  - sudo apt-get update -qq
+
+#install:
+#  - pip install -r requirements.txt
+#  - pip install ansible-lint
+
+script:
+  - echo 0
