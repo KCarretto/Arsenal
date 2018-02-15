@@ -8,12 +8,13 @@ before_install:
 
 install:
   # Install requirements
-  - sudo apt-get install pylint
   - pip install -r teamserver/requirements/dev.txt
 
 before_script:
+  # Display pylint version
+  - pylint --version
   # Ensure program passes lint tests
-    - find teamserver/ -name "*.py" -exec pylint --output-format=text --reports=y --disable=fixme --disable=trailing-newlines --disable=invalid-name --disable=wrong-import-position '{}' +
+  - find teamserver/ -name "*.py" -exec pylint --output-format=text --reports=y --disable=fixme --disable=trailing-newlines --disable=invalid-name --disable=wrong-import-position '{}' +
 
 script:
   # Run all unit tests
