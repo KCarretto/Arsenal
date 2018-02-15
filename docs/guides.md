@@ -16,7 +16,7 @@ This documentation file will provide you with any guides necessary in extending 
     + [Working with the Arsenal HTTP C2](#working-with-the-arsenal-http-c2)
       - [Initial Beacon](#initial-beacon)
       - [Standard Beacon](#standard-beacon)
-    + [Standard Response](#standard-response)
+      - [Standard Response](#standard-response)
 
 
 ## Creating an Agent
