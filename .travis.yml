@@ -8,6 +8,7 @@ before_install:
 
 install:
   # Install requirements
+  - sudo apt-get install pylint
   - pip install -r teamserver/requirements/dev.txt
 
 before_script:
