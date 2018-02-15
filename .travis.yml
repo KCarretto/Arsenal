@@ -6,9 +6,17 @@ before_install:
   # Make sure everything's up to date.
   - sudo apt-get update -qq
 
-#install:
-#  - pip install -r requirements.txt
-#  - pip install ansible-lint
+install:
+  # Install requirements
+  - pip install -r teamserver/requirements/dev.txt
+
+before_script:
+  # Display pylint version
+  - pylint --version
+  # Ensure program passes lint tests
+  - find teamserver/ -name "*.py" -exec pylint --output-format=text --reports=y --disable=fixme --disable=trailing-newlines --disable=invalid-name --disable=wrong-import-position '{}' +
 
 script:
-  - echo 0
+  # Run all unit tests
+  - python -m unittest discover -s teamserver/tests -p '*_test.py'
+
