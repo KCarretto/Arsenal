@@ -1,4 +1,6 @@
-from teamserver import teamapp
+from teamserver import create_app
 
-teamapp.run(debug=False)
+if __name__ == '__main__':
+    teamapp = create_app()
+    teamapp.run(debug=False)
 

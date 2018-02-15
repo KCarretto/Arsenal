@@ -9,26 +9,20 @@ from flask_mongoengine import MongoEngine
 
 from mongoengine import connect, MongoEngineConnectionError
 
-from .config import DB_NAME, DB_HOST, DB_PORT, DB_USER, DB_PASS
+db = MongoEngine()
 
-"""
-    Start App
-"""
-teamapp = Flask(__name__)
+def create_app(**config_overrides):
+    app = Flask(__name__)
+    app.config.from_object('teamserver.config')
+    app.config['MONGODB_SETTINGS'] = {'db': 'arsenal_default'}
+    from teamserver.router import endpoints
+    app.register_blueprint(endpoints)
+    app.config.update(config_overrides)
+    try:
+        db.init_app(app)
+    except MongoEngineConnectionError as e:
+        # TODO: Add logging
+        sys.exit("Could not connect to database.")
 
-"""
-    Connect to Database
-"""
-try:
-    teamapp.config['MONGODB_SETTINGS'] = {'DB': DB_NAME, 'HOST': DB_HOST, 'PORT': DB_PORT}
-    db = MongoEngine(teamapp)
-    # TODO: Support Database authentication
-except MongoEngineConnectionError as e:
-    # TODO: Add logging
-    sys.exit("Could not connect to database.")
-
-"""
-    Register Endpoints
-"""
-from . import router
+    return app
 

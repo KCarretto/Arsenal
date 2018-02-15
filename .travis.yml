@@ -11,6 +11,9 @@ install:
   - pip install -r teamserver/requirements.txt
 
 before_script:
+  # Ensure program passes lint tests
+  - pylint --output-format=text teamserver/teamserver.py
+
   # Start test teamserver
   - python teamserver/teamserver.py &
 
