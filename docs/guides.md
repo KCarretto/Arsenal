@@ -87,7 +87,7 @@ The existing Arsenal HTTP C2 utilizes JSON as a communication Format. The JSON t
       },
       {
         "name": "eth0",
-        "mac_addr": "FF:EE:DD:CC:BB:AA"
+        "mac_addr": "FF:EE:DD:CC:BB:AA",
         "ip_addrs": ["192.168.0.1","64.1.1.5"]
       }
     ]
@@ -140,10 +140,10 @@ After the session has been initialized, it should respond with the format below:
       "end_time": 124.2132,
       "stdout": "bin boot dev etc home lib lib64 mnt opt  proc root run usr var",
       "stderr": "",
-      "error": False
+      "error": false
     }
   ],
-  "facts": {}
+  "facts": {},
   "config": {}
 }
 ```
