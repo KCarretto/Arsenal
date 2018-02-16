@@ -27,7 +27,7 @@ An Agent is a program that will be run on a target system, and will callback to 
 
 ### Agent Requirements
 #### Target Identification Information
-When an Agent calls back to a C2, it is important that the Teamserver is able to identify what machine / target the Agent is running on. IP Addresses alone cannot accurately identify a system, because NAT would cause many systems to appear the same from the C2"s perspective. To solve this asset management problem, Arsenal utilizes a combination of the following information:
+When an Agent calls back to a C2, it is important that the Teamserver is able to identify what machine / target the Agent is running on. IP Addresses alone cannot accurately identify a system, because NAT would cause many systems to appear the same from the C2's perspective. To solve this asset management problem, Arsenal utilizes a combination of the following information:
   - All MAC Addresses
   - External IP Address (Collected by the C2)
 When a Session calls back with that criteria, identical to an already existing Target, the Session is associated with the already existing Target. If no Target with the given criteria exists, a new Target is created and is given an automatically generated name. Target naming rules may be created to assign Target names in an automated fashion. The order of the array of MAC Addresses does not matter.
@@ -67,7 +67,7 @@ It is required that Agents support the following action types, or return a speci
 More information on Actions can be found in the database.md documentation file.
 
 #### Fact Collection
-It is recommended that the Agent be capable of collecting facts about a Target system for ease of use. While the only two required facts are the Target"s hostname and MAC addresses, many other facts are useful for collection. Please see the database.md documentation"s Target section for more information on the default factsets.
+It is recommended that the Agent be capable of collecting facts about a Target system for ease of use. While the only two required facts are the Target's hostname and MAC addresses, many other facts are useful for collection. Please see the database.md documentation's Target section for more information on the default factsets.
 
 ### Working with the Arsenal HTTP C2
 
@@ -98,13 +98,13 @@ The existing Arsenal HTTP C2 utilizes JSON as a communication Format. The JSON t
 * **facts** - A dictionary containing facts about the target system. The only required fact is "interfaces", which should be provided in the format shown above, however it is recommended that you collect at least the "min" subset on initial beacon (Which can be found under the target section of database.md Documentation). It is also likely that the "hostname" fact will be used for target auto-naming, so it is highly recommended that you collect this fact as well.<br>
 
 #### Standard Response
-The following is sent in response to an Agent"s beacon. The same response format is used for both initial and standard beacons.
+The following is sent in response to an Agent's beacon. The same response format is used for both initial and standard beacons.
 ```json
 {
   "session_id": "Your Session ID",
   "actions": [
     {
-      "action_id": "Some action ID to track",
+      "action_id": "some action ID to track",
       "command": "echo",
       "args": ["hi dad"],
       "action_type": 0
@@ -126,7 +126,7 @@ The following is sent in response to an Agent"s beacon. The same response format
   * **action_type** - The integer identifier of the type of action being performed. See the above table, or the Action section in database.md for more information.<br>
   * **command** - This is a parameter for several action types, and may not always be included. Please see the Action section in database.md for more information on how Action types should be handled.<br>
   * **args** - This is a parameter for several action types, and may not always be included. Please see the Action section in database.md for more information on how Action types should be handled.<br>
-  * **config** - Any key / value pairs in this dictionary should override the Agent"s existing configuration settings. It is the Agent"s responsibility to validate that these configuration options are valid. Please see the Action section in database.md for more information on how Action types should be handled.<br>
+  * **config** - Any key / value pairs in this dictionary should override the Agent's existing configuration settings. It is the Agent's responsibility to validate that these configuration options are valid. Please see the Action section in database.md for more information on how Action types should be handled.<br>
 
 #### Standard Beacon
 After the session has been initialized, it should respond with the format below:
@@ -156,4 +156,4 @@ After the session has been initialized, it should respond with the format below:
   * **stderr** - The error output of the command run. If there is no error, or the action_type does not require a response, just leave this empty.
   * **error** - This is a boolean that represents whether the action sucessfully completed or not.<br>
 * **facts** - Any key / value pairs in this dictionary will override existing key / value pairs associated with the target. This should be returned whenever a change occurs, or in response to the "gather" action_type.<br>
-* **config** - This should only be included when a change has been made to the Agent"s configuration, and will be used to verify that the Agent has the correct configuration. It is never required that this field be sent.<br>
+* **config** - This should only be included when a change has been made to the Agent's configuration, and will be used to verify that the Agent has the correct configuration. It is never required that this field be sent.<br>
