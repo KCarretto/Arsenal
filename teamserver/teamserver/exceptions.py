@@ -22,7 +22,7 @@ def handle_exceptions(func):
         try:
             retval = func(*args, **kwargs)
             return retval
-        except Exception: # TODO: as e:
+        except Exception: #pylint: disable=broad-except
             return {
                 'status': 503,
                 'description': 'Server encountered unhandled exception.',

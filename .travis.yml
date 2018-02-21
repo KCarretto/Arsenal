@@ -14,7 +14,7 @@ before_script:
   # Display pylint version
   - pylint --version
   # Ensure program passes lint tests
-  - find teamserver/ -name "*.py" -exec pylint --output-format=text --reports=y --disable=fixme --disable=trailing-newlines --disable=invalid-name --disable=wrong-import-position --disable=broad-except '{}' +
+  - find teamserver/ -name "*.py" -exec pylint --output-format=text --reports=y '{}' +
 
 script:
   # Run all unit tests

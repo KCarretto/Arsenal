@@ -9,7 +9,7 @@ import unittest
 # Configure path to include teamserver module
 sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
-import teamserver
+import teamserver  #pylint: disable=wrong-import-position
 
 def create_test_app():
     """
