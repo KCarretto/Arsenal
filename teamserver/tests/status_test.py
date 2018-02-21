@@ -2,16 +2,9 @@
     This module tests basic functionality of the flask app,
     and ensures a proper status is returned from the /status endpoint.
 """
-import sys
-import os
 import unittest
 
-from testutils import create_test_app
-
-# Configure path to include teamserver module
-sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
-
-import teamserver  #pylint: disable=wrong-import-position
+from testutils import create_test_app #pylint: disable=no-name-in-module
 
 class StatusTest(unittest.TestCase):
     """

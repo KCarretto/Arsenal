@@ -1,8 +1,10 @@
+"""
+    This module will run all unit test cases.
+"""
 import unittest
 
-loader = unittest.TestLoader()
-start_dir = 'tests/'
-suite = loader.discover(start_dir, pattern='*_test.py')
+LOADER = unittest.TestLoader()
+SUITE = LOADER.discover('tests/', pattern='*_test.py')
 
-runner = unittest.TextTestRunner()
-runner.run(suite)
+RUNNER = unittest.TextTestRunner()
+RUNNER.run(SUITE)

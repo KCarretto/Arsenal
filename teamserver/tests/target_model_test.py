@@ -6,17 +6,13 @@
 import sys
 import os
 import unittest
-import mongomock
 
-from testutils import create_test_app
+from testutils import create_test_app #pylint: disable=no-name-in-module
 
 # Configure path to include teamserver module
 sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
-import teamserver #pylint: disable=wrong-import-position
 from teamserver.models.target  import Target #pylint: disable=wrong-import-position
-
-
 
 class TargetModelTest(unittest.TestCase):
     """
