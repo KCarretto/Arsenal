@@ -21,7 +21,7 @@ def teamserver_status():
         }
     )
 
-@API.route('/')
+@API.route('/', methods=['POST'])
 @API.route('/api', methods=['POST'])
 @API.route('/api/v1', methods=['POST'])
 def api_entry():

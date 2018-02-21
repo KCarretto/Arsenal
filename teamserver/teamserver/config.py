@@ -16,6 +16,8 @@ MAX_BIGSTR_LEN = 10000
 # DATABASE COLLECTION SETTINGS
 COLLECTION_TARGETS = "targets"
 COLLECTION_ACTIONS = "actions"
+COLLECTION_SESSIONS = "sessions"
+COLLECTION_SESSION_HISTORIES = "session_histories"
 
 # SESSION SETTINGS
 SESSION_CHECK_THRESHOLD = 5
@@ -26,3 +28,11 @@ SESSION_STATUSES = {
     'inactive': 'inactive'
 }
 
+# ACTION SETTINGS
+ACTION_STATUSES = {
+    'queued': 'queued',
+    'sent': 'sent',
+    'failing': 'failing',
+    'failed': 'failed',
+    'complete': 'complete',
+}

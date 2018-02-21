@@ -2,16 +2,16 @@
     This module defines a python object model for the Target document
     in the backend MongoDB database.
 """
-import time
 
-from mongoengine import Document, DynamicEmbeddedDocument, EmbeddedDocument
-from mongoengine.fields import StringField, DictField, FloatField, ListField
+from mongoengine import Document, DynamicEmbeddedDocument
+from mongoengine.fields import StringField, DictField, ListField
 from mongoengine.fields import EmbeddedDocumentListField
+
+from .session import Session
 
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN
 from ..config import COLLECTION_TARGETS
-from ..config import SESSION_CHECK_THRESHOLD, SESSION_CHECK_MODIFIER, SESSION_STATUSES
-
+from ..config import SESSION_STATUSES
 
 class Credential(DynamicEmbeddedDocument):
     """
@@ -24,92 +24,6 @@ class Credential(DynamicEmbeddedDocument):
     password = StringField(max_length=MAX_STR_LEN)
     service = StringField(max_length=MAX_STR_LEN)
     key = StringField(max_length=MAX_BIGSTR_LEN)
-
-class SessionHistory(Document):
-    """
-    This class stores historical information about a session, and
-    will be searched for infrequently. It is updated when a session
-    checks in.
-    """
-    checkin_timestamps = ListField(FloatField(required=True, null=False), required=True, null=False)
-
-class Session(EmbeddedDocument):
-    """
-    This class represents a running instance of the agent on a
-    target system. It is responsible for running actions created
-    by the user.
-
-    This class also has an associated class SessionHistory,
-    which stores less frequently accessed data, that tends to grow
-    rapidly over time.
-    """
-    history_id = StringField(required=True, null=False, max_length=MAX_STR_LEN)
-    servers = ListField(
-        StringField(required=True, null=False, max_length=MAX_STR_LEN),
-        required=True,
-        null=False)
-    interval = FloatField(required=True, null=False)
-    interval_delta = FloatField(required=True, null=False)
-    config_dict = DictField(required=True, null=False)
-    timestamp = FloatField(required=True, null=False)
-
-    @property
-    def config(self):
-        """
-        This property returns the session configuration,
-        overriding all reserved keys with their proper values.
-
-        config_dict should never be used directly.
-        """
-        self.config_dict['interval'] = self.interval #pylint: disable=unsupported-assignment-operation
-        self.config_dict['interval_delta'] = self.interval_delta #pylint: disable=unsupported-assignment-operation
-        self.config_dict['servers'] = self.servers #pylint: disable=unsupported-assignment-operation
-
-        return self.config_dict
-
-    @property
-    def status(self):
-        """
-        This property returns the session status,
-        which is based on the current interval setting
-        and the last seen timestamp.
-        """
-        max_time = self.timestamp + self.interval + self.interval_delta + SESSION_CHECK_THRESHOLD
-
-        if time.time() > max_time*SESSION_CHECK_MODIFIER:
-            return SESSION_STATUSES.get('inactive', 'inactive')
-        elif time.time() > max_time:
-            return SESSION_STATUSES.get('missing', 'missing')
-
-        return SESSION_STATUSES.get('active', 'active')
-
-    @property
-    def history(self):
-        """
-        Performs a query to retrieve history information about this session.
-        """
-        pass
-
-    def update_config(self, **kwargs):
-        """
-        This function will update a sessions config according to
-        keywords. It will also validate types of reserved keywords.
-        """
-        for key, value in kwargs.items():
-            # Check for reserved keys first, then set other options
-            if key == 'interval' or key == 'interval_delta':
-                if isinstance(value, float) and isinstance(value, int):
-                    # TODO: Raise type exception
-                    pass
-                self.__setattr__(key, value)
-            elif key == 'servers':
-                if isinstance(value, list):
-                    # TODO: Raise type exception
-                    pass
-                self.servers = value
-            else:
-                self.config_dict[key] = kwargs[key] #pylint: disable=unsupported-assignment-operation
-
 
 class Target(Document):
     """
@@ -126,6 +40,9 @@ class Target(Document):
                 'fields': ['name'],
                 'unique': True
             },
+            {
+                'fields': ['group_names']
+            }
         ]
     }
 
@@ -137,7 +54,15 @@ class Target(Document):
         primary_key=True)
     facts = DictField(required=True, null=False)
     group_names = ListField(StringField(null=False, max_length=MAX_STR_LEN))
-    sessions = EmbeddedDocumentListField(Session)
+    credentials = EmbeddedDocumentListField(Credential)
+
+    @property
+    def sessions(self):
+        """
+        This property returns all session objects that are
+        associated with this target.
+        """
+        return Session.objects(target_name=self.name) #pylint: disable=no-member
 
     @property
     def status(self):
