@@ -8,7 +8,7 @@ from flask import Blueprint, request, jsonify
 
 endpoints = Blueprint('router', __name__)
 
-@endpoints.route("/status")
+@endpoints.route('/status')
 def teamserver_status():
     """
     This endpoint returns the current status of the teamserver.
@@ -21,9 +21,9 @@ def teamserver_status():
         }
     )
 
-@endpoints.route("/")
-@endpoints.route("/api", methods=["POST"])
-@endpoints.route("/api/v1", methods=["POST"])
+@endpoints.route('/')
+@endpoints.route('/api', methods=['POST'])
+@endpoints.route('/api/v1', methods=['POST'])
 def api_entry():
     """
     This function serves as the entry point for the v1 JSON API.
@@ -34,75 +34,75 @@ def api_entry():
 
     api_functions = {
         # Web Hooks
-        "RegisterWebhook": None,
-        "RemoveWebhook": None, 
-        "ListWebhooks": None,
-        
+        'RegisterWebhook': None,
+        'RemoveWebhook': None,
+        'ListWebhooks': None,
+
         # API Tokens
-        "CreateAPIToken": None,
-        "DeleteAPIToken": None,
+        'CreateAPIToken': None,
+        'DeleteAPIToken': None,
 
         # Targets
-        "CreateTarget": None,
-        "GetTarget": None,
-        "SetTargetFacts": None,
-        "ArchiveTarget": None,
-        "ListTargets": None
+        'CreateTarget': None,
+        'GetTarget': None,
+        'SetTargetFacts': None,
+        'ArchiveTarget': None,
+        'ListTargets': None,
 
         # Sessions
-        "CreateSession": None,
-        "GetSession": None,
-        "SessionCheckIn": None,
-        "ArchiveSession": None,
-        "ListSessions": None,
+        'CreateSession': None,
+        'GetSession': None,
+        'SessionCheckIn': None,
+        'ArchiveSession': None,
+        'ListSessions': None,
 
         # Actions
-        "CreateAction": None,
-        "CreateGroupAction": None,
-        "GetAction": None,
-        "CancelAction": None,
-        "CancelGroupAction": None,
-        "ListActions": None,
-        
+        'CreateAction': None,
+        'CreateGroupAction': None,
+        'GetAction': None,
+        'CancelAction': None,
+        'CancelGroupAction': None,
+        'ListActions': None,
+
         # Groups
-        "CreateGroup": None,
-        "GetGroup": None,
-        "AddGroupMembers": None,
-        "RemoveGroupMembers": None,
-        "ListGroups": None,
-        "DeleteGroup": None,
+        'CreateGroup': None,
+        'GetGroup': None,
+        'AddGroupMembers': None,
+        'RemoveGroupMembers': None,
+        'ListGroups': None,
+        'DeleteGroup': None,
 
         # Credentials
-        "CreateCredentials": None,
-        "GetValidCredentials": None,
-        "InvalidateCredentials": None,
-        "ListCredentials": None,
+        'CreateCredentials': None,
+        'GetValidCredentials': None,
+        'InvalidateCredentials': None,
+        'ListCredentials': None,
 
         # Logs
-        "CreateLog": None,
-        "ListLogs": None
+        'CreateLog': None,
+        'ListLogs': None
     }
 
     # Attempt to find method
     method = None
     try:
-        method = data["method"]
+        method = api_functions[data['method']]
     except KeyError:
         # Return method not found
         return jsonify({
-            "status": 404,
-            "description": "Method not found.",
-            "error": True
+            'status': 404,
+            'description': 'Method not found.',
+            'error': True
         })
-    
+
     # If method was found but is None, return not implemented
     if method is None:
         return jsonify({
-            "status": 501,
-            "description": "Method not implemented.",
-            "error": True
+            'status': 501,
+            'description': 'Method not implemented.',
+            'error': True
         })
-    
+
     # Peform auth check, ensure user has permissions
     # TODO: Enable Authentication
 
@@ -114,6 +114,13 @@ def api_entry():
 
     # Trigger method post-hooks
     # TODO: Trigger method post-hooks
-    
+
     # Return method output
     # TODO: Return method output
+
+    return jsonify({
+        'status': 501,
+        'description': 'API not implemented. Sorry :(',
+        'error': True
+    })
+

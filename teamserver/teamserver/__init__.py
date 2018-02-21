@@ -27,7 +27,7 @@ def create_app(**config_overrides):
     except MongoEngineConnectionError as e:
         # TODO: Add logging
         print(e)
-        sys.exit("Could not connect to database.")
+        sys.exit('Could not connect to database.')
 
     return app
 
