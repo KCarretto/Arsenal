@@ -36,7 +36,6 @@ class Action(DynamicDocument):
     the session it was sent to, as well as if the session has sent or
     responded to the action yet.
     """
-
     meta = {
         'collection': COLLECTION_ACTIONS,
         'indexes': [

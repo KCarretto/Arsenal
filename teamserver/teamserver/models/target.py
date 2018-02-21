@@ -32,7 +32,6 @@ class Target(Document):
     It's status is represented as the best status of all sessions
     associated with this target.
     """
-
     meta = {
         'collection': COLLECTION_TARGETS,
         'indexes': [
