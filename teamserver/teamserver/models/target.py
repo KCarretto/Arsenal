@@ -4,14 +4,34 @@
 """
 import time
 
-from mongoengine import DynamicDocument, EmbeddedDocument
+from mongoengine import Document, DynamicEmbeddedDocument, EmbeddedDocument
 from mongoengine.fields import StringField, DictField, FloatField, ListField
 from mongoengine.fields import EmbeddedDocumentListField
 
-from ..config import MAX_STR_LEN
+from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN
 from ..config import COLLECTION_TARGETS
 from ..config import SESSION_CHECK_THRESHOLD, SESSION_CHECK_MODIFIER, SESSION_STATUSES
 
+
+class Credential(DynamicEmbeddedDocument):
+    """
+    This class represents information that can be used to access a
+    target, usually in the form of credentials. The below formatting
+    is suggested, so that automated tasks can be executed, but it is
+    a dynamic document, so data can be added here at will.
+    """
+    user = StringField(max_length=MAX_STR_LEN)
+    password = StringField(max_length=MAX_STR_LEN)
+    service = StringField(max_length=MAX_STR_LEN)
+    key = StringField(max_length=MAX_BIGSTR_LEN)
+
+class SessionHistory(Document):
+    """
+    This class stores historical information about a session, and
+    will be searched for infrequently. It is updated when a session
+    checks in.
+    """
+    checkin_timestamps = ListField(FloatField(required=True, null=False), required=True, null=False)
 
 class Session(EmbeddedDocument):
     """
@@ -23,7 +43,11 @@ class Session(EmbeddedDocument):
     which stores less frequently accessed data, that tends to grow
     rapidly over time.
     """
-    servers = ListField(StringField(null=False, max_length=MAX_STR_LEN))
+    history_id = StringField(required=True, null=False, max_length=MAX_STR_LEN)
+    servers = ListField(
+        StringField(required=True, null=False, max_length=MAX_STR_LEN),
+        required=True,
+        null=False)
     interval = FloatField(required=True, null=False)
     interval_delta = FloatField(required=True, null=False)
     config_dict = DictField(required=True, null=False)
@@ -59,6 +83,13 @@ class Session(EmbeddedDocument):
 
         return SESSION_STATUSES.get('active', 'active')
 
+    @property
+    def history(self):
+        """
+        Performs a query to retrieve history information about this session.
+        """
+        pass
+
     def update_config(self, **kwargs):
         """
         This function will update a sessions config according to
@@ -80,7 +111,7 @@ class Session(EmbeddedDocument):
                 self.config_dict[key] = kwargs[key] #pylint: disable=unsupported-assignment-operation
 
 
-class Target(DynamicDocument):
+class Target(Document):
     """
     This class represents a target system. It stores facts about the
     system, any sessions, as well as additional settings like groups.
@@ -92,7 +123,7 @@ class Target(DynamicDocument):
         'collection': COLLECTION_TARGETS,
         'indexes': [
             {
-                'fields': ['target_id'],
+                'fields': ['name'],
                 'unique': True
             },
         ]
@@ -126,3 +157,10 @@ class Target(DynamicDocument):
 
         return best_status
 
+    @property
+    def lastseen(self):
+        """
+        This property returns the last seen time of the target,
+        which is calculated as the minimum of it's Session timestamps.
+        """
+        return min([session.timestamp for session in self.sessions]) #pylint: disable=not-an-iterable

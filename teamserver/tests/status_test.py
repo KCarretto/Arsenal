@@ -22,6 +22,9 @@ class StatusTest(unittest.TestCase):
     This class is used to test the flask application's /status route.
     """
     def setUp(self):
+        """
+        This performs test setup operations.
+        """
         self.test_app = create_test_app()
         self.test_app.testing = True
         self.client = self.test_app.test_client()

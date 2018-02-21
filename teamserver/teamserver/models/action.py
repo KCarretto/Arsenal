@@ -3,7 +3,7 @@
     in the backend MongoDB database.
 """
 
-from mongoengine import DynamicDocument, EmbeddedDocument
+from mongoengine import Document, EmbeddedDocument
 from mongoengine.fields import StringField, FloatField, BooleanField
 from ..config import MAX_BIGSTR_LEN
 from ..config import COLLECTION_ACTIONS
@@ -25,7 +25,7 @@ class Response(EmbeddedDocument):
     end_time = FloatField(required=True, null=False)
     error = BooleanField(default=True)
 
-class Action(DynamicDocument):
+class Action(Document):
     """
     This class represents an action, which is assigned to a target
     and then sent to a session. It's status is based on the status of
