@@ -1,7 +1,7 @@
 """
-This module serves as the entry point for all basic API calls.
-It passes appropriate parameter information to various other modules,
-that will do the heavy lifting.
+    This module serves as the entry point for all basic API calls.
+    It passes appropriate parameter information to various other modules,
+    that will do the heavy lifting.
 """
 
 from flask import Blueprint, request, jsonify
@@ -53,16 +53,21 @@ def api_entry():
         'CreateSession': None,
         'GetSession': None,
         'SessionCheckIn': None,
+        'UpdateSessionConfig': None,
         'ArchiveSession': None,
         'ListSessions': None,
 
         # Actions
         'CreateAction': None,
-        'CreateGroupAction': None,
         'GetAction': None,
         'CancelAction': None,
-        'CancelGroupAction': None,
         'ListActions': None,
+
+        # Group Actions
+        'CreateGroupAction': None,
+        'GetGroupAction': None,
+        'CancelGroupAction': None,
+        'ListGroupActions': None,
 
         # Groups
         'CreateGroup': None,
