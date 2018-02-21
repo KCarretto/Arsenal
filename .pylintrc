@@ -1,3 +1,7 @@
+[SIMILARITIES]
+min-similarity-lines=7
+ignore-imports=no
+
 [MESSAGES CONTROL]
 disable=fixme,
         trailing-newlines,
