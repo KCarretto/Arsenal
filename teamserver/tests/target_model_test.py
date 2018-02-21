@@ -6,6 +6,9 @@
 import sys
 import os
 import unittest
+import mongomock
+
+from testutils import create_test_app
 
 # Configure path to include teamserver module
 sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
@@ -13,17 +16,7 @@ sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(
 import teamserver #pylint: disable=wrong-import-position
 from teamserver.models.target  import Target #pylint: disable=wrong-import-position
 
-def create_test_app():
-    """
-    This function creates the flask application with test values.
-    """
-    return teamserver.create_app(
-        TESTING=True,
-        MONGODB_SETTINGS=
-        {
-            'db': 'arsenal_default',
-            'host': 'mongomock://localhost'
-        })
+
 
 class TargetModelTest(unittest.TestCase):
     """

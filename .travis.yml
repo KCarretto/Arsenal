@@ -4,13 +4,9 @@ python: "3.6"
 
 before_install:
   # Make sure everything's up to date.
-  - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
-  - echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
   - sudo apt-get update -qq
 
 install:
-  # Install mongodb
-  - sudo apt-get install -y mongodb-org
   # Install python dependancies
   - pip install -r teamserver/requirements/dev.txt
 before_script:
@@ -21,5 +17,5 @@ before_script:
 
 script:
   # Run all unit tests
-  - python -m unittest discover -s teamserver/tests -p '*_test.py'
+  - cd teamserver; python run_tests.py
 

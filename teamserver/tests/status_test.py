@@ -6,16 +6,12 @@ import sys
 import os
 import unittest
 
+from testutils import create_test_app
+
 # Configure path to include teamserver module
 sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
 
 import teamserver  #pylint: disable=wrong-import-position
-
-def create_test_app():
-    """
-    This function creates the flask application with test values.
-    """
-    return teamserver.create_app(TESTING=True)
 
 class StatusTest(unittest.TestCase):
     """
