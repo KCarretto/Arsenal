@@ -20,6 +20,7 @@ def teamserver_status():
             'error': False
         }
     )
+
 @endpoints.route("/")
 @endpoints.route("/api", methods=["POST"])
 @endpoints.route("/api/v1", methods=["POST"])
@@ -31,3 +32,88 @@ def api_entry():
     if data is None:
         data = request.form
 
+    api_functions = {
+        # Web Hooks
+        "RegisterWebhook": None,
+        "RemoveWebhook": None, 
+        "ListWebhooks": None,
+        
+        # API Tokens
+        "CreateAPIToken": None,
+        "DeleteAPIToken": None,
+
+        # Targets
+        "CreateTarget": None,
+        "GetTarget": None,
+        "SetTargetFacts": None,
+        "ArchiveTarget": None,
+        "ListTargets": None
+
+        # Sessions
+        "CreateSession": None,
+        "GetSession": None,
+        "SessionCheckIn": None,
+        "ArchiveSession": None,
+        "ListSessions": None,
+
+        # Actions
+        "CreateAction": None,
+        "CreateGroupAction": None,
+        "GetAction": None,
+        "CancelAction": None,
+        "CancelGroupAction": None,
+        "ListActions": None,
+        
+        # Groups
+        "CreateGroup": None,
+        "GetGroup": None,
+        "AddGroupMembers": None,
+        "RemoveGroupMembers": None,
+        "ListGroups": None,
+        "DeleteGroup": None,
+
+        # Credentials
+        "CreateCredentials": None,
+        "GetValidCredentials": None,
+        "InvalidateCredentials": None,
+        "ListCredentials": None,
+
+        # Logs
+        "CreateLog": None,
+        "ListLogs": None
+    }
+
+    # Attempt to find method
+    method = None
+    try:
+        method = data["method"]
+    except KeyError:
+        # Return method not found
+        return jsonify({
+            "status": 404,
+            "description": "Method not found.",
+            "error": True
+        })
+    
+    # If method was found but is None, return not implemented
+    if method is None:
+        return jsonify({
+            "status": 501,
+            "description": "Method not implemented.",
+            "error": True
+        })
+    
+    # Peform auth check, ensure user has permissions
+    # TODO: Enable Authentication
+
+    # Trigger method pre-hooks
+    # TODO: Trigger method pre-hooks
+
+    # Call method
+    # TODO: Call method
+
+    # Trigger method post-hooks
+    # TODO: Trigger method post-hooks
+    
+    # Return method output
+    # TODO: Return method output
