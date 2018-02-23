@@ -3,18 +3,12 @@
     It does not test any database connectivity, but it does
     utilize mongoengine's mock database implementation.
 """
-import sys
-import os
 import unittest
 
-from testutils import create_test_app #pylint: disable=no-name-in-module
+from mongoengine import NotUniqueError
+from testutils import ModelTest, create_test_target, get_target #pylint: disable=no-name-in-module
 
-# Configure path to include teamserver module
-sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
-
-from teamserver.models.target  import Target #pylint: disable=wrong-import-position
-
-class TargetModelTest(unittest.TestCase):
+class TargetModelTest(ModelTest):
     """
     This class is used to test the teamserver's target model class.
     """
@@ -38,47 +32,33 @@ class TargetModelTest(unittest.TestCase):
     }
     TEST_GROUPS = ["group_a", "group_b"]
 
-    def setUp(self):
-        """
-        This performs test setup operations.
-        """
-        self.test_app = create_test_app()
-        self.test_app.testing = True
-        self.client = self.test_app.test_client()
-
-    def test_pass(self):
-        """
-        This test should always pass.
-        """
-        pass
-
     def test_create_pass(self):
         """
         This test will attempt to create a target model object.
         """
-        target = Target(
-            name=self.TEST_NAME,
-            facts=self.TEST_FACTS,
-            group_names=self.TEST_GROUPS,
-        )
+        target = create_test_target(self.TEST_NAME, self.TEST_GROUPS, self.TEST_FACTS)
         self.assertEqual(target.name, self.TEST_NAME)
         self.assertEqual(target.facts, self.TEST_FACTS)
         self.assertEqual(target.group_names, self.TEST_GROUPS)
 
-    def test_create_pass_find(self):
+    def test_create_find_pass(self):
         """
         This test will attempt to create a target model object,
         save it to the database, and then find it.
         """
-        target1 = Target(
-            name=self.TEST_NAME,
-            facts=self.TEST_FACTS
-        )
-        target1.save()
-        target2 = Target.objects.get(name=self.TEST_NAME) #pylint: disable=no-member
+        target1 = create_test_target(self.TEST_NAME)
+        target2 = get_target(self.TEST_NAME)
         self.assertEqual(target1, target2)
 
+    def test_create_dup_name_fail(self):
+        """
+        This test will attempt to create two targets with identitical names,
+        and it will fail as Mongo should throw a not unique exception.
+        """
+        with self.assertRaises(NotUniqueError):
+            target1 = create_test_target(self.TEST_NAME)
+            target2 = create_test_target(self.TEST_NAME)
+            self.assertEqual(target1, target2)
 
 if __name__ == '__main__':
     unittest.main()
-

@@ -30,7 +30,6 @@ class SessionHistory(Document):
     checkin_timestamps = ListField(FloatField(required=True, null=False), required=True, null=False)
     action_ids = ListField(StringField(null=False, max_length=MAX_STR_LEN))
 
-
 class Session(Document):
     """
     This class represents a running instance of the agent on a
@@ -55,7 +54,6 @@ class Session(Document):
     }
     session_id = StringField(required=True, null=False, max_length=MAX_STR_LEN)
     target_name = StringField(required=True, null=False, max_length=MAX_STR_LEN)
-    history_id = StringField(required=True, null=False, max_length=MAX_STR_LEN)
     timestamp = FloatField(required=True, null=False)
 
     servers = ListField(
@@ -64,7 +62,7 @@ class Session(Document):
         null=False)
     interval = FloatField(required=True, null=False)
     interval_delta = FloatField(required=True, null=False)
-    config_dict = DictField(required=True, null=False)
+    config_dict = DictField(null=False)
 
     @property
     def config(self):
@@ -87,11 +85,11 @@ class Session(Document):
         which is based on the current interval setting
         and the last seen timestamp.
         """
-        max_time = self.timestamp + self.interval + self.interval_delta + SESSION_CHECK_THRESHOLD
+        max_time = self.interval + self.interval_delta + SESSION_CHECK_THRESHOLD
 
-        if time.time() > max_time*SESSION_CHECK_MODIFIER:
+        if time.time() > self.timestamp+(max_time*SESSION_CHECK_MODIFIER):
             return SESSION_STATUSES.get('inactive', 'inactive')
-        elif time.time() > max_time:
+        elif time.time() > self.timestamp+max_time:
             return SESSION_STATUSES.get('missing', 'missing')
 
         return SESSION_STATUSES.get('active', 'active')
@@ -101,7 +99,7 @@ class Session(Document):
         """
         Performs a query to retrieve history information about this session.
         """
-        pass
+        return SessionHistory.objects.get(session_id=self.session_id) #pylint: disable=no-member
 
     def update_config(self, **kwargs):
         """
@@ -121,4 +119,4 @@ class Session(Document):
                     pass
                 self.servers = value
             else:
-                self.config_dict[key] = kwargs[key] #pylint: disable=unsupported-assignment-operation
+                self.config_dict[key] = value #pylint: disable=unsupported-assignment-operation
