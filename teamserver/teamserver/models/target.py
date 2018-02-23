@@ -51,9 +51,16 @@ class Target(Document):
         max_length=MAX_STR_LEN,
         unique=True,
         primary_key=True)
+    group_names = ListField(StringField(required=True, null=False))
     facts = DictField(required=True, null=False)
-    group_names = ListField(StringField(null=False, max_length=MAX_STR_LEN))
     credentials = EmbeddedDocumentListField(Credential)
+
+    @staticmethod
+    def get_by_name(name):
+        """
+        This method queries for the target object matching the name provided.
+        """
+        return Target.objects.get(name=name) #pylint: disable=no-member
 
     @property
     def sessions(self):

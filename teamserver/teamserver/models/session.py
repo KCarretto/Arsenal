@@ -28,7 +28,14 @@ class SessionHistory(Document):
     }
     session_id = StringField(required=True, null=False, max_length=MAX_STR_LEN)
     checkin_timestamps = ListField(FloatField(required=True, null=False), required=True, null=False)
-    action_ids = ListField(StringField(null=False, max_length=MAX_STR_LEN))
+
+    def add_checkin(self, timestamp):
+        """
+        This function adds a checkin timestamp to a list
+        of session checkin timestamps.
+        """
+        self.checkin_timestamps.append(timestamp) #pylint: disable=no-member
+
 
 class Session(Document):
     """
@@ -63,6 +70,13 @@ class Session(Document):
     interval = FloatField(required=True, null=False)
     interval_delta = FloatField(required=True, null=False)
     config_dict = DictField(null=False)
+
+    @staticmethod
+    def get_by_id(session_id):
+        """
+        This method queries for the session object matching the name provided.
+        """
+        return Session.objects.get(session_id=session_id) #pylint: disable=no-member
 
     @property
     def config(self):

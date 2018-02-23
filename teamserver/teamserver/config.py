@@ -30,10 +30,13 @@ SESSION_STATUSES = {
 }
 
 # ACTION SETTINGS
+ACTION_STALE_THRESHOLD = 900
 ACTION_STATUSES = {
     'queued': 'queued',
     'sent': 'sent',
     'failing': 'failing',
     'failed': 'failed',
+    'error': 'error',
     'complete': 'complete',
+    'stale': 'stale'
 }

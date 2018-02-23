@@ -46,6 +46,7 @@ class Group(Document):
     @staticmethod
     def target_groups(target_name):
         """
+        WARNING: Expensive Method
         This method returns a list of groups that a target is in.
         """
         groups = []

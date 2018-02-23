@@ -41,7 +41,7 @@ class TargetModelTest(ModelTest):
         self.assertEqual(target.facts, self.TEST_FACTS)
         self.assertEqual(target.group_names, self.TEST_GROUPS)
 
-    def test_create_find_pass(self):
+    def test_find_pass(self):
         """
         This test will attempt to create a target model object,
         save it to the database, and then find it.
