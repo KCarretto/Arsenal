@@ -179,9 +179,9 @@ def missing_session(session):
 
 def create_test_target(
         name=None,
-        group_names=None,
         facts=None,
-        credentials=None):
+        credentials=None,
+        mac_addrs=None):
     """
     Creates a test target object and commits it to the database based
     on the given properties. If the properties are left empty, they will
@@ -204,7 +204,10 @@ def create_test_target(
                 }
             ]
         },
-        group_names=group_names,
+        mac_addrs=mac_addrs if mac_addrs is not None else [
+            'AA:BB:CC:DD:EE:FF',
+            str(uuid4())[0:17]
+            ],
         credentials=credentials
     )
     target.save(force_insert=True)

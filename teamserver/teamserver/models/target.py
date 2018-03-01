@@ -38,9 +38,6 @@ class Target(Document):
             {
                 'fields': ['name'],
                 'unique': True
-            },
-            {
-                'fields': ['group_names']
             }
         ]
     }
@@ -51,9 +48,18 @@ class Target(Document):
         max_length=MAX_STR_LEN,
         unique=True,
         primary_key=True)
-    group_names = ListField(StringField(required=True, null=False))
-    facts = DictField(required=True, null=False)
+
+    mac_addrs = ListField(
+        StringField(required=True, null=False, max_length=20),
+        required=True,
+        null=False,
+        unique=True)
+
+    facts = DictField(null=False)
+
     credentials = EmbeddedDocumentListField(Credential)
+
+    _session_cache = None
 
     @staticmethod
     def get_by_name(name):
@@ -62,12 +68,23 @@ class Target(Document):
         """
         return Target.objects.get(name=name) #pylint: disable=no-member
 
+    @staticmethod
+    def list():
+        """
+        This method queries for all target objects.
+        """
+        return Target.objects() #pylint: disable=no-member
+
     @property
     def sessions(self):
         """
         This property returns all session objects that are
         associated with this target.
         """
+        # TODO: Figure out if caching at this level is worthwhile
+
+        #if self._session_cache is None:
+        #    self._session_cache = [session for session in Session.objects(target_name=self.name)] #pylint: disable=no-member
         return Session.objects(target_name=self.name) #pylint: disable=no-member
 
     @property
@@ -91,7 +108,34 @@ class Target(Document):
     @property
     def lastseen(self):
         """
-        This property returns the last seen time of the target,
+        This function returns the last seen time of the target,
         which is calculated as the minimum of it's Session timestamps.
+
+        This function will return -1 if the target has never been seen.
         """
-        return min([session.timestamp for session in self.sessions]) #pylint: disable=not-an-iterable
+        sessions = self.sessions
+        if sessions:
+            return min([session.timestamp for session in sessions]) #pylint: disable=not-an-iterable
+        return -1
+
+    @property
+    def document(self):
+        """
+        This property returns a filtered JSON document representation of the target.
+        """
+        return {
+            'name': self.name,
+            'status': self.status,
+            'lastseen': self.lastseen,
+            'mac_addrs': self.mac_addrs,
+            'facts': self.facts,
+            'sessions': self.sessions,
+            'credentials': self.credentials,
+        }
+
+    def set_facts(self, facts):
+        """
+        This method sets the facts dictionary for a target.
+        """
+        for key, value in facts.items():
+            self.facts[key] = value #pylint: disable=unsupported-assignment-operation
