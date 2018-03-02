@@ -43,6 +43,9 @@ def create_session(params):
     )
     session_history.save()
     session.save()
+
+    # TODO: Queue default config action
+
     return success_response(session_id=session.session_id)
 
 def get_session(params):

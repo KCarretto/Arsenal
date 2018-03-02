@@ -34,6 +34,19 @@ class Response(EmbeddedDocument):
     end_time = FloatField(required=True, null=False)
     error = BooleanField(default=True)
 
+    @property
+    def document(self):
+        """
+        This property filters and returns the JSON information for a queried action.
+        """
+        return {
+            'stdout': self.stdout,
+            'stderr': self.stderr,
+            'start_time': self.start_time,
+            'end_time': self.end_time,
+            'error': self.error
+        }
+
 class Action(DynamicDocument):
     """
     This class represents an action, which is assigned to a target
@@ -68,6 +81,7 @@ class Action(DynamicDocument):
     complete_time = FloatField()
 
     response = EmbeddedDocumentField(Response)
+    cancelled = BooleanField(default=False)
 
     @staticmethod
     def get_by_id(action_id):
@@ -92,8 +106,16 @@ class Action(DynamicDocument):
         return Action.objects( #pylint: disable=no-member
             target_name=target_name,
             session_id=None,
+            cancelled=False,
             bound_session_id__in=[session_id, None]
         )
+
+    @staticmethod
+    def list():
+        """
+        This method queries for all action objects.
+        """
+        return Action.objects() #pylint: disable=no-member
 
     @staticmethod
     def parse_action_string(action_string):
@@ -302,10 +324,106 @@ class Action(DynamicDocument):
         This property filters and returns the JSON information that will be sent
         to an agent.
         """
-        return {
-            'action_id': self.action_id,
-            'action_type': self.action_type,
+        def config_document():
+            """
+            Returns an action document for the config action type.
+            """
+            # TODO: Throw exception if config is empty
+            return {
+                'action_id': self.action_id,
+                'action_type': self.action_type,
+                'config': self.config #pylint: disable=no-member
+            }
+
+        def exec_document():
+            """
+            Returns an action document for the exec action type.
+            """
+            resp = {
+                'action_id': self.action_id,
+                'action_type': self.action_type, #pylint: disable=no-member
+                'command': self.command, #pylint: disable=no-member
+                'args': self.args #pylint: disable=no-member
+            }
+
+            if self.start_time is not None: #pylint: disable=no-member
+                resp['start_time'] = self.start_time #pylint: disable=no-member
+
+            return resp
+
+        def upload_document():
+            """
+            Returns an action document for the upload action type.
+            """
+            return {
+                'action_id': self.action_id,
+                'action_type': self.action_type,
+                'teamserver_path': self.teamserver_path, #pylint: disable=no-member
+                'remote_path': self.remote_path, #pylint: disable=no-member
+            }
+
+        def download_document():
+            """
+            Returns an action document for the download action type.
+            """
+            return {
+                'action_id': self.action_id,
+                'action_type': self.action_type,
+                'remote_path': self.remote_path, #pylint: disable=no-member
+                'teamserver_path': self.teamserver_path, #pylint: disable=no-member
+            }
+
+        def gather_document():
+            """
+            Returns an action document for the gather action type.
+            """
+            return {
+                'action_id': self.action_id,
+                'action_type': self.action_type,
+                'subset': self.subset, #pylint: disable=no-member
+            }
+
+        def default_document():
+            """
+            Returns an action document for any other action type.
+            """
+            return {
+                'action_id': self.action_id,
+                'action_type': self.action_type,
+            }
+
+        action_documents = {
+            0: config_document,
+            1: exec_document,
+            2: exec_document,
+            3: exec_document,
+            4: exec_document,
+            5: upload_document,
+            6: download_document,
+            7: gather_document,
+            999: default_document,
         }
+
+        return action_documents.get(self.action_type, default_document)()
+
+    @property
+    def document(self):
+        """
+        This property filters and returns the JSON information for a queried action.
+        """
+        doc = self.agent_document
+        doc['target_name'] = self.target_name
+        doc['action_string'] = self.action_string
+        doc['status'] = self.status
+        doc['session_id'] = self.session_id
+        doc['bound_session_id'] = self.bound_session_id
+        doc['queue_time'] = self.queue_time
+        doc['sent_time'] = self.sent_time
+        doc['complete_time'] = self.complete_time
+        if self.response:
+            doc['response'] = self.response.document
+        return doc
+
     def assign_to(self, session):
         """
         This function assigns this action to a session. It will update
