@@ -85,6 +85,12 @@ def get_action(action_id):
     """
     return Action.get_by_id(action_id)
 
+def parse_action_string(action_string):
+    """
+    Parses an action string.
+    """
+    return Action.parse_action_string(action_string)
+
 def create_test_action(
         target_name=None,
         action_string=None,

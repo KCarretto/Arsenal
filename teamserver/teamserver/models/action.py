@@ -4,16 +4,18 @@
 """
 import time
 import shlex
+import argparse
 
 from mongoengine import DynamicDocument, EmbeddedDocument
 from mongoengine.fields import StringField, IntField, FloatField
 from mongoengine.fields import BooleanField, EmbeddedDocumentField
+from flask import json
 
 from .session import Session
 
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, ACTION_STATUSES, SESSION_STATUSES
 from ..config import COLLECTION_ACTIONS, ACTION_STALE_THRESHOLD
-from ..config import ACTION_TYPES, FACT_SUBSETS
+from ..config import ACTION_TYPES, DEFAULT_SUBSET
 
 
 class Response(EmbeddedDocument):
@@ -107,10 +109,30 @@ class Action(DynamicDocument):
         def parse_config(tokens):
             """
             This parses the config action category.
+            This action tells a session to update it's config with the provided json.
 
-            syntax: config key=value key2=value2
+            syntax: config [options]
+                -i, --interval: Set the session's interval
+                -d, --delta: Set the session's interval delta
+                -s, --servers: Set a list of the sessions servers
             """
-            config = dict(token.split('=') for token in tokens)
+            parser = argparse.ArgumentParser('config_action_parser')
+            parser.add_argument('-i', '--interval', type=float)
+            parser.add_argument('-d', '--delta', type=float)
+            parser.add_argument('-s', '--servers', nargs='+', type=list)
+            args = parser.parse_args(tokens)
+
+            interval = args.interval
+            interval_delta = args.delta
+            servers = [''.join(server) for server in args.servers]
+            config = {}
+
+            if interval:
+                config['interval'] = interval
+            if interval_delta:
+                config['interval_delta'] = interval_delta
+            if servers:
+                config['servers'] = servers
 
             return {
                 'action_type': ACTION_TYPES.get('config', 0),
@@ -121,49 +143,43 @@ class Action(DynamicDocument):
             """
             This parses the exec action category.
 
-            syntax: exec [--time=<time>, -t=<time> ] [--spawn, -s] '<command>'
+            syntax: exec [options] <command> [args]
+                -t, --time: Set a timestamp for the command to execute
+                -s, --spawn: Cause the action to fork and spawn a process.
+                             WARN: In many cases, you may not receive command output.
             """
-            spawn = '--spawn' in tokens or '-s' in tokens
-            timed = any(
-                [
-                    '--time=' in token for token in tokens
-                ]) or any(
-                    [
-                        '-t=' in token for token in tokens
-                    ]
-                )
+            parser = argparse.ArgumentParser('exec_action_parser')
+            parser.add_argument('-t', '--time', type=float)
+            parser.add_argument('-s', '--spawn', action='store_true', default=False)
+            parser.add_argument('command', nargs=argparse.REMAINDER, type=str)
+            #parser.add_argument('args', , type=list, default=[])
 
-            start_time = None
-            if timed:
-                for token in tokens:
-                    if token.startswith('--time=') or token.startswith('-t='):
-                        start_time = token.split('=')[1]
+            args = parser.parse_args(tokens)
+            command_tokens = args.command
 
             action_type = ACTION_TYPES.get('exec', 1)
-            if timed and spawn:
+
+            if args.time and args.spawn:
                 action_type = ACTION_TYPES.get('timed_spawn', 4)
-            elif spawn:
+            elif args.spawn:
                 action_type = ACTION_TYPES.get('spawn', 2)
-            elif timed:
+            elif args.time:
                 action_type = ACTION_TYPES.get('timed_exec', 3)
 
-            cmd = tokens[-1]
-            if any([cmd in token for token in ['--time=', '-t=', '-s', '--spawn']]):
-                pass
-                # TODO: Raise parsing error
+            command_args = []
+            if len(command_tokens) > 1:
+                command_args = command_tokens[1:]
 
-            cmd_tokens = shlex.split(cmd)
-            args = []
-            if len(cmd_tokens) > 1:
-                args = cmd_tokens[1:]
-
-            response = {
+            resp = {
                 'action_type': action_type,
-                'command': cmd_tokens[0],
-                'args': args,
+                'command': command_tokens[0],
+                'args': command_args
             }
-            if timed:
-                response['start_time'] = start_time
+
+            if args.time:
+                resp['start_time'] = args.time
+
+            return resp
 
         def parse_upload(tokens):
             """
@@ -171,46 +187,59 @@ class Action(DynamicDocument):
 
             syntax: upload <teamserver_path> <remote_path>
             """
+            parser = argparse.ArgumentParser('upload_action_parser')
+            parser.add_argument('teamserver_path', type=str)
+            parser.add_argument('remote_path', type=str)
+            args = parser.parse_args(tokens)
+
             return {
                 'action_type': ACTION_TYPES.get('upload', 5),
-                'teamserver_path': tokens[0],
-                'remote_path': tokens[1]
+                'teamserver_path': args.teamserver_path,
+                'remote_path': args.remote_path,
             }
+
 
         def parse_download(tokens):
             """
             This parses the download action category.
 
-            syntax: download <remote_path> <name>
+            syntax: download <remote_path> <teamserver_path>
             """
+            parser = argparse.ArgumentParser('download_action_parser')
+            parser.add_argument('remote_path', type=str)
+            parser.add_argument('teamserver_path', type=str)
+            args = parser.parse_args(tokens)
+
             return {
                 'action_type': ACTION_TYPES.get('download', 6),
-                'remote_path': tokens[0],
-                'name': tokens[1]
+                'remote_path': args.remote_path,
+                'teamserver_path': args.teamserver_path,
             }
 
         def parse_gather(tokens):
             """
             This parses the gather action category.
-            You may specify a subset, however the default is all.
-            syntax: gather [subset]
+            You may specify a subset, however the default is DEFAULT_SUBSET ('all' by default)/
+            syntax: gather
+                -s, --subset: Specify a subset of facts to gather.
             """
-            action_type = ACTION_TYPES.get('gather', 7)
-            subset = FACT_SUBSETS.get('all', 'all')
-            if tokens:
-                subset = FACT_SUBSETS.get(tokens[0], 'all')
+            parser = argparse.ArgumentParser('download_action_parser')
+            parser.add_argument('-s', '--subset', type=str)
+            args = parser.parse_args(tokens)
 
             return {
-                'action_type': action_type,
-                'subset': subset
+                'action_type': ACTION_TYPES.get('gather', 7),
+                'subset': args.subset if args.subset else DEFAULT_SUBSET,
             }
 
         def parse_reset(tokens): #pylint: disable=unused-argument
             """
             This parses the reset action category.
+
+            syntax: reset
             """
             return {
-                'action_type': ACTION_TYPES.get('reset')
+                'action_type': ACTION_TYPES.get('reset', 999)
             }
 
         cmds = {
