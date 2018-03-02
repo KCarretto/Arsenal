@@ -3,8 +3,6 @@
     It does not test any database connectivity, but it does
     utilize mongoengine's mock database implementation.
 """
-from flask import json
-
 import os
 import sys
 import time

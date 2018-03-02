@@ -9,7 +9,6 @@ import argparse
 from mongoengine import DynamicDocument, EmbeddedDocument
 from mongoengine.fields import StringField, IntField, FloatField
 from mongoengine.fields import BooleanField, EmbeddedDocumentField
-from flask import json
 
 from .session import Session
 

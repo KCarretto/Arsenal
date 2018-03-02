@@ -107,6 +107,9 @@ def update_session_config(params):
     It will overwrite any currently existing keys, but will not remove
     existing keys that are not specified in the 'config' parameter.
 
+    NOTE: This should only be called when a session's config HAS been updated.
+          to update a session's config, queue an action of type 'config'.
+
     session_id (required): The session_id of the session to update. <str>
     config_dict (optional): The config dictionary to use. <dict>
     servers (optional): The session's new servers. <[str, str]>
