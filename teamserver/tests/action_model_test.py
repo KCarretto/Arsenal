@@ -17,6 +17,7 @@ sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(
 
 from teamserver.config import ACTION_STATUSES, ACTION_STALE_THRESHOLD #pylint: disable=wrong-import-position
 from teamserver.config import ACTION_TYPES, DEFAULT_SUBSET #pylint: disable=wrong-import-position
+
 class ActionModelTest(ModelTest):
     """
     This class is used to test the teamserver's action model class.

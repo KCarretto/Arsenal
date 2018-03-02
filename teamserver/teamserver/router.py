@@ -127,4 +127,3 @@ def api_entry():
 
     # Return method output
     return jsonify(response)
-

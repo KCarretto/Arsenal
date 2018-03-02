@@ -47,6 +47,7 @@ ACTION_STATUSES = {
     'complete': 'complete',
     'stale': 'stale'
 }
+
 ACTION_TYPES = {
     'config': 0,
     'exec': 1,
@@ -58,4 +59,3 @@ ACTION_TYPES = {
     'gather': 7,
     'reset': 999
 }
-

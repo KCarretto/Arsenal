@@ -16,7 +16,6 @@ from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, ACTION_STATUSES, SESSION_STATU
 from ..config import COLLECTION_ACTIONS, ACTION_STALE_THRESHOLD
 from ..config import ACTION_TYPES, DEFAULT_SUBSET
 
-
 class Response(EmbeddedDocument):
     """
     This class represents a response from an action.

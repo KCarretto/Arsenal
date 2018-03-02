@@ -188,6 +188,7 @@ def create_test_target(
         facts=None,
         credentials=None,
         mac_addrs=None):
+
     """
     Creates a test target object and commits it to the database based
     on the given properties. If the properties are left empty, they will
