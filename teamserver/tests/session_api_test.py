@@ -79,7 +79,7 @@ class SessionAPITest(ModelTest):
         data = json.loads(resp.data)
         self.assertEqual(False, data['error'])
 
-        resp = self.client.post(
+        response = self.client.post(
             '/api',
             data=json.dumps(dict(
                 method='UpdateSessionConfig',
@@ -88,7 +88,7 @@ class SessionAPITest(ModelTest):
                 interval=10,
                 interval_delta=5,
                 config_dict={
-                    'new fact': 'Wow. I am new!',
+                    'new fact': 'So new, am I',
                     'A list fact': ['asdasd', 'sdasd'],
                     'some fact': 55
                 },
@@ -101,13 +101,14 @@ class SessionAPITest(ModelTest):
             'interval': 10,
             'interval_delta': 5,
             'servers': ['10.10.10.10'],
-            'new fact': 'Wow. I am new!',
+            'new fact': 'So new, am I',
             'some other fact': 'Pi',
             'A list fact': ['asdasd', 'sdasd'],
             'some fact': 55
         }
 
-        data = json.loads(resp.data)
+        data = json.loads(response.data)
+        self.assertEqual(False, data['error'])
         self.assertEqual(final_config, data['config'])
 
     def test_list(self):
