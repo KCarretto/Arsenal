@@ -78,6 +78,13 @@ class Session(Document):
         """
         return Session.objects.get(session_id=session_id) #pylint: disable=no-member
 
+    @staticmethod
+    def list():
+        """
+        This method queries for all session objects.
+        """
+        return Session.objects() #pylint: disable=no-member
+
     @property
     def config(self):
         """
@@ -115,22 +122,37 @@ class Session(Document):
         """
         return SessionHistory.objects.get(session_id=self.session_id) #pylint: disable=no-member
 
-    def update_config(self, **kwargs):
+    @property
+    def document(self):
         """
-        This function will update a sessions config according to
-        keywords. It will also validate types of reserved keywords.
+        This property returns a filtered JSON document representation of the session.
         """
-        for key, value in kwargs.items():
-            # Check for reserved keys first, then set other options
-            if key == 'interval' or key == 'interval_delta':
-                if isinstance(value, float) and isinstance(value, int):
-                    # TODO: Raise type exception
-                    pass
-                self.__setattr__(key, value)
-            elif key == 'servers':
-                if isinstance(value, list):
-                    # TODO: Raise type exception
-                    pass
-                self.servers = value
-            else:
+        return {
+            'session_id': self.session_id,
+            'target_name': self.target_name,
+            'status': self.status,
+            'timestamp': self.timestamp,
+            'config': self.config,
+        }
+
+    def update_config(self, interval=None, interval_delta=None, servers=None, config=None):
+        """
+        This function will update a sessions config according to the
+        provided dict. It will also validate types of reserved keywords.
+        """
+        if interval is not None:
+            self.interval = interval
+        if interval_delta is not None:
+            self.interval_delta = interval_delta
+        if servers is not None:
+            self.servers = servers
+        if config is not None:
+            for key, value in config.items():
                 self.config_dict[key] = value #pylint: disable=unsupported-assignment-operation
+
+    def update_timestamp(self, new_timestamp):
+        """
+        This function will update a session's timestamp, and it's history document.
+        """
+        self.timestamp = new_timestamp
+        self.history.add_checkin(new_timestamp)

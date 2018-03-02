@@ -5,6 +5,10 @@
 """
 
 from flask import Blueprint, request, jsonify
+from .api.target import create_target, get_target, set_target_facts, list_targets
+from .api.session import create_session, get_session, session_check_in
+from .api.session import update_session_config, list_sessions
+from .api.action import create_action, get_action, cancel_action, list_actions
 
 API = Blueprint('router', __name__)
 
@@ -32,6 +36,7 @@ def api_entry():
     if data is None:
         data = request.form
 
+    # Available methods
     api_functions = {
         # Web Hooks
         'RegisterWebhook': None,
@@ -43,25 +48,25 @@ def api_entry():
         'DeleteAPIToken': None,
 
         # Targets
-        'CreateTarget': None,
-        'GetTarget': None,
-        'SetTargetFacts': None,
+        'CreateTarget': create_target,
+        'GetTarget': get_target,
+        'SetTargetFacts': set_target_facts,
         'ArchiveTarget': None,
-        'ListTargets': None,
+        'ListTargets': list_targets,
 
         # Sessions
-        'CreateSession': None,
-        'GetSession': None,
-        'SessionCheckIn': None,
-        'UpdateSessionConfig': None,
+        'CreateSession': create_session,
+        'GetSession': get_session,
+        'SessionCheckIn': session_check_in,
+        'UpdateSessionConfig': update_session_config,
         'ArchiveSession': None,
-        'ListSessions': None,
+        'ListSessions': list_sessions,
 
         # Actions
-        'CreateAction': None,
-        'GetAction': None,
-        'CancelAction': None,
-        'ListActions': None,
+        'CreateAction': create_action,
+        'GetAction': get_action,
+        'CancelAction': cancel_action,
+        'ListActions': list_actions,
 
         # Group Actions
         'CreateGroupAction': None,
@@ -101,7 +106,7 @@ def api_entry():
         })
 
     # If method was found but is None, return not implemented
-    if method is None:
+    if method is None or not callable(method):
         return jsonify({
             'status': 501,
             'description': 'Method not implemented.',
@@ -115,17 +120,10 @@ def api_entry():
     # TODO: Trigger method pre-hooks
 
     # Call method
-    # TODO: Call method
+    response = method(data)
 
     # Trigger method post-hooks
     # TODO: Trigger method post-hooks
 
     # Return method output
-    # TODO: Return method output
-
-    return jsonify({
-        'status': 501,
-        'description': 'API not implemented. Sorry :(',
-        'error': True
-    })
-
+    return jsonify(response)

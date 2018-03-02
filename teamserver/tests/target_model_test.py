@@ -5,7 +5,7 @@
 """
 import unittest
 
-from mongoengine import NotUniqueError
+from mongoengine import NotUniqueError, DoesNotExist
 from testutils import ModelTest, create_test_target, get_target #pylint: disable=no-name-in-module
 
 class TargetModelTest(ModelTest):
@@ -30,16 +30,14 @@ class TargetModelTest(ModelTest):
             }
         }
     }
-    TEST_GROUPS = ["group_a", "group_b"]
 
     def test_create_pass(self):
         """
         This test will attempt to create a target model object.
         """
-        target = create_test_target(self.TEST_NAME, self.TEST_GROUPS, self.TEST_FACTS)
+        target = create_test_target(self.TEST_NAME, self.TEST_FACTS)
         self.assertEqual(target.name, self.TEST_NAME)
         self.assertEqual(target.facts, self.TEST_FACTS)
-        self.assertEqual(target.group_names, self.TEST_GROUPS)
 
     def test_find_pass(self):
         """
@@ -58,7 +56,57 @@ class TargetModelTest(ModelTest):
         with self.assertRaises(NotUniqueError):
             target1 = create_test_target(self.TEST_NAME)
             target2 = create_test_target(self.TEST_NAME)
-            self.assertEqual(target1, target2)
+            self.assertEqual(target1.name, target2.name)
+
+    def test_create_dup_macs_fail(self):
+        """
+        This test will attempt to create targets with the same mac_addrs,
+        and it will fail as mongo should throw a not unique exception.
+        """
+
+        # Single element, same order
+        with self.assertRaises(NotUniqueError):
+            target1 = create_test_target(None, None, None, ['AA:BB:CC:DD:EE:FF'])
+            target2 = create_test_target(None, None, None, ['AA:BB:CC:DD:EE:FF'])
+            self.assertEqual(target1.mac_addrs, target2.mac_addrs)
+
+        # Multi element, same order
+        with self.assertRaises(NotUniqueError):
+            target1 = create_test_target(None, None, None, [
+                'AA:BB:CC:DD:EE:FF',
+                'AA:BB:CC:DD:EE:AA'])
+            target2 = create_test_target(None, None, None, [
+                'AA:BB:CC:DD:EE:FF',
+                'AA:BB:CC:DD:EE:AA'])
+            self.assertEqual(target1.mac_addrs, target2.mac_addrs)
+
+        # Multi element, different order
+        with self.assertRaises(NotUniqueError):
+            target1 = create_test_target(None, None, None, [
+                'AA:BB:CC:DD:EE:FF',
+                'AA:BB:CC:DD:EE:AA'])
+            target2 = create_test_target(None, None, None, [
+                'AA:BB:CC:DD:EE:AA',
+                'AA:BB:CC:DD:EE:FF'])
+            self.assertEqual(target1.mac_addrs, target2.mac_addrs)
+
+        # Multi element, different order, different encoding
+        with self.assertRaises(NotUniqueError):
+            target1 = create_test_target(None, None, None, [
+                'AA:BB:CC:DD:EE:FF'.encode('utf-8'),
+                'AA:BB:CC:DD:EE:AA'])
+            target2 = create_test_target(None, None, None, [
+                'AA:BB:CC:DD:EE:AA',
+                'AA:BB:CC:DD:EE:FF'.encode('ascii')])
+            self.assertEqual(target1.mac_addrs, target2.mac_addrs)
+
+    def test_find_no_name_fail(self):
+        """
+        This target tests to ensure mongoengine throws an error if the target
+        is not found by name.
+        """
+        with self.assertRaises(DoesNotExist):
+            get_target('HI. I DONT EXIST.')
 
 if __name__ == '__main__':
     unittest.main()

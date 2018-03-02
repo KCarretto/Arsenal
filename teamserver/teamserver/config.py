@@ -20,6 +20,13 @@ COLLECTION_SESSIONS = "sessions"
 COLLECTION_SESSION_HISTORIES = "session_histories"
 COLLECTION_TARGETS = "targets"
 
+# AGENT SETTINGS
+DEFAULT_AGENT_SERVERS = ['http://redteam.com']
+DEFAULT_AGENT_INTERVAL = 60
+DEFAULT_AGENT_INTERVAL_DELTA = 15
+DEFAULT_AGENT_CONFIG_DICT = {}
+DEFAULT_SUBSET = 'all'
+
 # SESSION SETTINGS
 SESSION_CHECK_THRESHOLD = 5
 SESSION_CHECK_MODIFIER = 1.5
@@ -39,4 +46,16 @@ ACTION_STATUSES = {
     'error': 'error',
     'complete': 'complete',
     'stale': 'stale'
+}
+
+ACTION_TYPES = {
+    'config': 0,
+    'exec': 1,
+    'spawn': 2,
+    'timed_exec': 3,
+    'timed_spawn': 4,
+    'upload': 5,
+    'download': 6,
+    'gather': 7,
+    'reset': 999
 }
