@@ -223,6 +223,33 @@ class ActionModelTest(ModelTest):
                     'args': ['--time', 'time']
                 }
             ),
+            # subshell
+            (
+                parse_action_string('exec find $(which bash)'),
+                {
+                    'action_type': ACTION_TYPES.get('exec', 1),
+                    'command': 'find',
+                    'args': ['$(which', 'bash)']
+                }
+            ),
+            # backtick subshell
+            (
+                parse_action_string('exec rm -rf `which bash`'),
+                {
+                    'action_type': ACTION_TYPES.get('exec', 1),
+                    'command': 'rm',
+                    'args': ['-rf', '`which', 'bash`']
+                }
+            ),
+            # special chars (must be quoted)
+            (
+                parse_action_string('exec echo -e "Hello \n World"'),
+                {
+                    'action_type': ACTION_TYPES.get('exec', 1),
+                    'command': 'echo',
+                    'args': ['-e', 'Hello \n World']
+                }
+            ),
         ]
         for test in action_tests:
             self.assertDictEqual(test[0], test[1])
