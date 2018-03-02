@@ -294,6 +294,10 @@ class Action(DynamicDocument):
         on the status of it's assigned session, as well as if it has
         been retrieved or contains a response.
         """
+        # Return cancelled if the action was cancelled
+        if self.cancelled:
+            return ACTION_STATUSES.get('cancelled', 'cancelled')
+
         # Return queued if no session has been assigned
         if self.session_id is None:
             if time.time() > self.queue_time + ACTION_STALE_THRESHOLD:

@@ -47,7 +47,7 @@ def create_action(params):
             action.__setattr__(key, value)
     action.save(force_insert=True)
 
-    return success_response()
+    return success_response(action_id=action.action_id)
 
 def get_action(params):
     """

@@ -55,6 +55,10 @@ class ActionModelTest(ModelTest):
         self.assertIsNone(action1.session_id)
         self.assertEqual(action1.status, ACTION_STATUSES.get('queued'))
 
+        action1.cancelled = True
+        self.assertEqual(action1.status, ACTION_STATUSES.get('cancelled'))
+        action1.cancelled = False
+
         action1.queue_time = time.time() - (ACTION_STALE_THRESHOLD+1)
         action1.save()
         self.assertEqual(action1.status, ACTION_STATUSES.get('stale'))
