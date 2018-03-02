@@ -43,7 +43,7 @@ def set_target_facts(params):
     It will overwrite any currently existing keys, but will not remove
     existing keys that are not specified in the 'facts' parameter.
 
-    name (required): The name of the target to update.
+    name (required): The name of the target to update. <str>
     facts (required): The dictionary of facts to use. <dict>
     """
     target = Target.get_by_name(params['name'])

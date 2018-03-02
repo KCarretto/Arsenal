@@ -6,6 +6,8 @@
 
 from flask import Blueprint, request, jsonify
 from .api.target import create_target, get_target, set_target_facts, list_targets
+from .api.session import create_session, get_session, session_check_in
+from .api.session import update_session_config, list_sessions
 
 API = Blueprint('router', __name__)
 
@@ -52,12 +54,12 @@ def api_entry():
         'ListTargets': list_targets,
 
         # Sessions
-        'CreateSession': None,
-        'GetSession': None,
-        'SessionCheckIn': None,
-        'UpdateSessionConfig': None,
+        'CreateSession': create_session,
+        'GetSession': get_session,
+        'SessionCheckIn': session_check_in,
+        'UpdateSessionConfig': update_session_config,
         'ArchiveSession': None,
-        'ListSessions': None,
+        'ListSessions': list_sessions,
 
         # Actions
         'CreateAction': None,

@@ -73,6 +73,20 @@ class Action(DynamicDocument):
         """
         return Action.objects.get(action_id=action_id) #pylint: disable=no-member
 
+    @staticmethod
+    def get_target_actions(target_name):
+        """
+        This method returns a list of actions for the given target name.
+        """
+        return Action.objects(target_name=target_name) #pylint: disable=no-member
+
+    @staticmethod
+    def get_target_unassigned_actions(target_name):
+        """
+        This method returns a list of unassigned actions for the given target name.
+        """
+        return Action.objects(target_name=target_name, session_id=None) #pylint: disable=no-member
+
     @property
     def session(self):
         """
@@ -110,6 +124,16 @@ class Action(DynamicDocument):
 
         return ACTION_STATUSES.get('failed', 'failed')
 
+    @property
+    def agent_document(self):
+        """
+        This property filters and returns the JSON information that will be sent
+        to an agent.
+        """
+        return {
+            'action_id': self.action_id,
+            'action_type': self.action_type,
+        }
     def assign_to(self, session):
         """
         This function assigns this action to a session. It will update

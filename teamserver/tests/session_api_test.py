@@ -6,71 +6,72 @@
 import unittest
 
 from flask import json
-from mongoengine import DoesNotExist
-from testutils import ModelTest, create_test_target, get_target #pylint: disable=no-name-in-module
+from testutils import ModelTest, create_test_session, create_test_target, get_session #pylint: disable=no-name-in-module
 
-class TargetAPITest(ModelTest):
+class SessionAPITest(ModelTest):
     """
-    This class is used to test the Target API funcitons.
+    This class is used to test the Session API funcitons.
     """
     def test_create(self):
         """
-        This test will pass if the target is created.
+        This test will pass if the session is created.
         """
-        with self.assertRaises(DoesNotExist):
-            get_target('TEST Target')
-
+        target = create_test_target()
         resp = self.client.post(
             '/api',
             data=json.dumps(dict(
-                method='CreateTarget',
-                name='TEST Target',
-                mac_addrs=['AA:BB:CC:DD:EE:FF']
+                method='CreateSession',
+                mac_addrs=target.mac_addrs,
+                servers=['10.10.10.10', 'https://google.com'],
+                interval=120,
+                interval_delta=20,
+                config_dict={'TEST_SESSION': 'hello world'},
             )),
             content_type='application/json',
             follow_redirects=True
-            )
+        )
 
         data = json.loads(resp.data)
+        session_id = data['session_id']
+
         self.assertEqual(False, data['error'])
-        self.assertIsNotNone(get_target('TEST Target'))
+        self.assertIsNotNone(get_session(session_id))
 
     def test_get(self):
         """
-        This test will pass if it finds the correct target.
+        This test will pass if it finds the correct session.
         """
-        create_test_target('GET TEST')
-        self.assertIsNotNone(get_target('GET TEST'))
+        session = create_test_session()
         resp = self.client.post(
             '/api',
             data=json.dumps(dict(
-                method='GetTarget',
-                name='GET TEST',
+                method='GetSession',
+                session_id=session.session_id,
             )),
             content_type='application/json',
             follow_redirects=True
-            )
+        )
         data = json.loads(resp.data)
-        self.assertEqual(False, data['error'])
-        self.assertEqual('GET TEST', data['target']['name'])
+        session_id = data['session']['session_id']
+        self.assertEqual(session_id, session.session_id)
 
-    def test_target_set_facts(self):
+    def test_update_config(self):
         """
-        This test will pass if the facts are correctly set.
+        This test will pass if the config is correctly set.
         """
-        initial_facts = {
+        initial_config = {
             'some fact': 54,
             'some other fact': 'Pi',
             'A list fact': ['sdasd', 'asdasd']
         }
 
+        target = create_test_target()
         resp = self.client.post(
             '/api',
             data=json.dumps(dict(
-                method='CreateTarget',
-                name='TEST Target',
-                mac_addrs=['AA:BB:CC:DD:EE:FF'],
-                facts=initial_facts,
+                method='CreateSession',
+                mac_addrs=target.mac_addrs,
+                config_dict=initial_config
             )),
             content_type='application/json',
             follow_redirects=True
@@ -81,10 +82,12 @@ class TargetAPITest(ModelTest):
         resp = self.client.post(
             '/api',
             data=json.dumps(dict(
-                method='SetTargetFacts',
-                name='TEST Target',
-                mac_addrs=['AA:BB:CC:DD:EE:FF'],
-                facts={
+                method='UpdateSessionConfig',
+                session_id=data['session_id'],
+                servers=['10.10.10.10'],
+                interval=10,
+                interval_delta=5,
+                config_dict={
                     'new fact': 'Wow. I am new!',
                     'A list fact': ['asdasd', 'sdasd'],
                     'some fact': 55
@@ -94,7 +97,10 @@ class TargetAPITest(ModelTest):
             follow_redirects=True
             )
 
-        final_facts = {
+        final_config = {
+            'interval': 10,
+            'interval_delta': 5,
+            'servers': ['10.10.10.10'],
             'new fact': 'Wow. I am new!',
             'some other fact': 'Pi',
             'A list fact': ['asdasd', 'sdasd'],
@@ -102,28 +108,33 @@ class TargetAPITest(ModelTest):
         }
 
         data = json.loads(resp.data)
-        self.assertEqual(final_facts, data['target']['facts'])
+        self.assertEqual(final_config, data['config'])
 
-    def test_target_list(self):
+    def test_list(self):
         """
         Populates the database with sample targets, and calls the list API
         function to ensure that all are returned.
         """
-        create_test_target('a')
-        create_test_target('b')
-        create_test_target('c')
-        create_test_target('d')
-
+        sessions = [
+            create_test_session('a'),
+            create_test_session('b'),
+            create_test_session('c'),
+            create_test_session('d'),
+            create_test_session('e'),
+        ]
         resp = self.client.post(
             '/api',
             data=json.dumps(dict(
-                method='ListTargets',
+                method='ListSessions',
             )),
             content_type='application/json',
             follow_redirects=True
             )
         data = json.loads(resp.data)
-        self.assertEqual(list(data['targets'].keys()), ['a', 'b', 'c', 'd'])
+        self.assertEqual(
+            sorted(list(data['sessions'].keys())),
+            sorted([session.session_id for session in sessions])
+            )
 
 if __name__ == '__main__':
     unittest.main()

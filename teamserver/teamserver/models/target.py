@@ -38,6 +38,10 @@ class Target(Document):
             {
                 'fields': ['name'],
                 'unique': True
+            },
+            {
+                'fields': ['mac_addrs'],
+                'unique': True
             }
         ]
     }
@@ -67,6 +71,13 @@ class Target(Document):
         This method queries for the target object matching the name provided.
         """
         return Target.objects.get(name=name) #pylint: disable=no-member
+
+    @staticmethod
+    def get_by_macs(mac_addrs):
+        """
+        This method queries for the target object matching the mac_addrs provided.
+        """
+        return Target.objects.get(mac_addrs=mac_addrs) #pylint: disable=no-member
 
     @staticmethod
     def list():
