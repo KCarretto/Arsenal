@@ -3,6 +3,7 @@
     in the backend MongoDB database.
 """
 import time
+import shlex
 
 from mongoengine import DynamicDocument, EmbeddedDocument
 from mongoengine.fields import StringField, IntField, FloatField
@@ -12,6 +13,7 @@ from .session import Session
 
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, ACTION_STATUSES, SESSION_STATUSES
 from ..config import COLLECTION_ACTIONS, ACTION_STALE_THRESHOLD
+from ..config import ACTION_TYPES, FACT_SUBSETS
 
 
 class Response(EmbeddedDocument):
@@ -81,11 +83,153 @@ class Action(DynamicDocument):
         return Action.objects(target_name=target_name) #pylint: disable=no-member
 
     @staticmethod
-    def get_target_unassigned_actions(target_name):
+    def get_target_unassigned_actions(target_name, session_id=None):
         """
         This method returns a list of unassigned actions for the given target name.
+        Provide a session_id to include actions that are bound to that session_id.
         """
-        return Action.objects(target_name=target_name, session_id=None) #pylint: disable=no-member
+        return Action.objects( #pylint: disable=no-member
+            target_name=target_name,
+            session_id=None,
+            bound_session_id__in=[session_id, None]
+        )
+
+    @staticmethod
+    def parse_action_string(action_string):
+        """
+        This function will parse an action string, and return a dictionary of
+        key value pairs to set on an associated Action document. Additionally it
+        will return the action type of the action in the 'action_type' field of the
+        dictionary.
+        """
+        cmd = shlex.split(action_string)
+
+        def parse_config(tokens):
+            """
+            This parses the config action category.
+
+            syntax: config key=value key2=value2
+            """
+            config = dict(token.split('=') for token in tokens)
+
+            return {
+                'action_type': ACTION_TYPES.get('config', 0),
+                'config': config
+            }
+
+        def parse_exec(tokens):
+            """
+            This parses the exec action category.
+
+            syntax: exec [--time=<time>, -t=<time> ] [--spawn, -s] '<command>'
+            """
+            spawn = '--spawn' in tokens or '-s' in tokens
+            timed = any(
+                [
+                    '--time=' in token for token in tokens
+                ]) or any(
+                    [
+                        '-t=' in token for token in tokens
+                    ]
+                )
+
+            start_time = None
+            if timed:
+                for token in tokens:
+                    if token.startswith('--time=') or token.startswith('-t='):
+                        start_time = token.split('=')[1]
+
+            action_type = ACTION_TYPES.get('exec', 1)
+            if timed and spawn:
+                action_type = ACTION_TYPES.get('timed_spawn', 4)
+            elif spawn:
+                action_type = ACTION_TYPES.get('spawn', 2)
+            elif timed:
+                action_type = ACTION_TYPES.get('timed_exec', 3)
+
+            cmd = tokens[-1]
+            if any([cmd in token for token in ['--time=', '-t=', '-s', '--spawn']]):
+                pass
+                # TODO: Raise parsing error
+
+            cmd_tokens = shlex.split(cmd)
+            args = []
+            if len(cmd_tokens) > 1:
+                args = cmd_tokens[1:]
+
+            response = {
+                'action_type': action_type,
+                'command': cmd_tokens[0],
+                'args': args,
+            }
+            if timed:
+                response['start_time'] = start_time
+
+        def parse_upload(tokens):
+            """
+            This parses the upload action category.
+
+            syntax: upload <teamserver_path> <remote_path>
+            """
+            return {
+                'action_type': ACTION_TYPES.get('upload', 5),
+                'teamserver_path': tokens[0],
+                'remote_path': tokens[1]
+            }
+
+        def parse_download(tokens):
+            """
+            This parses the download action category.
+
+            syntax: download <remote_path> <name>
+            """
+            return {
+                'action_type': ACTION_TYPES.get('download', 6),
+                'remote_path': tokens[0],
+                'name': tokens[1]
+            }
+
+        def parse_gather(tokens):
+            """
+            This parses the gather action category.
+            You may specify a subset, however the default is all.
+            syntax: gather [subset]
+            """
+            action_type = ACTION_TYPES.get('gather', 7)
+            subset = FACT_SUBSETS.get('all', 'all')
+            if tokens:
+                subset = FACT_SUBSETS.get(tokens[0], 'all')
+
+            return {
+                'action_type': action_type,
+                'subset': subset
+            }
+
+        def parse_reset(tokens): #pylint: disable=unused-argument
+            """
+            This parses the reset action category.
+            """
+            return {
+                'action_type': ACTION_TYPES.get('reset')
+            }
+
+        cmds = {
+            'config': parse_config,
+            'exec': parse_exec,
+            'upload': parse_upload,
+            'download': parse_download,
+            'gather': parse_gather,
+            'reset': parse_reset
+        }
+        method = cmds.get(cmd[0].lower())
+        if method is None or not callable(method):
+            # TODO: Raise parsing exception
+            pass
+
+        # TODO: Raise parsing exception
+        parsed = method(cmd[1:])
+
+        return parsed
 
     @property
     def session(self):

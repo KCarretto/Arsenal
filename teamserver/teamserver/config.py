@@ -46,3 +46,17 @@ ACTION_STATUSES = {
     'complete': 'complete',
     'stale': 'stale'
 }
+ACTION_TYPES = {
+    'config': 0,
+    'exec': 1,
+    'spawn': 2,
+    'timed_exec': 3,
+    'timed_spawn': 4,
+    'upload': 5,
+    'download': 6,
+    'gather': 7,
+    'reset': 999
+}
+FACT_SUBSETS = {
+    'all': 'all'
+}

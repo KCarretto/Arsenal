@@ -96,6 +96,7 @@ def session_check_in(params):
     for action in actions_raw:
         action.assign_to(session)
         actions.append(action.agent_document)
+    # TODO: Look for 'upload' actions and read file from disk
 
     # Respond
     return success_response(session_id=session.session_id, actions=actions)
@@ -131,4 +132,3 @@ def list_sessions(params): #pylint: disable=unused-argument
     """
     sessions = Session.list()
     return success_response(sessions={session.session_id: session.document for session in sessions})
-
