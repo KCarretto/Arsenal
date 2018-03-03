@@ -92,5 +92,33 @@ class ActionAPITest(ModelTest):
         self.assertEqual(action.status, ACTION_STATUSES.get('cancelled'))
         self.assertEqual(action.cancelled, True)
 
+    def test_list(self):
+        """
+        This test will create a few action objects through the API, and then test listing them.
+        """
+        test_actions = [
+            self.create_action('exec ls -al'),
+            self.create_action('config -i 20'),
+            self.create_action('exec --time 12345.12345 rm -rf tmp/'),
+            self.create_action('exec --spawn /bin/beloved'),
+            self.create_action('upload /some/file /another/file'),
+            self.create_action('download /lol/what /ha/nope'),
+            self.create_action('gather -s min')
+        ]
+        resp = self.client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='ListActions',
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        data = json.loads(resp.data)
+        self.assertEqual(data['error'], False)
+
+        for action in test_actions:
+            self.assertIn(action['action_id'], data['actions'].keys())
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -68,7 +68,6 @@ def cancel_action(params):
     action = Action.get_by_id(params['action_id'])
     if not action.cancel():
         # TODO: Raise exception to return error response
-        print(action.cancelled)
         pass
 
     return success_response()
