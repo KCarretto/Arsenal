@@ -7,7 +7,6 @@ import time
 
 from .utils import success_response
 from ..models.action import Action
-from ..config import ACTION_STATUSES
 
 def create_action(params):
     """
@@ -47,7 +46,7 @@ def create_action(params):
             action.__setattr__(key, value)
     action.save(force_insert=True)
 
-    return success_response()
+    return success_response(action_id=action.action_id)
 
 def get_action(params):
     """
@@ -67,11 +66,9 @@ def cancel_action(params):
     action_id: The action_id of the action to cancel. <str>
     """
     action = Action.get_by_id(params['action_id'])
-    if action.status == ACTION_STATUSES.get('queued', 'queued'):
-        action.cancelled = True
-        action.save()
-
-    # TODO: Raise exception when status is not queued
+    if not action.cancel():
+        # TODO: Raise exception to return error response
+        pass
 
     return success_response()
 

@@ -1,7 +1,5 @@
 """
-    This module tests basic functionality of the target model.
-    It does not test any database connectivity, but it does
-    utilize mongoengine's mock database implementation.
+    This module tests basic functionality of the session API.
 """
 import unittest
 

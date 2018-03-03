@@ -76,6 +76,7 @@ class Action(DynamicDocument):
     bound_session_id = StringField(max_length=MAX_STR_LEN)
 
     queue_time = FloatField(required=True, null=False)
+    cancel_time = FloatField()
     sent_time = FloatField()
     complete_time = FloatField()
 
@@ -141,18 +142,14 @@ class Action(DynamicDocument):
             parser.add_argument('-d', '--delta', type=float)
             parser.add_argument('-s', '--servers', nargs='+', type=list)
             args = parser.parse_args(tokens)
-
-            interval = args.interval
-            interval_delta = args.delta
-            servers = [''.join(server) for server in args.servers]
             config = {}
 
-            if interval:
-                config['interval'] = interval
-            if interval_delta:
-                config['interval_delta'] = interval_delta
-            if servers:
-                config['servers'] = servers
+            if args.servers:
+                config['servers'] = [''.join(server) for server in args.servers]
+            if args.interval:
+                config['interval'] = args.interval
+            if args.delta:
+                config['interval_delta'] = args.delta
 
             return {
                 'action_type': ACTION_TYPES.get('config', 0),
@@ -172,7 +169,6 @@ class Action(DynamicDocument):
             parser.add_argument('-t', '--time', type=float)
             parser.add_argument('-s', '--spawn', action='store_true', default=False)
             parser.add_argument('command', nargs=argparse.REMAINDER, type=str)
-            #parser.add_argument('args', , type=list, default=[])
 
             args = parser.parse_args(tokens)
             command_tokens = args.command
@@ -294,6 +290,10 @@ class Action(DynamicDocument):
         on the status of it's assigned session, as well as if it has
         been retrieved or contains a response.
         """
+        # Return cancelled if the action was cancelled
+        if self.cancelled:
+            return ACTION_STATUSES.get('cancelled', 'cancelled')
+
         # Return queued if no session has been assigned
         if self.session_id is None:
             if time.time() > self.queue_time + ACTION_STALE_THRESHOLD:
@@ -345,7 +345,7 @@ class Action(DynamicDocument):
                 'args': self.args #pylint: disable=no-member
             }
 
-            if self.start_time is not None: #pylint: disable=no-member
+            if hasattr(self, 'start_time'): #pylint: disable=no-member
                 resp['start_time'] = self.start_time #pylint: disable=no-member
 
             return resp
@@ -462,3 +462,15 @@ class Action(DynamicDocument):
         self.response = response
         self.complete_time = time.time()
         self.save()
+
+    def cancel(self):
+        """
+        This function will cancel an action if possible (only if status is queued).
+        It will return True or False with the success of this operation.
+        """
+        if self.status == ACTION_STATUSES.get('queued', 'queued'):
+            self.cancelled = True
+            self.cancel_time = time.time()
+            self.save()
+            return True
+        return False

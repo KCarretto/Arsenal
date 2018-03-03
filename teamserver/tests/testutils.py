@@ -98,6 +98,7 @@ def create_test_action(
         response=None,
         bound_session_id=None):
     """
+    WARNING: THIS DOES NOT USE THE CREATE API, AND WILL NOT PARSE THE ACTION OR SET PROPER FIELDS.
     Creates a test action object and commits it to the database based
     on the given properties. If the properties are left empty, they will
     automatically be determined.
@@ -110,8 +111,8 @@ def create_test_action(
 
     action = Action(
         action_id=action_id,
-        action_string=action_string if action_string is not None else 'echo test',
-        action_type=action_type if action_type is not None else 0,
+        action_string=action_string if action_string is not None else 'exec echo test',
+        action_type=action_type if action_type is not None else 1,
         target_name=target_name,
         bound_session_id=bound_session_id,
         queue_time=time.time(),
