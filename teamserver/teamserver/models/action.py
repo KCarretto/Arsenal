@@ -76,6 +76,7 @@ class Action(DynamicDocument):
     bound_session_id = StringField(max_length=MAX_STR_LEN)
 
     queue_time = FloatField(required=True, null=False)
+    cancel_time = FloatField()
     sent_time = FloatField()
     complete_time = FloatField()
 
@@ -349,7 +350,7 @@ class Action(DynamicDocument):
                 'args': self.args #pylint: disable=no-member
             }
 
-            if self.start_time is not None: #pylint: disable=no-member
+            if hasattr(self, 'start_time'): #pylint: disable=no-member
                 resp['start_time'] = self.start_time #pylint: disable=no-member
 
             return resp
@@ -466,3 +467,15 @@ class Action(DynamicDocument):
         self.response = response
         self.complete_time = time.time()
         self.save()
+
+    def cancel(self):
+        """
+        This function will cancel an action if possible (only if status is queued).
+        It will return True or False with the success of this operation.
+        """
+        if self.status == ACTION_STATUSES.get('queued', 'queued'):
+            self.cancelled = True
+            self.cancel_time = time.time()
+            self.save()
+            return True
+        return False

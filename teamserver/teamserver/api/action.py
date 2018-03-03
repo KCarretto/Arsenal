@@ -7,7 +7,6 @@ import time
 
 from .utils import success_response
 from ..models.action import Action
-from ..config import ACTION_STATUSES
 
 def create_action(params):
     """
@@ -67,11 +66,10 @@ def cancel_action(params):
     action_id: The action_id of the action to cancel. <str>
     """
     action = Action.get_by_id(params['action_id'])
-    if action.status == ACTION_STATUSES.get('queued', 'queued'):
-        action.cancelled = True
-        action.save()
-
-    # TODO: Raise exception when status is not queued
+    if not action.cancel():
+        # TODO: Raise exception to return error response
+        print(action.cancelled)
+        pass
 
     return success_response()
 

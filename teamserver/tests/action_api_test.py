@@ -6,7 +6,7 @@ import sys
 import unittest
 
 from flask import json
-from testutils import ModelTest, create_test_action, get_action #pylint: disable=no-name-in-module
+from testutils import ModelTest, get_action #pylint: disable=no-name-in-module
 
 # Configure path to include teamserver module
 sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
@@ -17,24 +17,29 @@ class ActionAPITest(ModelTest):
     """
     This class is used to test the Action API funcitons.
     """
-    def test_create(self):
+    def create_action(self, action_string, target_name=None):
         """
-        This test will pass if the action is created and content matches.
+        This method is used to create an action through the API.
         """
         resp = self.client.post(
             '/api',
             data=json.dumps(dict(
                 method='CreateAction',
-                target_name='ACTION TEST Target',
-                action_string='exec ls -al /dir'
+                target_name=target_name if target_name is not None else 'ACTION TEST Target',
+                action_string=action_string
             )),
             content_type='application/json',
             follow_redirects=True
         )
-
         data = json.loads(resp.data)
-        action_id = data['action_id']
+        return data
 
+    def test_create(self):
+        """
+        This test will pass if the action is created and content matches.
+        """
+        data = self.create_action('exec ls -al /dir')
+        action_id = data['action_id']
         self.assertEqual(False, data['error'])
         action = get_action(action_id)
         self.assertIsNotNone(action)
@@ -46,28 +51,30 @@ class ActionAPITest(ModelTest):
         """
         This test will pass if it finds the correct action.
         """
-        action = create_test_action('TEST TARGET', 'exec ls')
+        action_id = self.create_action('exec ls', 'ACTION TEST GET')['action_id']
         resp = self.client.post(
             '/api',
             data=json.dumps(dict(
                 method='GetAction',
-                action_id=action.action_id,
+                action_id=action_id,
             )),
             content_type='application/json',
             follow_redirects=True
         )
+        action = get_action(action_id)
         data = json.loads(resp.data)
         self.assertEqual(data['error'], False)
         self.assertIsNotNone(data['action'])
-        self.assertEqual(action.action_id, data['action']['action_id'])
-        self.assertEqual(action.target_name, data['action']['target_name'])
-        self.assertEqual(data['action']['command'], 'ls')
+        self.assertEqual(action_id, action.action_id)
+        self.assertEqual('ACTION TEST GET', action.target_name)
+        self.assertEqual('ls', action.command)
 
     def test_cancel(self):
         """
         This test will pass if an action is successfully cancelled.
         """
-        action = create_test_action('TEST TARGET', 'exec echo hello world')
+        action_id = self.create_action('exec echo hello world')['action_id']
+        action = get_action(action_id)
         self.assertEqual(action.cancelled, False)
         resp = self.client.post(
             '/api',
@@ -80,8 +87,8 @@ class ActionAPITest(ModelTest):
         )
         data = json.loads(resp.data)
         self.assertEqual(data['error'], False)
+        action = get_action(action_id)
 
-        action = get_action(action)
         self.assertEqual(action.status, ACTION_STATUSES.get('cancelled'))
         self.assertEqual(action.cancelled, True)
 
