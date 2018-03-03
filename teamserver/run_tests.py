@@ -4,9 +4,16 @@
 import sys
 import unittest
 
-LOADER = unittest.TestLoader()
-SUITE = LOADER.discover('tests/', pattern='*_test.py')
+def main():
+    """
+    Discover and run unit tests.
+    """
+    loader = unittest.TestLoader()
+    suite = loader.discover('tests/', pattern='*_test.py')
 
-RUNNER = unittest.TextTestRunner()
-ret = not RUNNER.run(SUITE).wasSuccessful()
-sys.exit(ret)
+    runner = unittest.TextTestRunner()
+    ret = not runner.run(suite).wasSuccessful()
+    sys.exit(ret)
+
+if __name__ == '__main__':
+    main()
