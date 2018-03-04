@@ -12,7 +12,7 @@ def create_action(params):
     """
     This API function creates a new action object in the database.
 
-    target_name (required): The name of the target to perform the action on. <str>
+    target_name (required, unique): The name of the target to perform the action on. <str>
     action_string (required): The action string that will be parsed into an action. <str>
     bound_session_id (optional): This will restrict the action to only be retrieved
                                  by a specific session. <str>

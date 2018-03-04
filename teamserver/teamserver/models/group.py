@@ -56,6 +56,14 @@ class Group(Document):
 
         return list(set(groups))
 
+    @staticmethod
+    def get_by_name(name):
+        """
+        This method queries for the group with the given name.
+        """
+        return Group.objects.get(name=name) #pylint: disable=no-member
+
+
     @property
     def members(self):
         """
@@ -71,3 +79,16 @@ class Group(Document):
         """
         # TODO: Implement membership rules and blacklist
         return self.whitelist_members
+
+    def whitelist_member(self, target):
+        """
+        This function attempts to add a target to the member whitelist.
+        The target will not be added if the target is in the blacklist.
+        """
+
+        if target.name in self.blacklist_members: #pylint: disable=unsupported-membership-test
+            # TODO: Throw exception. Should not be in both lists at once
+            pass
+
+        self.whitelist_members.append(target.name) #pylint: disable=no-member
+        self.save()
