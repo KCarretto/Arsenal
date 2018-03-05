@@ -15,6 +15,7 @@ MAX_BIGSTR_LEN = 10000
 
 # DATABASE COLLECTION SETTINGS
 COLLECTION_ACTIONS = "actions"
+COLLECTION_GROUP_ACTIONS = "group_actions"
 COLLECTION_GROUPS = "groups"
 COLLECTION_SESSIONS = "sessions"
 COLLECTION_SESSION_HISTORIES = "session_histories"
@@ -47,6 +48,13 @@ ACTION_STATUSES = {
     'error': 'error',
     'complete': 'complete',
     'stale': 'stale',
+}
+GROUP_ACTION_STATUSES = {
+    'queued': 'queued',
+    'in progress': 'in progress',
+    'mixed success': 'mixed success',
+    'success': 'success',
+    'failed': 'failed',
 }
 
 ACTION_TYPES = {

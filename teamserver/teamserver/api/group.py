@@ -47,14 +47,26 @@ def add_group_member(params):
     return success_response()
 
 def remove_group_member(params):
+    """
+    Removes a target from a group's membership whitelist.
+
+    group_name: The name of the group to modify. <str>
+    target_name: The name of the member to remove. <str>
+    """
     group = Group.get_by_name(params['group_name'])
     target = Target.get_by_name(params['target_name'])
 
-    group.remove_group_member(target
+    group.remove_group_member(target)
 
     return success_response()
 
-def blacklist_group_member():
+def blacklist_group_member(params):
+    """
+    Blacklist a target from ever being a member of a group.
+
+    group_name: The name of the group to modify. <str>
+    target_name: The name of the member to remove. <str>
+    """
     group = Group.get_by_name(params['group_name'])
     target = Target.get_by_name(params['target_name'])
 
@@ -62,8 +74,8 @@ def blacklist_group_member():
 
     return success_response()
 
-def list_groups():
-    pass
+#def list_groups():
+#    pass
 
 #def delete_group():
 #    pass
