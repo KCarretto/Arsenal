@@ -3,26 +3,28 @@
     It does not test any database connectivity, but it does
     utilize mongoengine's mock database implementation.
 """
-import os
 import sys
 import time
 import unittest
 
-from testutils import ModelTest, create_test_target, create_test_action, get_action #pylint: disable=no-name-in-module
-from testutils import create_test_session, create_test_response, missing_session #pylint: disable=no-name-in-module
-from testutils import parse_action_string #pylint: disable=no-name-in-module
-
-# Configure path to include teamserver module
-sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
-
-from teamserver.config import ACTION_STATUSES, ACTION_STALE_THRESHOLD #pylint: disable=wrong-import-position
-from teamserver.config import ACTION_TYPES, DEFAULT_SUBSET #pylint: disable=wrong-import-position
+try:
+    from testutils.test_cases import ModelTest
+    from testutils.database import Database
+    from teamserver.config import ACTION_STATUSES, ACTION_STALE_THRESHOLD
+    from teamserver.config import ACTION_TYPES, DEFAULT_SUBSET
+except ModuleNotFoundError:
+    # Configure path to start at teamserver module
+    from os.path import dirname, abspath
+    sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
+    from teamserver.config import ACTION_STATUSES, ACTION_STALE_THRESHOLD
+    from teamserver.config import ACTION_TYPES, DEFAULT_SUBSET
+    from tests.testutils.test_cases import ModelTest
+    from tests.testutils.database import Database
 
 class ActionModelTest(ModelTest):
     """
     This class is used to test the teamserver's action model class.
     """
-
     TEST_ACTION_STRING = 'echo hello world'
     TEST_ACTION_TYPE = '0'
 
@@ -30,9 +32,8 @@ class ActionModelTest(ModelTest):
         """
         This test will attempt to create an action model object.
         """
-
-        target = create_test_target()
-        action = create_test_action(target.name, self.TEST_ACTION_STRING, self.TEST_ACTION_TYPE)
+        target = Database.create_target()
+        action = Database.create_action(target.name, self.TEST_ACTION_STRING, self.TEST_ACTION_TYPE)
         self.assertEqual(action.target_name, target.name)
         self.assertEqual(action.action_string, self.TEST_ACTION_STRING)
         self.assertEqual(action.action_type, self.TEST_ACTION_TYPE)
@@ -42,8 +43,8 @@ class ActionModelTest(ModelTest):
         This test will attempt to create an action model object,
         save it to the database, and then find it.
         """
-        action1 = create_test_action()
-        action2 = get_action(action1.action_id)
+        action1 = Database.create_action()
+        action2 = Database.get_action(action1.action_id)
         self.assertEqual(action1, action2)
 
     def test_status_pass(self):
@@ -51,7 +52,7 @@ class ActionModelTest(ModelTest):
         This test will attempt to see if the action is assigned
         the correct statuses based on it's session.
         """
-        action1 = create_test_action()
+        action1 = Database.create_action()
         self.assertIsNone(action1.session_id)
         self.assertEqual(action1.status, ACTION_STATUSES.get('queued'))
 
@@ -63,11 +64,11 @@ class ActionModelTest(ModelTest):
         action1.save()
         self.assertEqual(action1.status, ACTION_STATUSES.get('stale'))
 
-        session1 = create_test_session()
+        session1 = Database.create_session()
         action1.assign_to(session1)
         self.assertEqual(action1.status, ACTION_STATUSES.get('sent'))
 
-        missing_session(session1)
+        Database.missing_session(session1)
         self.assertEqual(action1.status, ACTION_STATUSES.get('failing'))
 
         session1.timestamp = 0
@@ -76,7 +77,7 @@ class ActionModelTest(ModelTest):
 
         session1.timestamp = time.time()
         session1.save()
-        response = create_test_response(None, None, True)
+        response = Database.create_response(None, None, True)
         action1.submit_response(response)
         self.assertEqual(action1.status, ACTION_STATUSES.get('error'))
 
@@ -100,7 +101,7 @@ class ActionModelTest(ModelTest):
         action_tests = [
             # config
             (
-                parse_action_string('config {} {} {}'.format(
+                Database.parse_action_string('config {} {} {}'.format(
                     '--interval 300',
                     '--delta 20',
                     '--servers 10.80.100.10 https://bobzinga.com')),
@@ -111,7 +112,7 @@ class ActionModelTest(ModelTest):
             ),
             # exec
             (
-                parse_action_string('exec ls'),
+                Database.parse_action_string('exec ls'),
                 {
                     'action_type': ACTION_TYPES.get('exec', 1),
                     'command': 'ls',
@@ -120,7 +121,7 @@ class ActionModelTest(ModelTest):
             ),
             # exec with args
             (
-                parse_action_string('exec ls -al'),
+                Database.parse_action_string('exec ls -al'),
                 {
                     'action_type': ACTION_TYPES.get('exec', 1),
                     'command': 'ls',
@@ -129,7 +130,7 @@ class ActionModelTest(ModelTest):
             ),
             # timed exec
             (
-                parse_action_string('exec --time={} ls -al'.format(test_time)),
+                Database.parse_action_string('exec --time={} ls -al'.format(test_time)),
                 {
                     'action_type': ACTION_TYPES.get('timed_exec', 2),
                     'command': 'ls',
@@ -139,7 +140,7 @@ class ActionModelTest(ModelTest):
             ),
             # spawn
             (
-                parse_action_string('exec --spawn ls -al'),
+                Database.parse_action_string('exec --spawn ls -al'),
                 {
                     'action_type': ACTION_TYPES.get('spawn', 3),
                     'command': 'ls',
@@ -148,7 +149,7 @@ class ActionModelTest(ModelTest):
             ),
             # timed spawn
             (
-                parse_action_string('exec --time={} --spawn ls -al'.format(test_time)),
+                Database.parse_action_string('exec --time={} --spawn ls -al'.format(test_time)),
                 {
                     'action_type': ACTION_TYPES.get('timed_spawn', 4),
                     'command': 'ls',
@@ -158,7 +159,7 @@ class ActionModelTest(ModelTest):
             ),
             # timed spawn (swapped args)
             (
-                parse_action_string('exec --spawn --time={} ls -al'.format(test_time)),
+                Database.parse_action_string('exec --spawn --time={} ls -al'.format(test_time)),
                 {
                     'action_type': ACTION_TYPES.get('timed_spawn', 4),
                     'command': 'ls',
@@ -168,7 +169,7 @@ class ActionModelTest(ModelTest):
             ),
             # upload
             (
-                parse_action_string('upload files/sshd_config /etc/ssh/sshd_config'),
+                Database.parse_action_string('upload files/sshd_config /etc/ssh/sshd_config'),
                 {
                     'action_type': ACTION_TYPES.get('upload', 5),
                     'remote_path': '/etc/ssh/sshd_config',
@@ -177,7 +178,7 @@ class ActionModelTest(ModelTest):
             ),
             # download
             (
-                parse_action_string('download /etc/passwd files/passwd'),
+                Database.parse_action_string('download /etc/passwd files/passwd'),
                 {
                     'action_type': ACTION_TYPES.get('download', 6),
                     'remote_path': '/etc/passwd',
@@ -186,7 +187,7 @@ class ActionModelTest(ModelTest):
             ),
             # gather default
             (
-                parse_action_string('gather'),
+                Database.parse_action_string('gather'),
                 {
                     'action_type': ACTION_TYPES.get('gather', 7),
                     'subset': DEFAULT_SUBSET
@@ -194,7 +195,7 @@ class ActionModelTest(ModelTest):
             ),
             # gather min
             (
-                parse_action_string('gather -s min'),
+                Database.parse_action_string('gather -s min'),
                 {
                     'action_type': ACTION_TYPES.get('gather', 7),
                     'subset': 'min'
@@ -212,7 +213,7 @@ class ActionModelTest(ModelTest):
         action_tests = [
             # pipe
             (
-                parse_action_string('exec echo hi | tee output.txt'),
+                Database.parse_action_string('exec echo hi | tee output.txt'),
                 {
                     'action_type': ACTION_TYPES.get('exec', 1),
                     'command': 'echo',
@@ -221,7 +222,7 @@ class ActionModelTest(ModelTest):
             ),
             # conflicting args
             (
-                parse_action_string('exec date --time time'),
+                Database.parse_action_string('exec date --time time'),
                 {
                     'action_type': ACTION_TYPES.get('exec', 1),
                     'command': 'date',
@@ -230,7 +231,7 @@ class ActionModelTest(ModelTest):
             ),
             # subshell
             (
-                parse_action_string('exec find $(which bash)'),
+                Database.parse_action_string('exec find $(which bash)'),
                 {
                     'action_type': ACTION_TYPES.get('exec', 1),
                     'command': 'find',
@@ -239,7 +240,7 @@ class ActionModelTest(ModelTest):
             ),
             # backtick subshell
             (
-                parse_action_string('exec rm -rf `which bash`'),
+                Database.parse_action_string('exec rm -rf `which bash`'),
                 {
                     'action_type': ACTION_TYPES.get('exec', 1),
                     'command': 'rm',
@@ -248,7 +249,7 @@ class ActionModelTest(ModelTest):
             ),
             # special chars (must be quoted)
             (
-                parse_action_string('exec echo -e "Hello \n World"'),
+                Database.parse_action_string('exec echo -e "Hello \n World"'),
                 {
                     'action_type': ACTION_TYPES.get('exec', 1),
                     'command': 'echo',

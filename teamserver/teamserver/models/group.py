@@ -39,7 +39,7 @@ class Group(Document):
     name = StringField(required=True, null=False, unique=True)
 
     whitelist_members = ListField(StringField(required=True, null=False), required=True, null=False)
-    blacklist_members = ListField(StringField(required=True, null=False), required=True, null=False)
+    blacklist_members = ListField(StringField(required=True, null=False), required=True)
 
     membership_rules = EmbeddedDocumentListField(GroupAutomemberRule, null=False)
 

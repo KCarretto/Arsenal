@@ -91,6 +91,12 @@ def parse_action_string(action_string):
     """
     return Action.parse_action_string(action_string)
 
+def create_test_group(
+    group_name=None,
+    members=None
+):
+    pass
+
 def create_test_action(
         target_name=None,
         action_string=None,
