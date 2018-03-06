@@ -308,55 +308,190 @@ class APIClient(object): # pylint: disable=too-many-public-methods
     #        Group Action Methods       #
     #####################################
     @staticmethod
-    def create_group_action(client):
-        pass
+    def create_group_action(
+            client,
+            group_name,
+            action_string=None):
+        """
+        Invoke the CreateGroupAction API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='CreateGroupAction',
+                group_name=group_name,
+                action_string=action_string if action_string is not None else 'exec echo DEFAULT'
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
 
     @staticmethod
-    def get_group_action(client):
-        pass
+    def get_group_action(
+            client,
+            group_action_id):
+        """
+        Invoke the GetGroupAction API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='GetGroupAction',
+                group_action_id=group_action_id
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
 
     @staticmethod
-    def cancel_group_action(client):
-        pass
+    def cancel_group_action(
+            client,
+            group_action_id):
+        """
+        Invoke the CancelGroupAction API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='CancelGroupAction',
+                group_action_id=group_action_id
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
 
     @staticmethod
     def list_group_actions(client):
-        pass
+        """
+        Invoke the ListGroupActions API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='ListGroupActions',
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
 
     #####################################
     #           Group Methods           #
     #####################################
     @staticmethod
-    def create_group(client):
-        pass
+    def create_group(
+            client,
+            name):
+        """
+        Invoke the CreateGroup API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='CreateGroup',
+                name=name,
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
 
     @staticmethod
-    def get_group(client):
-        pass
+    def get_group(
+            client,
+            name):
+        """
+        Invoke the GetGroup API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='GetGroup',
+                name=name,
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
 
     @staticmethod
-    def add_group_members(client):
-        pass
+    def add_group_member(
+            client,
+            group_name,
+            target_name):
+        """
+        Invoke the AddGroupMember API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='CreateGroup',
+                group_name=group_name,
+                target_name=target_name,
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
 
     @staticmethod
-    def remove_group_members(client):
-        pass
+    def remove_group_member(
+            client,
+            group_name,
+            target_name):
+        """
+        Invoke the RemoveGroupMember API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='RemoveGroupMember',
+                group_name=group_name,
+                target_name=target_name,
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
 
     @staticmethod
-    def list_groups(client):
-        pass
+    def blacklist_group_member(
+            client,
+            group_name,
+            target_name):
+        """
+        Invoke the BlacklistGroupMember API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='BlacklistGroupMember',
+                group_name=group_name,
+                target_name=target_name,
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
 
-    @staticmethod
-    def delete_groups(client):
-        pass
+    #@staticmethod
+    #def list_groups(client):
+    #    pass
 
+    #@staticmethod
+    #def delete_groups(client):
+    #    pass
+    #
     #####################################
     #        Credentials Methods        #
     #####################################
     #@staticmethod
     #def create_credentials(client):
     #    pass
-
+    #
     #@staticmethod
     #def get_valid_credentials(client):
     #    pass
