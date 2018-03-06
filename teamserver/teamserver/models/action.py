@@ -73,7 +73,7 @@ class Action(DynamicDocument):
     action_type = IntField(required=True, null=False)
     target_name = StringField(required=True, null=False, max_length=MAX_STR_LEN)
     session_id = StringField(max_length=MAX_STR_LEN)
-    bound_session_id = StringField(max_length=MAX_STR_LEN)
+    bound_session_id = StringField(null=False, default='', max_length=MAX_STR_LEN)
 
     queue_time = FloatField(required=True, null=False)
     cancel_time = FloatField()
@@ -103,12 +103,13 @@ class Action(DynamicDocument):
         This method returns a list of unassigned actions for the given target name.
         Provide a session_id to include actions that are bound to that session_id.
         """
-        return Action.objects( #pylint: disable=no-member
+        actions = Action.objects.filter( #pylint: disable=no-member
             target_name=target_name,
             session_id=None,
             cancelled=False,
-            bound_session_id__in=[session_id, None]
+            bound_session_id__in=[None, session_id, ''],
         )
+        return actions
 
     @staticmethod
     def list():
@@ -474,6 +475,23 @@ class Action(DynamicDocument):
             self.save()
             return True
         return False
+
+    def update_fields(self, parsed_action):
+        """
+        Sets fields on this action document based on a parsed action dictionary.
+        """
+        for key, value in parsed_action.items():
+            if key not in [
+                    'action_id',
+                    'target_name',
+                    'action_string',
+                    'bound_session_id',
+                    'queue_time',
+                    'sent_time',
+                    'complete_time',
+                    'response'
+            ]:
+                self.__setattr__(key, value)
 
 class GroupAction(Document):
     """

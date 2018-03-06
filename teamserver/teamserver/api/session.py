@@ -78,6 +78,9 @@ def session_check_in(params):
     for response in params.get('responses', []):
         action = Action.get_by_id(response['action_id'])
 
+        if response['stderr'] is None:
+            response['stderr'] = ''
+
         # TODO: Handle response formatting errors
         resp = Response(
             stdout=response['stdout'],
@@ -94,7 +97,6 @@ def session_check_in(params):
     # Gather new actions
     actions_raw = Action.get_target_unassigned_actions(session.target_name)
     actions = []
-
     # Assign each action to this status, and append it's document to the list
     for action in actions_raw:
         action.assign_to(session)

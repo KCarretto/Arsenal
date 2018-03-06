@@ -32,19 +32,9 @@ def create_action(params, commit=True):
         bound_session_id=bound_session_id,
         queue_time=time.time()
     )
-    for key, value in parsed_action.items():
-        if key not in [
-                'action_id',
-                'target_name',
-                'action_string',
-                'action_type',
-                'bound_session_id',
-                'queue_time',
-                'sent_time',
-                'complete_time',
-                'response'
-        ]:
-            action.__setattr__(key, value)
+
+    action.update_fields(parsed_action)
+
     if commit:
         action.save(force_insert=True)
     else:

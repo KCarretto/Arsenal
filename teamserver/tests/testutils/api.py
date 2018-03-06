@@ -188,11 +188,12 @@ class APIClient(object): # pylint: disable=too-many-public-methods
         return json.loads(resp.data)
 
     @staticmethod
-    def update_session_config(
+    def update_session_config( # pylint: disable=too-many-arguments
             client,
             session_id,
             interval=None,
             interval_delta=None,
+            servers=None,
             config_dict=None):
         """
         Invoke the UpdateSessionConfig API function using the provided client.
@@ -204,6 +205,7 @@ class APIClient(object): # pylint: disable=too-many-public-methods
                 session_id=session_id,
                 interval=interval,
                 interval_delta=interval_delta,
+                servers=servers,
                 config_dict=config_dict
             )),
             content_type='application/json',

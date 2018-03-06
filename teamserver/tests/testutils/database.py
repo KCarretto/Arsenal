@@ -45,15 +45,19 @@ class Database(object):
             target = Database.create_target()
             target_name = target.name
 
+        action_string = action_string if action_string is not None else 'exec echo test'
+
         action = Action(
             action_id=str(uuid4()),
-            action_string=action_string if action_string is not None else 'exec echo test',
+            action_string=action_string,
             action_type=action_type if action_type is not None else 1,
             target_name=target_name,
-            bound_session_id=bound_session_id,
+            bound_session_id=bound_session_id if bound_session_id is not None else '',
             queue_time=time.time(),
             response=response
         )
+        parsed_action = Action.parse_action_string(action_string)
+        action.update_fields(parsed_action)
         action.save(force_insert=True)
         return action
 
@@ -103,6 +107,7 @@ class Database(object):
             interval=20,
             interval_delta=5,
             servers=None,
+            config_dict=None,
             create_history=True):
         """
         Create an session object in the database.
@@ -123,6 +128,7 @@ class Database(object):
             servers=servers if servers is not None else ['8.8.8.8'],
             interval=interval,
             interval_delta=interval_delta,
+            config_dict=config_dict,
             timestamp=timestamp
         )
         session.save(force_insert=True)

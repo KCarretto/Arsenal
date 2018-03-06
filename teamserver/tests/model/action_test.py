@@ -12,31 +12,34 @@ try:
     from testutils.database import Database
     from teamserver.config import ACTION_STATUSES, ACTION_STALE_THRESHOLD
     from teamserver.config import ACTION_TYPES, DEFAULT_SUBSET
+    from teamserver.models.action import Action
 except ModuleNotFoundError:
     # Configure path to start at teamserver module
     from os.path import dirname, abspath
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
-    from teamserver.config import ACTION_STATUSES, ACTION_STALE_THRESHOLD
-    from teamserver.config import ACTION_TYPES, DEFAULT_SUBSET
     from tests.testutils.test_cases import BaseTest
     from tests.testutils.database import Database
+    from teamserver.config import ACTION_STATUSES, ACTION_STALE_THRESHOLD
+    from teamserver.config import ACTION_TYPES, DEFAULT_SUBSET
+    from teamserver.models.action import Action
 
 class ActionModelTest(BaseTest):
     """
     This class is used to test the teamserver's action model class.
     """
-    TEST_ACTION_STRING = 'echo hello world'
-    TEST_ACTION_TYPE = '0'
+    TEST_ACTION_STRING = 'exec echo hello world'
 
     def test_create_pass(self):
         """
         This test will attempt to create an action model object.
         """
         target = Database.create_target()
-        action = Database.create_action(target.name, self.TEST_ACTION_STRING, self.TEST_ACTION_TYPE)
+        action = Database.create_action(target.name, self.TEST_ACTION_STRING)
         self.assertEqual(action.target_name, target.name)
         self.assertEqual(action.action_string, self.TEST_ACTION_STRING)
-        self.assertEqual(action.action_type, self.TEST_ACTION_TYPE)
+        self.assertEqual(action.action_type, ACTION_TYPES.get('exec', 1))
+        self.assertEqual(action.bound_session_id, '')
+        self.assertIsNone(action.session_id)
 
     def test_find_pass(self):
         """
@@ -45,7 +48,10 @@ class ActionModelTest(BaseTest):
         """
         action1 = Database.create_action()
         action2 = Database.get_action(action1.action_id)
+        self.assertIsNotNone(action1)
+        self.assertIsNotNone(action2)
         self.assertEqual(action1, action2)
+        self.assertEqual(action1.action_id, action2.action_id)
 
     def test_status_pass(self):
         """
@@ -259,6 +265,21 @@ class ActionModelTest(BaseTest):
         ]
         for test in action_tests:
             self.assertDictEqual(test[0], test[1])
+
+    def test_get_unassigned_actions(self):
+        """
+        This test ensures that the proper unassigned actions are returned for a target.
+        """
+        target = Database.create_target()
+        action1 = Database.create_action(target.name, 'exec echo hello')
+        action2 = Database.create_action(target.name, 'exec echo world')
+
+        actions = Action.get_target_unassigned_actions(target.name)
+
+        for action in actions:
+            self.assertIn(action.action_id, [action1.action_id, action2.action_id])
+        self.assertEqual(len(actions), 2)
+
 
 if __name__ == '__main__':
     unittest.main()

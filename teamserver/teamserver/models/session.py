@@ -161,7 +161,7 @@ class Session(Document):
             self.interval = interval
         if interval_delta is not None:
             self.interval_delta = interval_delta
-        if servers is not None and isinstance(servers, float):
+        if servers is not None:
             self.servers = servers
         if config is not None and isinstance(config, dict):
             for key, value in config.items():
