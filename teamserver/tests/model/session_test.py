@@ -8,7 +8,7 @@ import time
 import unittest
 
 try:
-    from testutils.test_cases import ModelTest
+    from testutils.test_cases import BaseTest
     from testutils.database import Database
     from teamserver.config import SESSION_STATUSES, SESSION_CHECK_THRESHOLD, SESSION_CHECK_MODIFIER
 except ModuleNotFoundError:
@@ -16,10 +16,10 @@ except ModuleNotFoundError:
     from os.path import dirname, abspath
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
     from teamserver.config import SESSION_STATUSES, SESSION_CHECK_THRESHOLD, SESSION_CHECK_MODIFIER
-    from tests.testutils.test_cases import ModelTest
+    from tests.testutils.test_cases import BaseTest
     from tests.testutils.database import Database
 
-class SessionModelTest(ModelTest):
+class SessionModelTest(BaseTest):
     """
     This class is used to test the teamserver's session model class.
     """

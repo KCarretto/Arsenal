@@ -1,5 +1,6 @@
 """
-    This module contains methods used to create objects in the database.
+    This module contains methods used to directly access the database.
+    This is useful in cases where relying on API functions may be unreliable.
 """
 from os.path import abspath, dirname
 from uuid import uuid4
@@ -83,10 +84,13 @@ class Database(object):
         """
         Create an group object in the database.
         """
+        if whitelist_members is None:
+            whitelist_members = [Database.create_target().name]
+
         group = Group(
             name=name if name is not None else str(uuid4()),
-            whitelist_members=whitelist_members if whitelist_members else [],
-            blacklist_members=blacklist_members if blacklist_members else []
+            whitelist_members=whitelist_members,
+            blacklist_members=blacklist_members
         )
         group.save(force_insert=True)
 

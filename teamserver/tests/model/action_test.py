@@ -8,7 +8,7 @@ import time
 import unittest
 
 try:
-    from testutils.test_cases import ModelTest
+    from testutils.test_cases import BaseTest
     from testutils.database import Database
     from teamserver.config import ACTION_STATUSES, ACTION_STALE_THRESHOLD
     from teamserver.config import ACTION_TYPES, DEFAULT_SUBSET
@@ -18,10 +18,10 @@ except ModuleNotFoundError:
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
     from teamserver.config import ACTION_STATUSES, ACTION_STALE_THRESHOLD
     from teamserver.config import ACTION_TYPES, DEFAULT_SUBSET
-    from tests.testutils.test_cases import ModelTest
+    from tests.testutils.test_cases import BaseTest
     from tests.testutils.database import Database
 
-class ActionModelTest(ModelTest):
+class ActionModelTest(BaseTest):
     """
     This class is used to test the teamserver's action model class.
     """

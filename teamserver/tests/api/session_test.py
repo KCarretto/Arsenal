@@ -1,10 +1,22 @@
 """
     This module tests basic functionality of the session API.
 """
+import sys
 import unittest
 
 from flask import json
-from testutils import ModelTest, create_test_session, create_test_target, get_session #pylint: disable=no-name-in-module
+
+try:
+    from testutils.test_cases import ModelTest
+    from testutils.database import Database
+    from teamserver.config import ACTION_STATUSES, ACTION_TYPES
+except ModuleNotFoundError:
+    # Configure path to start at teamserver module
+    from os.path import dirname, abspath
+    sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
+    from tests.testutils.test_cases import ModelTest
+    from tests.testutils.database import Database
+
 
 class SessionAPITest(ModelTest):
     """
@@ -14,7 +26,7 @@ class SessionAPITest(ModelTest):
         """
         This test will pass if the session is created.
         """
-        target = create_test_target()
+        target = Database.create_target()
         resp = self.client.post(
             '/api',
             data=json.dumps(dict(
@@ -63,7 +75,7 @@ class SessionAPITest(ModelTest):
             'A list fact': ['sdasd', 'asdasd']
         }
 
-        target = create_test_target()
+        target = Database.create_target()
         resp = self.client.post(
             '/api',
             data=json.dumps(dict(

@@ -161,11 +161,12 @@ class Session(Document):
             self.interval = interval
         if interval_delta is not None:
             self.interval_delta = interval_delta
-        if servers is not None:
+        if servers is not None and isinstance(servers, float):
             self.servers = servers
-        if config is not None:
+        if config is not None and isinstance(config, dict):
             for key, value in config.items():
                 self.config_dict[key] = value #pylint: disable=unsupported-assignment-operation
+        self.save()
 
     def update_timestamp(self, new_timestamp):
         """

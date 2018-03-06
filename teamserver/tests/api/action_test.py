@@ -1,17 +1,22 @@
 """
     This module tests basic functionality of the action API.
 """
-import os
 import sys
 import unittest
 
 from flask import json
-from testutils import ModelTest, get_action #pylint: disable=no-name-in-module
 
-# Configure path to include teamserver module
-sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__)))))
-
-from teamserver.config import ACTION_TYPES, ACTION_STATUSES #pylint: disable=wrong-import-position
+try:
+    from testutils.test_cases import ModelTest
+    from testutils.database import Database
+    from teamserver.config import ACTION_STATUSES, ACTION_TYPES
+except ModuleNotFoundError:
+    # Configure path to start at teamserver module
+    from os.path import dirname, abspath
+    sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
+    from tests.testutils.test_cases import ModelTest
+    from tests.testutils.database import Database
+    from teamserver.config import ACTION_STATUSES, ACTION_TYPES # pylint: disable=ungrouped-imports
 
 class ActionAPITest(ModelTest):
     """
@@ -41,7 +46,7 @@ class ActionAPITest(ModelTest):
         data = self.create_action('exec ls -al /dir')
         action_id = data['action_id']
         self.assertEqual(False, data['error'])
-        action = get_action(action_id)
+        action = Database.get_action(action_id)
         self.assertIsNotNone(action)
         self.assertEqual(action.action_type, ACTION_TYPES.get('exec', 1))
         self.assertEqual(action.command, 'ls')
@@ -61,7 +66,7 @@ class ActionAPITest(ModelTest):
             content_type='application/json',
             follow_redirects=True
         )
-        action = get_action(action_id)
+        action = Database.get_action(action_id)
         data = json.loads(resp.data)
         self.assertEqual(data['error'], False)
         self.assertIsNotNone(data['action'])
@@ -74,7 +79,7 @@ class ActionAPITest(ModelTest):
         This test will pass if an action is successfully cancelled.
         """
         action_id = self.create_action('exec echo hello world')['action_id']
-        action = get_action(action_id)
+        action = Database.get_action(action_id)
         self.assertEqual(action.cancelled, False)
         resp = self.client.post(
             '/api',
@@ -87,7 +92,7 @@ class ActionAPITest(ModelTest):
         )
         data = json.loads(resp.data)
         self.assertEqual(data['error'], False)
-        action = get_action(action_id)
+        action = Database.get_action(action_id)
 
         self.assertEqual(action.status, ACTION_STATUSES.get('cancelled'))
         self.assertEqual(action.cancelled, True)

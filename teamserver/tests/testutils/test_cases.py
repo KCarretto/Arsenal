@@ -45,7 +45,7 @@ def create_test_app():
             'is_mock': True
         })
 
-class ModelTest(unittest.TestCase):
+class BaseTest(unittest.TestCase):
     """
     This class is meant for unit tests to inherit from.
     It takes care of basics like setup and teardown, as well as a pass test.

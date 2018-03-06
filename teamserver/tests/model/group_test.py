@@ -6,17 +6,18 @@
 import sys
 import unittest
 
+# pylint: disable=duplicate-code
 try:
-    from testutils.test_cases import ModelTest
+    from testutils.test_cases import BaseTest
     from testutils.database import Database
 except ModuleNotFoundError:
     # Configure path to start at teamserver module
     from os.path import dirname, abspath
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
-    from tests.testutils.test_cases import ModelTest
+    from tests.testutils.test_cases import BaseTest
     from tests.testutils.database import Database
 
-class GroupModelTest(ModelTest):
+class GroupModelTest(BaseTest):
     """
     This class is used to test the teamserver's group model class.
     """
