@@ -52,7 +52,7 @@ class Group(Document):
         groups = []
         for group in Group.objects(): #pylint: disable=no-member
             if target_name in group.member_names:
-                groups.append(group.name)
+                groups.append(group)
 
         return list(set(groups))
 
