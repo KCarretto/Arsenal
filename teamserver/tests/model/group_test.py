@@ -103,6 +103,16 @@ class GroupModelTest(BaseTest):
 
         self.assertNotIn(target2.name, member_names)
 
+    def test_whitelist_member(self):
+        """
+        Test the whitelist_member function.
+        """
+        group = Database.create_group('SOME GROUP')
+        target = Database.create_target()
+        group.whitelist_member(target)
+        group = Database.get_group('SOME GROUP')
+        self.assertListEqual([target.name], group.whitelist_members)
+
     def test_create(self):
         """
         Test to ensure a group can be properly created.

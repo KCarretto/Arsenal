@@ -9,6 +9,8 @@ from .api import create_target, get_target, set_target_facts, list_targets
 from .api import create_session, get_session, session_check_in
 from .api import update_session_config, list_sessions
 from .api import create_action, get_action, cancel_action, list_actions
+from .api import get_group, create_group, delete_group, list_groups
+from .api import remove_group_member, add_group_member, blacklist_group_member
 
 API = Blueprint('router', __name__)
 
@@ -75,12 +77,13 @@ def api_entry():
         'ListGroupActions': None,
 
         # Groups
-        'CreateGroup': None,
-        'GetGroup': None,
-        'AddGroupMembers': None,
-        'RemoveGroupMembers': None,
-        'ListGroups': None,
-        'DeleteGroup': None,
+        'CreateGroup': create_group,
+        'GetGroup': get_group,
+        'AddGroupMember': add_group_member,
+        'RemoveGroupMember': remove_group_member,
+        'BlacklistGroupMember': blacklist_group_member,
+        'DeleteGroup': delete_group,
+        'ListGroups': list_groups,
 
         # Credentials
         'CreateCredentials': None,

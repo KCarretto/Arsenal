@@ -16,7 +16,7 @@ except ModuleNotFoundError:
 
 class TargetAPITest(BaseTest):
     """
-    This class is used to test the Target API funcitons.
+    This class is used to test the Target API functions.
     """
     def test_create(self):
         """

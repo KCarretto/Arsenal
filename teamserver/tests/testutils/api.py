@@ -430,7 +430,7 @@ class APIClient(object): # pylint: disable=too-many-public-methods
         resp = client.post(
             '/api',
             data=json.dumps(dict(
-                method='CreateGroup',
+                method='AddGroupMember',
                 group_name=group_name,
                 target_name=target_name,
             )),
@@ -479,14 +479,36 @@ class APIClient(object): # pylint: disable=too-many-public-methods
         )
         return json.loads(resp.data)
 
-    #@staticmethod
-    #def list_groups(client):
-    #    pass
+    @staticmethod
+    def delete_group(
+            client,
+            name):
+        """
+        Invoke the DeleteGroup API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='DeleteGroup',
+                name=name,
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
 
-    #@staticmethod
-    #def delete_groups(client):
-    #    pass
-    #
+    @staticmethod
+    def list_groups(client):
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='ListGroups',
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
+
     #####################################
     #        Credentials Methods        #
     #####################################

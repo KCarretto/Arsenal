@@ -57,7 +57,7 @@ def set_target_facts(params):
 def list_targets(params): #pylint: disable=unused-argument
     """
     This API function will return a list of target documents.
-    It is highly recommended to avoid using this function, as it
+    WARNING: It is highly recommended to avoid using this function, as it
     can be very expensive.
     """
     targets = Target.list()

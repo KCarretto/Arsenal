@@ -88,9 +88,6 @@ class Database(object):
         """
         Create an group object in the database.
         """
-        if whitelist_members is None:
-            whitelist_members = [Database.create_target().name]
-
         group = Group(
             name=name if name is not None else str(uuid4()),
             whitelist_members=whitelist_members,
