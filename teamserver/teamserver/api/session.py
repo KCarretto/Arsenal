@@ -72,7 +72,11 @@ def session_check_in(params):
     # Fetch session object
     session = Session.get_by_id(params['session_id'])
     # TODO: Handle DoesNotExist in wrapper
-    log('INFO', 'Session checked in from (target: {}) (session: {})'.format(session.target_name, session.session_id))
+    log(
+        'INFO',
+        'Session checked in from (target: {}) (session: {})'.format(
+            session.target_name,
+            session.session_id))
 
     # Update timestamps
     session.update_timestamp(time.time())
