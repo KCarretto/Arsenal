@@ -6,8 +6,7 @@ from uuid import uuid4
 import time
 
 from .utils import success_response
-from ..models.action import Action, GroupAction
-from ..models.group import Group
+from ..models import Action, GroupAction, Group
 
 def create_action(params, commit=True):
     """

@@ -1,13 +1,20 @@
 """
     This module tests basic functionality of the target API.
 """
+import sys
 import unittest
 
-from flask import json
 from mongoengine import DoesNotExist
-from testutils import ModelTest, create_test_target, get_target #pylint: disable=no-name-in-module
 
-class TargetAPITest(ModelTest):
+try:
+    from testutils import BaseTest, Database, APIClient
+except ModuleNotFoundError:
+    # Configure path to start at teamserver module
+    from os.path import dirname, abspath
+    sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
+    from tests.testutils import BaseTest, Database, APIClient
+
+class TargetAPITest(BaseTest):
     """
     This class is used to test the Target API funcitons.
     """
@@ -15,8 +22,8 @@ class TargetAPITest(ModelTest):
         """
         This test will pass if the target is created.
         """
+
         with self.assertRaises(DoesNotExist):
-            get_target('TEST Target')
 
         resp = self.client.post(
             '/api',
