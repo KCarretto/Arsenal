@@ -12,6 +12,10 @@ def create_log(params):
     level (required): The log level that the message is at. <str, LOG_LEVELS from config.py>
     message (required): The message to log. <str>
     """
+    if params['application'] is None:
+        # TODO: Raise error
+        pass
+
     log(params['level'], params['message'], params['application'])
     return success_response()
 
@@ -26,6 +30,6 @@ def list_logs(params):
     logs = Log.list(
         params.get('include_archived', False),
         params.get('application'),
-        params.get('include_archived', 0))
+        params.get('since', 0))
 
     return success_response(logs=[entry.document for entry in logs])
