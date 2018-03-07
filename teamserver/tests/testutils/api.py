@@ -99,6 +99,23 @@ class APIClient(object): # pylint: disable=too-many-public-methods
             )
         return json.loads(resp.data)
 
+    @staticmethod
+    def get_target_groups(
+            client,
+            name):
+        """
+        Invoke the GetTargetGroups API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='GetTargetGroups',
+                name=name,
+            )),
+            content_type='application/json',
+            follow_redirects=True
+            )
+        return json.loads(resp.data)
 
     #@staticmethod
     #def archive_target(client):
@@ -499,6 +516,9 @@ class APIClient(object): # pylint: disable=too-many-public-methods
 
     @staticmethod
     def list_groups(client):
+        """
+        Invoke the ListGroups API function using the provided client.
+        """
         resp = client.post(
             '/api',
             data=json.dumps(dict(

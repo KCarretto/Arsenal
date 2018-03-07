@@ -2,7 +2,7 @@
     This module contains all 'Target' API functions.
 """
 from .utils import success_response
-from ..models import Target
+from ..models import Target, Group
 
 def create_target(params):
     """
@@ -62,3 +62,12 @@ def list_targets(params): #pylint: disable=unused-argument
     """
     targets = Target.list()
     return success_response(targets={target.name: target.document for target in targets})
+
+def get_target_groups(params):
+    """
+    List which groups a target is in.
+
+    name (required): The name of target to search for. <str>
+    """
+    target = Target.get_by_name(params['name'])
+    return success_response(groups=[group.name for group in Group.target_groups(target.name)])

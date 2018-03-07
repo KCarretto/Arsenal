@@ -5,7 +5,7 @@
 """
 
 from flask import Blueprint, request, jsonify
-from .api import create_target, get_target, set_target_facts, list_targets
+from .api import create_target, get_target, set_target_facts, list_targets, get_target_groups
 from .api import create_session, get_session, session_check_in
 from .api import update_session_config, list_sessions
 from .api import create_action, get_action, cancel_action, list_actions
@@ -55,6 +55,7 @@ def api_entry():
         'SetTargetFacts': set_target_facts,
         'ArchiveTarget': None,
         'ListTargets': list_targets,
+        'GetTargetGroups': get_target_groups,
 
         # Sessions
         'CreateSession': create_session,
