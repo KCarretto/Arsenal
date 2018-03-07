@@ -50,6 +50,7 @@ ACTION_STATUSES = {
     'stale': 'stale',
 }
 GROUP_ACTION_STATUSES = {
+    'cancelled': 'cancelled',
     'queued': 'queued',
     'in progress': 'in progress',
     'mixed success': 'mixed success',

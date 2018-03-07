@@ -10,14 +10,12 @@ from mongoengine import NotUniqueError, DoesNotExist
 
 # pylint: disable=duplicate-code
 try:
-    from testutils.test_cases import BaseTest
-    from testutils.database import Database
+    from testutils import BaseTest, Database
 except ModuleNotFoundError:
     # Configure path to start at teamserver module
     from os.path import dirname, abspath
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
-    from tests.testutils.test_cases import BaseTest
-    from tests.testutils.database import Database
+    from tests.testutils import BaseTest, Database
 
 class TargetModelTest(BaseTest):
     """

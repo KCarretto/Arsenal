@@ -36,8 +36,6 @@ class ActionAPITest(BaseTest):
     def test_get(self):
         """
         This test will pass if it finds the correct action.
-        Note that this must use the CreateTarget API call because the
-        action string needs to be parsed.
         """
         target = Database.create_target()
         action_id = Database.create_action(target.name, 'exec ls')['action_id']

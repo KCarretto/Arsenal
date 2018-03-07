@@ -1,5 +1,5 @@
 """
-    This module tests basic functionality of the target model.
+    This module tests basic functionality of the action model.
     It does not test any database connectivity, but it does
     utilize mongoengine's mock database implementation.
 """
@@ -8,20 +8,18 @@ import time
 import unittest
 
 try:
-    from testutils.test_cases import BaseTest
-    from testutils.database import Database
+    from testutils import BaseTest, Database
     from teamserver.config import ACTION_STATUSES, ACTION_STALE_THRESHOLD
     from teamserver.config import ACTION_TYPES, DEFAULT_SUBSET
-    from teamserver.models.action import Action
+    from teamserver.models import Action
 except ModuleNotFoundError:
     # Configure path to start at teamserver module
     from os.path import dirname, abspath
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
-    from tests.testutils.test_cases import BaseTest
-    from tests.testutils.database import Database
+    from tests.testutils import BaseTest, Database
     from teamserver.config import ACTION_STATUSES, ACTION_STALE_THRESHOLD
     from teamserver.config import ACTION_TYPES, DEFAULT_SUBSET
-    from teamserver.models.action import Action
+    from teamserver.models import Action
 
 class ActionModelTest(BaseTest):
     """

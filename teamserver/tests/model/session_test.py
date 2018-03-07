@@ -8,16 +8,14 @@ import time
 import unittest
 
 try:
-    from testutils.test_cases import BaseTest
-    from testutils.database import Database
+    from testutils import BaseTest, Database
     from teamserver.config import SESSION_STATUSES, SESSION_CHECK_THRESHOLD, SESSION_CHECK_MODIFIER
 except ModuleNotFoundError:
     # Configure path to start at teamserver module
     from os.path import dirname, abspath
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
+    from testutils import BaseTest, Database
     from teamserver.config import SESSION_STATUSES, SESSION_CHECK_THRESHOLD, SESSION_CHECK_MODIFIER
-    from tests.testutils.test_cases import BaseTest
-    from tests.testutils.database import Database
 
 class SessionModelTest(BaseTest):
     """

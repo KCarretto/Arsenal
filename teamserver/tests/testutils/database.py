@@ -2,25 +2,21 @@
     This module contains methods used to directly access the database.
     This is useful in cases where relying on API functions may be unreliable.
 """
-from os.path import abspath, dirname
 from uuid import uuid4
 
 import sys
 import time
 
 try:
-    from teamserver.models.action import Action, Response #pylint: disable=wrong-import-position
-    from teamserver.models.group import Group
-    from teamserver.models.session import Session, SessionHistory #pylint: disable=wrong-import-position
-    from teamserver.models.target  import Target #pylint: disable=wrong-import-position
+    from teamserver.models import Action, Response, GroupAction
+    from teamserver.models import Session, SessionHistory, Target, Group
     from teamserver.config import SESSION_CHECK_THRESHOLD
 except ModuleNotFoundError:
+    from os.path import abspath, dirname
     # Configure path to start at teamserver module
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
-    from teamserver.models.action  import Action, Response #pylint: disable=wrong-import-position
-    from teamserver.models.group import Group
-    from teamserver.models.session import Session, SessionHistory #pylint: disable=wrong-import-position
-    from teamserver.models.target  import Target #pylint: disable=wrong-import-position
+    from teamserver.models import Action, Response, GroupAction
+    from teamserver.models import Session, SessionHistory, Target, Group
     from teamserver.config import SESSION_CHECK_THRESHOLD
 
 class Database(object):
@@ -60,6 +56,40 @@ class Database(object):
         action.update_fields(parsed_action)
         action.save(force_insert=True)
         return action
+
+    @staticmethod
+    def create_group_action(
+            group_name=None,
+            action_string=None):
+        """
+        Create a group action object in the database.
+        """
+        action_string = action_string if action_string is not None else 'exec ls -al /bin'
+
+        if group_name is None:
+            targets = [
+                Database.create_target().name,
+                Database.create_target().name,
+                Database.create_target().name,
+                Database.create_target().name,
+            ]
+            group_name = Database.create_group(None, targets).name
+
+        group = Database.get_group(group_name)
+        actions = [
+            Database.create_action(target, action_string).action_id
+            for target in group.member_names
+        ]
+
+        action_string = action_string if action_string is not None else 'exec echo test'
+
+        group_action = GroupAction(
+            group_action_id=str(uuid4()),
+            action_string=action_string,
+            action_ids=actions
+        )
+        group_action.save(force_insert=True)
+        return group_action
 
     @staticmethod
     def create_response(
@@ -189,6 +219,12 @@ class Database(object):
         Get an action object from the database.
         """
         return Action.get_by_id(action_id)
+    @staticmethod
+    def get_group_action(group_action_id):
+        """
+        Get a group action object from the database.
+        """
+        return GroupAction.get_by_id(group_action_id)
 
     @staticmethod
     def get_group(name):
