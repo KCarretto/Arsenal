@@ -12,6 +12,8 @@ from .api import create_action, get_action, cancel_action, list_actions
 from .api import create_group_action, get_group_action, cancel_group_action, list_group_actions
 from .api import get_group, create_group, delete_group, list_groups
 from .api import remove_group_member, add_group_member, blacklist_group_member
+from .config import APPLICATION
+from .models import log
 
 API = Blueprint('router', __name__)
 
@@ -125,6 +127,7 @@ def api_entry():
     # TODO: Trigger method pre-hooks
 
     # Call method
+    log(APPLICATION, 'DEBUG', 'Calling API method {}'.format(data['method']))
     response = method(data)
 
     # Trigger method post-hooks
