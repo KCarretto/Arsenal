@@ -38,7 +38,7 @@ class Group(Document):
     }
     name = StringField(required=True, null=False, unique=True)
 
-    whitelist_members = ListField(StringField(required=True, null=False), required=True, null=False)
+    whitelist_members = ListField(StringField(required=True, null=False))
     blacklist_members = ListField(StringField(required=True, null=False))
 
     membership_rules = EmbeddedDocumentListField(GroupAutomemberRule, null=False)
@@ -63,6 +63,12 @@ class Group(Document):
         """
         return Group.objects.get(name=name) #pylint: disable=no-member
 
+    @staticmethod
+    def list():
+        """
+        This method queries for all group objects.
+        """
+        return Group.objects() #pylint: disable=no-member
 
     @property
     def members(self):
@@ -88,7 +94,7 @@ class Group(Document):
         return {
             'name': self.name,
             'whitelist_members': self.whitelist_members,
-            'blacklist_members': self.blacklist_member
+            'blacklist_members': self.blacklist_members
         }
 
     def whitelist_member(self, target):
@@ -112,16 +118,26 @@ class Group(Document):
             # TODO: Raise exception
             pass
         self.whitelist_members.remove(target.name) #pylint: disable=no-member
+        self.save()
 
     def blacklist_member(self, target):
         """
         This function removes a target from the member whitelist (if they exist),
         and add them to the blacklist (if they are not yet on there).
         """
-        # TODO: try catch the error that remove_member will throw when target is not yet whitelisted
-        self.remove_member(target)
+        try:
+            self.remove_member(target)
+        except ValueError:
+            pass
 
         if target.name in self.blacklist_members: #pylint: disable=unsupported-membership-test
             # TODO: Raise exception
             pass
         self.blacklist_members.append(target.name) #pylint: disable=no-member
+        self.save()
+
+    def remove(self):
+        """
+        Remove this document from the database, and perform any related cleanup.
+        """
+        self.delete()

@@ -16,7 +16,7 @@ except ModuleNotFoundError:
 
 class TargetAPITest(BaseTest):
     """
-    This class is used to test the Target API funcitons.
+    This class is used to test the Target API functions.
     """
     def test_create(self):
         """
@@ -100,6 +100,27 @@ class TargetAPITest(BaseTest):
         self.assertListEqual(
             sorted(list(data['targets'].keys())),
             sorted([target.name for target in targets]))
+
+    def test_target_groups(self):
+        """
+        Tests the GetTargetGroups API function.
+        """
+        target = Database.create_target()
+        groups = [
+            Database.create_group(),
+            Database.create_group(),
+            Database.create_group(),
+            Database.create_group(),
+        ]
+        for group in groups:
+            group.whitelist_member(target)
+
+        data = APIClient.get_target_groups(self.client, target.name)
+        self.assertEqual(data['error'], False)
+        self.assertListEqual(
+            sorted([group.name for group in groups]),
+            sorted(data['groups'])
+        )
 
 if __name__ == '__main__':
     unittest.main()

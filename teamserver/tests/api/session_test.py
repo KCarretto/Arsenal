@@ -19,7 +19,7 @@ except ModuleNotFoundError:
 
 class SessionAPITest(BaseTest):
     """
-    This class is used to test the Session API funcitons.
+    This class is used to test the Session API functions.
     """
     def test_create(self):
         """
@@ -138,7 +138,7 @@ class SessionAPITest(BaseTest):
 
     def test_list(self):
         """
-        Populates the database with sample targets, and calls the list API
+        Populates the database with sample sessions, and calls the list API
         function to ensure that all are returned.
         """
         sessions = [
@@ -149,6 +149,7 @@ class SessionAPITest(BaseTest):
             Database.create_session(),
         ]
         data = APIClient.list_sessions(self.client)
+        self.assertEqual(data['error'], False)
         self.assertEqual(
             sorted(list(data['sessions'].keys())),
             sorted([session.session_id for session in sessions])

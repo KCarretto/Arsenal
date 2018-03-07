@@ -10,7 +10,7 @@ def create_group(params):
 
     name (required, unique): A unique and human readable identifier for the group. <str>
     """
-    name = params['group_name']
+    name = params['name']
 
     group = Group(
         name=name
@@ -26,7 +26,6 @@ def get_group(params):
     name: The name of the group to query for. <str>
     """
     group = Group.get_by_name(params['name'])
-
     return success_response(group=group.document)
 
 def add_group_member(params):
@@ -55,7 +54,7 @@ def remove_group_member(params):
     group = Group.get_by_name(params['group_name'])
     target = Target.get_by_name(params['target_name'])
 
-    group.remove_group_member(target)
+    group.remove_member(target)
 
     return success_response()
 
@@ -73,8 +72,20 @@ def blacklist_group_member(params):
 
     return success_response()
 
-#def list_groups():
-#    pass
+def delete_group(params):
+    """
+    Delete a group from the database.
 
-#def delete_group():
-#    pass
+    name: The unique identifier for the group to delete. <str>
+    """
+    group = Group.get_by_name(params['name'])
+    group.delete()
+    return success_response()
+
+def list_groups(params): #pylint: disable=unused-argument
+    """
+    List all groups that currently exist.
+    WARNING: This will be quite an expensive operation.
+    """
+    groups = Group.list()
+    return success_response(groups={group.name: group.document for group in groups})

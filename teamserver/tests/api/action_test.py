@@ -16,7 +16,7 @@ except ModuleNotFoundError:
 
 class ActionAPITest(BaseTest):
     """
-    This class is used to test the Action API funcitons.
+    This class is used to test the Action API functions.
     """
     def test_create(self):
         """
@@ -73,11 +73,11 @@ class ActionAPITest(BaseTest):
         test_actions = [
             Database.create_action(target.name, 'exec ls -al'),
             Database.create_action(target.name, 'config -i 20'),
-            #Database.create_action(target.name, 'exec --time 1345.12345 rm -rf tmp/'),
-            #Database.create_action(target.name, 'exec --spawn /bin/beloved'),
-            #Database.create_action(target.name, 'upload /some/file /another/file'),
-            #Database.create_action(target.name, 'download /lol/what /ha/nope'),
-            #Database.create_action(target.name, 'gather -s min')
+            Database.create_action(target.name, 'exec --time 1345.12345 rm -rf tmp/'),
+            Database.create_action(target.name, 'exec --spawn /bin/beloved'),
+            Database.create_action(target.name, 'upload /some/file /another/file'),
+            Database.create_action(target.name, 'download /lol/what /ha/nope'),
+            Database.create_action(target.name, 'gather -s min')
         ]
         data = APIClient.list_actions(self.client)
         self.assertEqual(data['error'], False)
