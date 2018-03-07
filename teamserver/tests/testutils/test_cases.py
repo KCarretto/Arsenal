@@ -8,13 +8,15 @@ import unittest
 
 try:
     from teamserver import create_app
-    from teamserver.models import Action, GroupAction, Group, Session, SessionHistory, Target
+    from teamserver.models import Action, GroupAction, Group, Session, SessionHistory, Target, Log
+    from teamserver.config import APPLICATION
 except ModuleNotFoundError:
     # Configure path to start at teamserver module
     from os.path import abspath, dirname
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
     from teamserver import create_app
     from teamserver.models import Action, GroupAction, Group, Session, SessionHistory, Target
+    from teamserver.config import APPLICATION
 
 def clear_database():
     """
@@ -26,6 +28,7 @@ def clear_database():
     Session.drop_collection()
     SessionHistory.drop_collection()
     Target.drop_collection()
+    Log.drop_collection()
 
 def create_test_app():
     """
@@ -58,6 +61,12 @@ class BaseTest(unittest.TestCase):
         """
         This clears the database after each test.
         """
+        for entry in Log.list(False, APPLICATION):
+            print('[{}]\t{}\t{}:\t{}'.format(
+                entry.timestamp,
+                entry.level,
+                entry.application,
+                entry.message))
         clear_database()
 
     def test_pass(self):

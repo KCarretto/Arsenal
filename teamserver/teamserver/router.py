@@ -12,6 +12,8 @@ from .api import create_action, get_action, cancel_action, list_actions
 from .api import create_group_action, get_group_action, cancel_group_action, list_group_actions
 from .api import get_group, create_group, delete_group, list_groups
 from .api import remove_group_member, add_group_member, blacklist_group_member
+from .api import create_log, list_logs
+from .models import log
 
 API = Blueprint('router', __name__)
 
@@ -94,8 +96,8 @@ def api_entry():
         'ListCredentials': None,
 
         # Logs
-        'CreateLog': None,
-        'ListLogs': None
+        'CreateLog': create_log,
+        'ListLogs': list_logs,
     }
 
     # Attempt to find method
@@ -125,6 +127,7 @@ def api_entry():
     # TODO: Trigger method pre-hooks
 
     # Call method
+    log('DEBUG', 'Calling API method {}'.format(data['method']))
     response = method(data)
 
     # Trigger method post-hooks

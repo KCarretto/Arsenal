@@ -8,14 +8,14 @@ import sys
 import time
 
 try:
-    from teamserver.models import Action, Response, GroupAction
+    from teamserver.models import Action, Response, GroupAction, Log
     from teamserver.models import Session, SessionHistory, Target, Group
     from teamserver.config import SESSION_CHECK_THRESHOLD
 except ModuleNotFoundError:
     from os.path import abspath, dirname
     # Configure path to start at teamserver module
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
-    from teamserver.models import Action, Response, GroupAction
+    from teamserver.models import Action, Response, GroupAction, Log
     from teamserver.models import Session, SessionHistory, Target, Group
     from teamserver.config import SESSION_CHECK_THRESHOLD
 
@@ -210,6 +210,20 @@ class Database(object):
         target.save(force_insert=True)
         return target
 
+    @staticmethod
+    def create_log(timestamp, application, level, message):
+        """
+        Creates a log in the database.
+        """
+        entry = Log(
+            application=application,
+            timestamp=timestamp,
+            level=level,
+            message=message
+        )
+        entry.save(force_insert=True)
+        return entry
+
     #####################################
     #           Get Methods             #
     #####################################
@@ -253,6 +267,13 @@ class Database(object):
         Get a target object from the database.
         """
         return Target.get_by_name(name)
+
+    @staticmethod
+    def list_logs(application=None):
+        """
+        List logs for an application.
+        """
+        return Log.list(False, application)
 
     #####################################
     #           Utility Methods         #

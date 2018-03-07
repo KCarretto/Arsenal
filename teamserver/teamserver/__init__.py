@@ -24,7 +24,9 @@ def create_app(**config_overrides):
     try:
         DB.init_app(app)
     except MongoEngineConnectionError as conn_err:
-        # TODO: Add logging
+        from .models import log
+        log('FATAL', 'Failed to connect to database.')
+        log('DEBUG', conn_err)
         print(conn_err)
         sys.exit('Could not connect to database.')
 

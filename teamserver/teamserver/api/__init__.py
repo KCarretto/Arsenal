@@ -14,3 +14,5 @@ from .session import session_check_in, update_session_config, list_sessions
 
 from .target import create_target, get_target, set_target_facts, list_targets
 from .target import get_target_groups
+
+from .log import create_log, list_logs

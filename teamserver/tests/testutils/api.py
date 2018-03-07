@@ -551,11 +551,47 @@ class APIClient(object): # pylint: disable=too-many-public-methods
     #####################################
     #             Log Methods           #
     #####################################
-    #@staticmethod
-    #def create_log(client):
-    #    pass
-    #
-    #@staticmethod
-    #def list_logs(client):
-    #    pass
+    @staticmethod
+    def create_log(
+            client,
+            application,
+            level,
+            message):
+        """
+        Invoke the CreateLog API method.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='CreateLog',
+                application=application,
+                level=level,
+                message=message
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
+
+    @staticmethod
+    def list_logs(
+            client,
+            include_archived=False,
+            since=0,
+            application=None):
+        """
+        Invoke the ListLogs API method.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='ListLogs',
+                application=application,
+                include_archived=include_archived,
+                since=since
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
 

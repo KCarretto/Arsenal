@@ -6,7 +6,7 @@ from uuid import uuid4
 import time
 
 from .utils import success_response
-from ..models import Target, Session, SessionHistory, Action, Response
+from ..models import Target, Session, SessionHistory, Action, Response, log
 from ..config import DEFAULT_AGENT_SERVERS, DEFAULT_AGENT_INTERVAL
 from ..config import DEFAULT_AGENT_INTERVAL_DELTA, DEFAULT_AGENT_CONFIG_DICT
 
@@ -42,6 +42,10 @@ def create_session(params):
     session_history.save()
     session.save()
 
+    log(
+        'INFO',
+        'New Session on (target: {}) (session: {})'.format(target.name, session.session_id))
+
     # TODO: Queue default config action
 
     return success_response(session_id=session.session_id)
@@ -68,6 +72,11 @@ def session_check_in(params):
     # Fetch session object
     session = Session.get_by_id(params['session_id'])
     # TODO: Handle DoesNotExist in wrapper
+    log(
+        'INFO',
+        'Session checked in from (target: {}) (session: {})'.format(
+            session.target_name,
+            session.session_id))
 
     # Update timestamps
     session.update_timestamp(time.time())

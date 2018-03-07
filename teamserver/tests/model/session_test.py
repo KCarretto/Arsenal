@@ -14,7 +14,7 @@ except ModuleNotFoundError:
     # Configure path to start at teamserver module
     from os.path import dirname, abspath
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
-    from testutils import BaseTest, Database
+    from tests.testutils import BaseTest, Database
     from teamserver.config import SESSION_STATUSES, SESSION_CHECK_THRESHOLD, SESSION_CHECK_MODIFIER
 
 class SessionModelTest(BaseTest):

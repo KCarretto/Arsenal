@@ -2,6 +2,7 @@
 This package contains all database models, and convinient functions
 for manipulating them.
 """
+from .log import log, Log
 from .action import Action, Response
 from .group_action import GroupAction
 from .group import Group, GroupAutomemberRule
