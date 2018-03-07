@@ -24,7 +24,7 @@ COLLECTION_LOGS = 'logs'
 
 # LOG SETTINGS
 APPLICATION = 'teamserver-internal'
-LOG_LEVEL = 'INFO'
+LOG_LEVEL = 'DEBUG'
 LOG_LEVELS = {
     'DEBUG': 0,
     'INFO': 1,

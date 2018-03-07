@@ -43,19 +43,20 @@ class Log(Document):
     archived = BooleanField(default=False)
 
     @staticmethod
-    def list(include_archived=False, application=None):
+    def list(include_archived=False, application=None, since=0):
         """
         Return a list of logs.
         Optionally include archived logs.
         Optionally filter by application.
+        Optionally filter by a timestamp
         """
         if application is not None:
             if include_archived:
-                return Log.objects(application=application) # pylint: disable=no-member
-            return Log.objects(application=application, archived=False) # pylint: disable=no-member
+                return Log.objects(application=application, timestamp__gte=since) # pylint: disable=no-member
+            return Log.objects(application=application, archived=False, timestamp__gte=since) # pylint: disable=no-member
         elif include_archived:
-            return Log.objects() # pylint: disable=no-member
-        return Log.objects(archived=False) # pylint: disable=no-member
+            return Log.objects(timestamp__gte=since) # pylint: disable=no-member
+        return Log.objects(archived=False, timestamp__gte=since) # pylint: disable=no-member
 
     @property
     def document(self):
