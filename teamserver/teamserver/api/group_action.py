@@ -54,3 +54,24 @@ def get_group_action(params):
     group_action = GroupAction.get_by_id(params['group_action_id'])
 
     return success_response(group_action=group_action.document)
+
+def cancel_group_action(params):
+    """
+    Cancels all actions associated with a group action (only if status is queued).
+
+    group_action_id: The unique identifier associated with the group action. <str>
+    """
+    group_action = GroupAction.get_by_id(params['group_action_id'])
+    group_action.cancel()
+
+    return success_response()
+
+def list_group_actions(params): #pylint: disable=unused-argument
+    """
+    This API function will return a list of group action documents.
+    It is highly recommended to avoid using this function, as it
+    can be very expensive.
+    """
+    group_actions = GroupAction.list()
+    return success_response(group_actions={
+        group_action.group_action_id: group_action.document for group_action in group_actions})

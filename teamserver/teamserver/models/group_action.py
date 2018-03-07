@@ -3,7 +3,7 @@
     in the backend MongoDB database.
 """
 from mongoengine import Document
-from mongoengine.fields import StringField, ListField
+from mongoengine.fields import StringField, ListField, BooleanField
 
 from .action import Action
 
@@ -28,6 +28,14 @@ class GroupAction(Document):
     action_string = StringField(required=True, null=False, max_length=MAX_STR_LEN)
     action_ids = ListField(
         StringField(required=True, null=False, max_length=MAX_STR_LEN), required=True, null=False)
+    cancelled = BooleanField(default=False)
+
+    @staticmethod
+    def list():
+        """
+        This method queries for all group action objects.
+        """
+        return GroupAction.objects() #pylint: disable=no-member
 
     @staticmethod
     def get_by_id(group_action_id):
@@ -77,6 +85,8 @@ class GroupAction(Document):
         it's included actions. If no included action list is passed to this function,
         it will resolve them.
         """
+        if self.cancelled:
+            return GROUP_ACTION_STATUSES.get('cancelled', 'cancelled')
         if actions is None:
             actions = self.actions
 
@@ -109,3 +119,12 @@ class GroupAction(Document):
             return GROUP_ACTION_STATUSES.get('mixed success', 'mixed success')
 
         return GROUP_ACTION_STATUSES.get('failed', 'failed')
+
+    def cancel(self):
+        """
+        Cancel all actions associated with this group action.
+        """
+        for action in self.actions:
+            action.cancel()
+        self.cancelled = True
+        self.save()

@@ -473,8 +473,7 @@ class Action(DynamicDocument):
             self.cancelled = True
             self.cancel_time = time.time()
             self.save()
-            return True
-        return False
+        # TODO:  Raise exception
 
     def update_fields(self, parsed_action):
         """

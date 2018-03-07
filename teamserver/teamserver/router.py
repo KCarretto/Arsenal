@@ -9,6 +9,7 @@ from .api import create_target, get_target, set_target_facts, list_targets, get_
 from .api import create_session, get_session, session_check_in
 from .api import update_session_config, list_sessions
 from .api import create_action, get_action, cancel_action, list_actions
+from .api import create_group_action, get_group_action, cancel_group_action, list_group_actions
 from .api import get_group, create_group, delete_group, list_groups
 from .api import remove_group_member, add_group_member, blacklist_group_member
 
@@ -72,10 +73,10 @@ def api_entry():
         'ListActions': list_actions,
 
         # Group Actions
-        'CreateGroupAction': None,
-        'GetGroupAction': None,
-        'CancelGroupAction': None,
-        'ListGroupActions': None,
+        'CreateGroupAction': create_group_action,
+        'GetGroupAction': get_group_action,
+        'CancelGroupAction': cancel_group_action,
+        'ListGroupActions': list_group_actions,
 
         # Groups
         'CreateGroup': create_group,
