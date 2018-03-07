@@ -62,7 +62,7 @@ class GroupAction(Document):
         return {
             'group_action_id': self.group_action_id,
             'action_string': self.action_string,
-            'status': self.status(actions),
+            'status': self.get_status(actions),
             'action_ids': self.action_ids,
             'actions': [action.document for action in actions]
         }
@@ -79,7 +79,7 @@ class GroupAction(Document):
             'action_ids': self.action_ids
         }
 
-    def status(self, actions=None):
+    def get_status(self, actions=None):
         """
         This property determines the status of the group action, based on all of
         it's included actions. If no included action list is passed to this function,
@@ -91,7 +91,6 @@ class GroupAction(Document):
             actions = self.actions
 
         queued = 0
-        stale = 0
         sent = 0
         complete = 0
 
@@ -101,8 +100,6 @@ class GroupAction(Document):
                 queued += 1
             if status == ACTION_STATUSES.get('sent', 'sent'):
                 sent += 1
-            if status == ACTION_STATUSES.get('stale', 'stale'):
-                stale += 1
             if status == ACTION_STATUSES.get('complete', 'complete'):
                 complete += 1
 

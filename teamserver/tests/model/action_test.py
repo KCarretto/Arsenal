@@ -1,5 +1,5 @@
 """
-    This module tests basic functionality of the target model.
+    This module tests basic functionality of the action model.
     It does not test any database connectivity, but it does
     utilize mongoengine's mock database implementation.
 """
