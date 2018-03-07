@@ -7,26 +7,21 @@ import sys
 import unittest
 
 try:
-    from teamserver import create_app #pylint: disable=wrong-import-position
-    from teamserver.models.action import Action #pylint: disable=wrong-import-position
-    from teamserver.models.group import Group
-    from teamserver.models.session import Session, SessionHistory #pylint: disable=wrong-import-position
-    from teamserver.models.target  import Target #pylint: disable=wrong-import-position
+    from teamserver import create_app
+    from teamserver.models import Action, GroupAction, Group, Session, SessionHistory, Target
 except ModuleNotFoundError:
     # Configure path to start at teamserver module
     from os.path import abspath, dirname
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
-    from teamserver import create_app #pylint: disable=wrong-import-position
-    from teamserver.models.action  import Action #pylint: disable=wrong-import-position
-    from teamserver.models.group import Group
-    from teamserver.models.session import Session, SessionHistory #pylint: disable=wrong-import-position
-    from teamserver.models.target  import Target #pylint: disable=wrong-import-position
+    from teamserver import create_app
+    from teamserver.models import Action, GroupAction, Group, Session, SessionHistory, Target
 
 def clear_database():
     """
     This function drops all relevant collections in the database.
     """
     Action.drop_collection()
+    GroupAction.drop_collection()
     Group.drop_collection()
     Session.drop_collection()
     SessionHistory.drop_collection()

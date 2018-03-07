@@ -76,14 +76,17 @@ class Database(object):
             group_name = Database.create_group(None, targets).name
 
         group = Database.get_group(group_name)
-        actions = [Database.create_action(target, action_string) for target in group.member_names]
+        actions = [
+            Database.create_action(target, action_string).action_id
+            for target in group.member_names
+        ]
 
         action_string = action_string if action_string is not None else 'exec echo test'
 
         group_action = GroupAction(
             group_action_id=str(uuid4()),
             action_string=action_string,
-            action_ids=[action.action_id for action in actions]
+            action_ids=actions
         )
         group_action.save(force_insert=True)
         return group_action
