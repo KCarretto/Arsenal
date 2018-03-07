@@ -7,9 +7,10 @@ import time
 from mongoengine import Document
 from mongoengine.fields import BooleanField, StringField, FloatField
 
-from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, COLLECTION_LOGS, LOG_LEVELS, LOG_LEVEL
+from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, COLLECTION_LOGS
+from ..config import LOG_LEVELS, LOG_LEVEL, APPLICATION
 
-def log(application, level, message):
+def log(level, message, application=APPLICATION):
     """
     Log a message for the application at the given level.
     """

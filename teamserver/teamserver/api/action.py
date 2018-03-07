@@ -6,7 +6,7 @@ from uuid import uuid4
 import time
 
 from .utils import success_response
-from ..models import Action
+from ..models import Action, log
 
 def create_action(params, commit=True):
     """
@@ -36,6 +36,9 @@ def create_action(params, commit=True):
 
     if commit:
         action.save(force_insert=True)
+        log(
+            'INFO',
+            'Action Created (action: {}) on (target: {})'.format(action_string, target_name))
     else:
         return action
 
