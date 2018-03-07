@@ -5,18 +5,14 @@ import sys
 import unittest
 
 try:
-    from testutils.test_cases import BaseTest
-    from testutils.database import Database
-    from testutils.api import APIClient
+    from testutils import BaseTest, Database, APIClient
     from teamserver.config import ACTION_STATUSES, ACTION_TYPES
 except ModuleNotFoundError:
     # Configure path to start at teamserver module
     from os.path import dirname, abspath
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
-    from tests.testutils.test_cases import BaseTest
-    from tests.testutils.database import Database
-    from tests.testutils.api import APIClient
-    from teamserver.config import ACTION_STATUSES, ACTION_TYPES # pylint: disable=ungrouped-imports
+    from tests.testutils import BaseTest, Database, APIClient
+    from teamserver.config import ACTION_STATUSES, ACTION_TYPES
 
 class ActionAPITest(BaseTest):
     """

@@ -2,8 +2,7 @@
     This module contains all 'Group' API functions.
 """
 from .utils import success_response
-from ..models.group import Group
-from ..models.target import Target
+from ..models import Group, Target
 
 def create_group(params):
     """

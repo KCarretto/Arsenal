@@ -5,10 +5,10 @@
 """
 
 from flask import Blueprint, request, jsonify
-from .api.target import create_target, get_target, set_target_facts, list_targets
-from .api.session import create_session, get_session, session_check_in
-from .api.session import update_session_config, list_sessions
-from .api.action import create_action, get_action, cancel_action, list_actions
+from .api import create_target, get_target, set_target_facts, list_targets
+from .api import create_session, get_session, session_check_in
+from .api import update_session_config, list_sessions
+from .api import create_action, get_action, cancel_action, list_actions
 
 API = Blueprint('router', __name__)
 

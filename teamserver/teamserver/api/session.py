@@ -6,9 +6,7 @@ from uuid import uuid4
 import time
 
 from .utils import success_response
-from ..models.target import Target
-from ..models.session import Session, SessionHistory
-from ..models.action import Action, Response
+from ..models import Target, Session, SessionHistory, Action, Response
 from ..config import DEFAULT_AGENT_SERVERS, DEFAULT_AGENT_INTERVAL
 from ..config import DEFAULT_AGENT_INTERVAL_DELTA, DEFAULT_AGENT_CONFIG_DICT
 

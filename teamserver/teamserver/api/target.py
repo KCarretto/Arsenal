@@ -2,7 +2,7 @@
     This module contains all 'Target' API functions.
 """
 from .utils import success_response
-from ..models.target import Target
+from ..models import Target
 
 def create_target(params):
     """
