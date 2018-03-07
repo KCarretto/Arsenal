@@ -17,7 +17,7 @@ class GroupAutomemberRule(EmbeddedDocument):
     This class represents an embedded document into the group document,
     which will be used to calculate members of a group.
     """
-    property = StringField(required=True, null=False, max_length=MAX_STR_LEN)
+    attribute = StringField(required=True, null=False, max_length=MAX_STR_LEN)
     regex = StringField(required=True, null=False, max_length=MAX_STR_LEN)
     include = BooleanField(required=True, null=False, default=True)
 
@@ -39,9 +39,9 @@ class Group(Document):
     name = StringField(required=True, null=False, unique=True)
 
     whitelist_members = ListField(StringField(required=True, null=False), required=True, null=False)
-    blacklist_members = ListField(StringField(required=True, null=False), required=True, null=False)
+    blacklist_members = ListField(StringField(required=True, null=False))
 
-    membership_rules = EmbeddedDocumentListField(GroupAutomemberRule(null=False), null=False)
+    membership_rules = EmbeddedDocumentListField(GroupAutomemberRule, null=False)
 
     @staticmethod
     def target_groups(target_name):
@@ -52,9 +52,17 @@ class Group(Document):
         groups = []
         for group in Group.objects(): #pylint: disable=no-member
             if target_name in group.member_names:
-                groups.append(group.name)
+                groups.append(group)
 
         return list(set(groups))
+
+    @staticmethod
+    def get_by_name(name):
+        """
+        This method queries for the group with the given name.
+        """
+        return Group.objects.get(name=name) #pylint: disable=no-member
+
 
     @property
     def members(self):
@@ -71,3 +79,49 @@ class Group(Document):
         """
         # TODO: Implement membership rules and blacklist
         return self.whitelist_members
+
+    @property
+    def document(self):
+        """
+                This property filters and returns the JSON information for a queried group.
+        """
+        return {
+            'name': self.name,
+            'whitelist_members': self.whitelist_members,
+            'blacklist_members': self.blacklist_member
+        }
+
+    def whitelist_member(self, target):
+        """
+        This function attempts to add a target to the member whitelist.
+        The target will not be added if the target is in the blacklist.
+        """
+
+        if target.name in self.blacklist_members: #pylint: disable=unsupported-membership-test
+            # TODO: Throw exception. Should not be in both lists at once
+            pass
+
+        self.whitelist_members.append(target.name) #pylint: disable=no-member
+        self.save()
+
+    def remove_member(self, target):
+        """
+        This function removes a target from the member whitelist.
+        """
+        if not target.name in self.whitelist_members: #pylint: disable=unsupported-membership-test
+            # TODO: Raise exception
+            pass
+        self.whitelist_members.remove(target.name) #pylint: disable=no-member
+
+    def blacklist_member(self, target):
+        """
+        This function removes a target from the member whitelist (if they exist),
+        and add them to the blacklist (if they are not yet on there).
+        """
+        # TODO: try catch the error that remove_member will throw when target is not yet whitelisted
+        self.remove_member(target)
+
+        if target.name in self.blacklist_members: #pylint: disable=unsupported-membership-test
+            # TODO: Raise exception
+            pass
+        self.blacklist_members.append(target.name) #pylint: disable=no-member

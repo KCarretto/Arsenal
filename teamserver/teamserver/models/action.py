@@ -6,15 +6,15 @@ import time
 import shlex
 import argparse
 
-from mongoengine import DynamicDocument, EmbeddedDocument
-from mongoengine.fields import StringField, IntField, FloatField
+from mongoengine import Document, DynamicDocument, EmbeddedDocument
+from mongoengine.fields import StringField, IntField, FloatField, ListField
 from mongoengine.fields import BooleanField, EmbeddedDocumentField
 
 from .session import Session
 
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, ACTION_STATUSES, SESSION_STATUSES
-from ..config import COLLECTION_ACTIONS, ACTION_STALE_THRESHOLD
-from ..config import ACTION_TYPES, DEFAULT_SUBSET
+from ..config import COLLECTION_ACTIONS, COLLECTION_GROUP_ACTIONS, ACTION_STALE_THRESHOLD
+from ..config import ACTION_TYPES, DEFAULT_SUBSET, GROUP_ACTION_STATUSES
 
 class Response(EmbeddedDocument):
     """
@@ -73,7 +73,7 @@ class Action(DynamicDocument):
     action_type = IntField(required=True, null=False)
     target_name = StringField(required=True, null=False, max_length=MAX_STR_LEN)
     session_id = StringField(max_length=MAX_STR_LEN)
-    bound_session_id = StringField(max_length=MAX_STR_LEN)
+    bound_session_id = StringField(null=False, default='', max_length=MAX_STR_LEN)
 
     queue_time = FloatField(required=True, null=False)
     cancel_time = FloatField()
@@ -103,12 +103,13 @@ class Action(DynamicDocument):
         This method returns a list of unassigned actions for the given target name.
         Provide a session_id to include actions that are bound to that session_id.
         """
-        return Action.objects( #pylint: disable=no-member
+        actions = Action.objects.filter( #pylint: disable=no-member
             target_name=target_name,
             session_id=None,
             cancelled=False,
-            bound_session_id__in=[session_id, None]
+            bound_session_id__in=[None, session_id, ''],
         )
+        return actions
 
     @staticmethod
     def list():
@@ -392,15 +393,15 @@ class Action(DynamicDocument):
             }
 
         action_documents = {
-            0: config_document,
-            1: exec_document,
-            2: exec_document,
-            3: exec_document,
-            4: exec_document,
-            5: upload_document,
-            6: download_document,
-            7: gather_document,
-            999: default_document,
+            ACTION_TYPES.get('config', 0): config_document,
+            ACTION_TYPES.get('exec', 1): exec_document,
+            ACTION_TYPES.get('spawn', 2): exec_document,
+            ACTION_TYPES.get('timed_exec', 3): exec_document,
+            ACTION_TYPES.get('timed_spawn', 4): exec_document,
+            ACTION_TYPES.get('upload', 5): upload_document,
+            ACTION_TYPES.get('download', 6): download_document,
+            ACTION_TYPES.get('gather', 7): gather_document,
+            ACTION_TYPES.get('reset', 999): default_document,
         }
 
         return action_documents.get(self.action_type, default_document)()
@@ -474,3 +475,121 @@ class Action(DynamicDocument):
             self.save()
             return True
         return False
+
+    def update_fields(self, parsed_action):
+        """
+        Sets fields on this action document based on a parsed action dictionary.
+        """
+        for key, value in parsed_action.items():
+            if key not in [
+                    'action_id',
+                    'target_name',
+                    'action_string',
+                    'bound_session_id',
+                    'queue_time',
+                    'sent_time',
+                    'complete_time',
+                    'response'
+            ]:
+                self.__setattr__(key, value)
+
+class GroupAction(Document):
+    """
+    This class represents a group action, which is created to track actions
+    across multiple targets. This document primarily serves as a reference,
+    pointing to all the action documents themselves.
+    """
+    meta = {
+        'collection': COLLECTION_GROUP_ACTIONS,
+        'indexes': [
+            {
+                'fields': ['group_action_id'],
+                'unique': True
+            },
+        ]
+    }
+    group_action_id = StringField(required=True, null=False, max_length=MAX_STR_LEN)
+    action_string = StringField(required=True, null=False, max_length=MAX_STR_LEN)
+    action_ids = ListField(
+        StringField(required=True, null=False, max_length=MAX_STR_LEN), required=True, null=False)
+
+    @staticmethod
+    def get_by_id(group_action_id):
+        """
+        This method queries for the group action object matching the id provided.
+        """
+        return GroupAction.objects.get(group_action_id=group_action_id) #pylint: disable=no-member
+
+    @property
+    def actions(self):
+        """
+        This property returns all of a group_actions associated action objects.
+        """
+        return [Action.get_by_id(action_id) for action_id in self.action_ids] #pylint: disable=not-an-iterable
+
+
+    @property
+    def document(self):
+        """
+        This property returns a document describing statuses for all of it's included actions.
+        """
+        actions = self.actions
+
+        return {
+            'group_action_id': self.group_action_id,
+            'action_string': self.action_string,
+            'status': self.status(actions),
+            'action_ids': self.action_ids,
+            'actions': [action.document for action in actions]
+        }
+
+    @property
+    def brief_document(self):
+        """
+        This property returns a document describing basic information about the action
+        without querying for all of it's included actions.
+        """
+        return {
+            'group_action_id': self.group_action_id,
+            'action_string': self.action_string,
+            'action_ids': self.action_ids
+        }
+
+    def status(self, actions=None):
+        """
+        This property determines the status of the group action, based on all of
+        it's included actions. If no included action list is passed to this function,
+        it will resolve them.
+        """
+        if actions is None:
+            actions = self.actions
+
+        queued = 0
+        stale = 0
+        sent = 0
+        complete = 0
+
+        for action in actions:
+            status = action.status
+            if status == ACTION_STATUSES.get('queued', 'queued'):
+                queued += 1
+            if status == ACTION_STATUSES.get('sent', 'sent'):
+                sent += 1
+            if status == ACTION_STATUSES.get('stale', 'stale'):
+                stale += 1
+            if status == ACTION_STATUSES.get('complete', 'complete'):
+                complete += 1
+
+        if complete == len(actions):
+            return GROUP_ACTION_STATUSES.get('success', 'success')
+
+        if sent > 0:
+            return GROUP_ACTION_STATUSES.get('in progress', 'in progress')
+
+        if queued > 0:
+            return GROUP_ACTION_STATUSES.get('queued', 'queued')
+
+        if complete > 0:
+            return GROUP_ACTION_STATUSES.get('mixed success', 'mixed success')
+
+        return GROUP_ACTION_STATUSES.get('failed', 'failed')
