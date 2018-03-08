@@ -1,3 +1,4 @@
 #!/bin/bash
 
-sudo systemctl stop arsenal.service
+#sudo systemctl stop arsenal.service
+echo "ITS STOPPED"
