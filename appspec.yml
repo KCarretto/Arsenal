@@ -7,7 +7,7 @@ files:
     destination: /lib/systemd/system/arsenal.service
 
 hooks:
-  After_Install:
+  AfterInstall:
     - location: contrib/setup
       timeout: 300
       runas: root
