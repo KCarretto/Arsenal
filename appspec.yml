@@ -3,6 +3,8 @@ os: linux
 files:
   - source: ./
     destination: /opt/arsenal
+  - source: ./contrib/arsenal.service
+    destination: /lib/systemd/system/arsenal.service
 
 hooks:
   After_Install:
