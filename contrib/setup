@@ -15,7 +15,7 @@ python3.6 -m venv venv
 source venv/bin/activate
 
 # Install dependencies
-pip install -r teamserver/teamserver/requirements/prod.txt
+pip install -r teamserver/requirements/prod.txt
 
 # Install systemd service file
 cp -f /opt/arsenal/contrib/arsenal.service /lib/systemd/system/arsenal.service
