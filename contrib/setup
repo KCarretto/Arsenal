@@ -1,0 +1,21 @@
+#!/bin/bash
+
+cd ..
+touch EC2_SETUP_TEST
+
+# Ubuntu python install
+#sudo add-apt-repository ppa:deadsnakes/ppa || true
+#sudo apt-get update -y || true
+#sudo apt-get install -y python3.6 || true
+#curl https://bootstrap.pypa.io/get-pip.py | sudo python3.6 || true
+
+# CentOS python install
+#sudo yum install -y yum-utils
+#sudo yum groupinstall -y development
+#sudo yum install -y https://centos7.iuscommunity.org/ius-release.rpm || true
+#sudo yum install -y python36u python36u-pip python36u-dev || true
+
+# Install python dependencies
+#pip3.6 install -r teamserver/requirements/prod.txt
+
+#

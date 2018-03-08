@@ -1,0 +1,2 @@
+#!/bin/bash
+touch EC2_STOP_TEST

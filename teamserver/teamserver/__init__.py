@@ -31,4 +31,3 @@ def create_app(**config_overrides):
         sys.exit('Could not connect to database.')
 
     return app
-

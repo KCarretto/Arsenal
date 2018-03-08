@@ -1,0 +1,22 @@
+version: 0.0
+os: linux
+files:
+  - source: ./
+    destination: /opt/arsenal
+
+hooks:
+  After_Install:
+    - location: contrib/setup
+      timeout: 300
+      runas: ec2-user
+  ApplicationStart:
+    - location: contrib/arsenal-start
+      timeout: 300
+      runas: ec2-user
+  ValidateService:
+    - location: contrib/arsenal-status
+      timeout: 30
+  ApplicationStop:
+    - location: contrib/arsenal-stop
+      timeout: 300
+      runas: ec2-user
