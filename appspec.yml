@@ -12,12 +12,12 @@ hooks:
   ApplicationStart:
     - location: contrib/arsenal-start
       timeout: 300
-      runas: ubuntu
+      runas: root
   ValidateService:
     - location: contrib/arsenal-status
       timeout: 30
-      runas: ubuntu
+      runas: root
   ApplicationStop:
     - location: contrib/arsenal-stop
       timeout: 300
-      runas: ubuntu
+      runas: root
