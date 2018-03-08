@@ -1,6 +1,4 @@
 #!/bin/bash
-
-cd ..
 touch EC2_SETUP_TEST
 
 # Ubuntu python install
