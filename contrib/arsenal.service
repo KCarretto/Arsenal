@@ -3,12 +3,10 @@ Description=Arsenal team server
 After=network.target
 
 [Service]
-ExecStart=/bin/bash -c "cd /opt/arsenal/teamserver; uwsgi --ini uwsgi.ini"
-ExecReload=/bin/kill -HUP $MAINPID
-KillMode=process
-Restart=on-failure
-RestartPreventExitStatus=255
-Type=notify
+ExecStart=/bin/bash -c "cd /opt/arsenal/teamserver; source /opt/arsenal/teamserver/venv/bin/activate; uwsgi --ini uwsgi.ini"
+ExecReload=/bin/kill -SIGQUIT $MAINPID
+KillSignal=SIGTERM
+Type=simple
 
 [Install]
 WantedBy=multi-user.target
