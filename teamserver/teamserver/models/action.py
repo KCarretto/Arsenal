@@ -12,6 +12,7 @@ from mongoengine.fields import BooleanField, EmbeddedDocumentField
 
 from .session import Session
 
+from ..exceptions import CannotCancel
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, ACTION_STATUSES, SESSION_STATUSES
 from ..config import COLLECTION_ACTIONS, ACTION_STALE_THRESHOLD
 from ..config import ACTION_TYPES, DEFAULT_SUBSET
@@ -473,7 +474,8 @@ class Action(DynamicDocument):
             self.cancelled = True
             self.cancel_time = time.time()
             self.save()
-        # TODO:  Raise exception
+        else:
+            raise CannotCancel('Action status is not queued.')
 
     def update_fields(self, parsed_action):
         """

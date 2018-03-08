@@ -7,6 +7,7 @@ import time
 
 from .utils import success_response
 from ..models import Action, log
+from ..exceptions import handle_exceptions
 
 def create_action(params, commit=True):
     """
@@ -54,6 +55,7 @@ def get_action(params):
 
     return success_response(action=action.document)
 
+@handle_exceptions
 def cancel_action(params):
     """
     Cancels an action if it has not yet been sent.
@@ -62,9 +64,7 @@ def cancel_action(params):
     action_id(required): The action_id of the action to cancel. <str>
     """
     action = Action.get_by_id(params['action_id'])
-    if not action.cancel():
-        # TODO: Raise exception to return error response
-        pass
+    action.cancel()
 
     return success_response()
 
