@@ -1,2 +1,2 @@
 #!/bin/bash
-touch EC2_START_TEST
+sudo touch EC2_START_TEST
