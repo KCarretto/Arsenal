@@ -1,16 +1,19 @@
 """
     This module contains all 'Session' API functions.
 """
-from uuid import uuid4
-
 import time
 
+from uuid import uuid4
+from mongoengine.errors import DoesNotExist
+
+
 from .utils import success_response
+from ..exceptions import handle_exceptions, TargetNotFound
 from ..models import Target, Session, SessionHistory, Action, Response, log
 from ..config import DEFAULT_AGENT_SERVERS, DEFAULT_AGENT_INTERVAL
 from ..config import DEFAULT_AGENT_INTERVAL_DELTA, DEFAULT_AGENT_CONFIG_DICT
 
-
+@handle_exceptions
 def create_session(params):
     """
     This API function creates a new session object in the database.
@@ -23,9 +26,11 @@ def create_session(params):
     config_dict (optional): Any other configuration options that the agent is initially
                             configured with. <dict>
     """
-    target = Target.get_by_macs(params['mac_addrs'])
+    try:
+        target = Target.get_by_macs(params['mac_addrs'])
+    except DoesNotExist:
+        raise TargetNotFound('Target with given mac_addrs does not exist')
 
-    # TODO: Handle target does not exist exception
     session = Session(
         session_id=str(uuid4()),
         timestamp=time.time(),
