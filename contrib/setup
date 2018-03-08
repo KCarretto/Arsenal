@@ -3,13 +3,11 @@
 # This script will install the teamserver and dependencies on Ubuntu 16.04
 # It expects the repo to be cloned into /opt/arsenal
 
-# Install systemd service file
-cp -f /opt/arsenal/contrib/arsenal.service /lib/systemd/system/arsenal.service
-
 # Install python 3.6
 add-apt-repository -y ppa:deadsnakes/ppa
 apt-get update -y
-apt-get install -y python3.6 uwsgi
+apt-get install -y python3.6 python3.6-venv uwsgi
+curl https://bootstrap.pypa.io/get-pip.py | sudo python3.6
 
 # Create and activate a virtualenv
 cd /opt/arsenal
@@ -18,6 +16,9 @@ source venv/bin/activate
 
 # Install dependencies
 pip install -r teamserver/teamserver/requirements/prod.txt
+
+# Install systemd service file
+cp -f /opt/arsenal/contrib/arsenal.service /lib/systemd/system/arsenal.service
 
 # Reload systemd daemons
 systemctl daemon-reload

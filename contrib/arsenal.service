@@ -3,9 +3,10 @@ Description=Arsenal team server
 After=network.target
 
 [Service]
-ExecStart=/bin/bash -c "cd /opt/arsenal/teamserver; source /opt/arsenal/teamserver/venv/bin/activate; uwsgi --ini uwsgi.ini"
+ExecStart=/bin/bash -c "cd /opt/arsenal/teamserver; source /opt/arsenal/venv/bin/activate; uwsgi --ini uwsgi.ini"
 ExecReload=/bin/kill -SIGQUIT $MAINPID
 KillSignal=SIGTERM
+StandardError=syslog
 Type=simple
 
 [Install]
