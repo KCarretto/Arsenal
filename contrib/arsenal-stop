@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo touch EC2_STOP_TEST
+
+sudo systemctl stop arsenal.service

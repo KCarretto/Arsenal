@@ -1,2 +1,3 @@
 #!/bin/bash
-sudo touch EC2_START_TEST
+
+sudo systemctl start arsenal.service

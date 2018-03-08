@@ -8,7 +8,7 @@ hooks:
   After_Install:
     - location: contrib/setup
       timeout: 300
-      runas: ubuntu
+      runas: root
   ApplicationStart:
     - location: contrib/arsenal-start
       timeout: 300
@@ -16,6 +16,7 @@ hooks:
   ValidateService:
     - location: contrib/arsenal-status
       timeout: 30
+      runas: ubuntu
   ApplicationStop:
     - location: contrib/arsenal-stop
       timeout: 300
