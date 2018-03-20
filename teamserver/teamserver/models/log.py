@@ -14,7 +14,7 @@ def log(level, message, application=APPLICATION):
     """
     Log a message for the application at the given level.
     """
-    if LOG_LEVELS.get(level.upper(), 'DEBUG') >= LOG_LEVELS.get(LOG_LEVEL, 0):
+    if LOG_LEVELS.get(level.upper(), 0) >= LOG_LEVELS.get(LOG_LEVEL, 0):
         entry = Log(
             timestamp=time.time(),
             application=application,

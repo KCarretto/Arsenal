@@ -92,10 +92,6 @@ class Target(Document):
         This property returns all session objects that are
         associated with this target.
         """
-        # TODO: Figure out if caching at this level is worthwhile
-
-        #if self._session_cache is None:
-        #    self._session_cache = [session for session in Session.objects(target_name=self.name)] #pylint: disable=no-member
         return Session.objects(target_name=self.name) #pylint: disable=no-member
 
     @property

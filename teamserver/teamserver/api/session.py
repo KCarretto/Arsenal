@@ -4,11 +4,9 @@
 import time
 
 from uuid import uuid4
-from mongoengine.errors import DoesNotExist
-
 
 from .utils import success_response
-from ..exceptions import handle_exceptions, TargetNotFound
+from ..exceptions import handle_exceptions
 from ..models import Target, Session, SessionHistory, Action, Response, log
 from ..config import DEFAULT_AGENT_SERVERS, DEFAULT_AGENT_INTERVAL
 from ..config import DEFAULT_AGENT_INTERVAL_DELTA, DEFAULT_AGENT_CONFIG_DICT
@@ -26,10 +24,7 @@ def create_session(params):
     config_dict (optional): Any other configuration options that the agent is initially
                             configured with. <dict>
     """
-    try:
-        target = Target.get_by_macs(params['mac_addrs'])
-    except DoesNotExist:
-        raise TargetNotFound('Target with given mac_addrs does not exist')
+    target = Target.get_by_macs(params['mac_addrs'])
 
     session = Session(
         session_id=str(uuid4()),
@@ -55,6 +50,7 @@ def create_session(params):
 
     return success_response(session_id=session.session_id)
 
+@handle_exceptions
 def get_session(params):
     """
     This API function queries and returns a session object with the given session_id.
@@ -62,10 +58,9 @@ def get_session(params):
     session_id (required): The session_id to search for. <str>
     """
     session = Session.get_by_id(params['session_id'])
-    # TODO: Handle DoesNotExist in wrapper
-
     return success_response(session=session.document)
 
+@handle_exceptions
 def session_check_in(params):
     """
     This API function checks in a session, updating timestamps and history, submitting
@@ -76,7 +71,7 @@ def session_check_in(params):
     """
     # Fetch session object
     session = Session.get_by_id(params['session_id'])
-    # TODO: Handle DoesNotExist in wrapper
+
     log(
         'INFO',
         'Session checked in from (target: {}) (session: {})'.format(
@@ -93,7 +88,6 @@ def session_check_in(params):
         if response['stderr'] is None:
             response['stderr'] = ''
 
-        # TODO: Handle response formatting errors
         resp = Response(
             stdout=response['stdout'],
             stderr=response['stderr'],
@@ -118,6 +112,7 @@ def session_check_in(params):
     # Respond
     return success_response(session_id=session.session_id, actions=actions)
 
+@handle_exceptions
 def update_session_config(params):
     """
     This API function updates the config dictionary for a session.
@@ -144,6 +139,7 @@ def update_session_config(params):
 
     return success_response(config=session.config)
 
+@handle_exceptions
 def list_sessions(params): #pylint: disable=unused-argument
     """
     This API function will return a list of session documents.

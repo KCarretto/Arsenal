@@ -12,7 +12,7 @@ from mongoengine.fields import BooleanField, EmbeddedDocumentField
 
 from .session import Session
 
-from ..exceptions import CannotCancel
+from ..exceptions import CannotCancel, ActionParseException, UnboundException, CannotAssign
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, ACTION_STATUSES, SESSION_STATUSES
 from ..config import COLLECTION_ACTIONS, ACTION_STALE_THRESHOLD
 from ..config import ACTION_TYPES, DEFAULT_SUBSET
@@ -270,10 +270,8 @@ class Action(DynamicDocument):
         }
         method = cmds.get(cmd[0].lower())
         if method is None or not callable(method):
-            # TODO: Raise parsing exception
-            pass
+            raise ActionParseException("Invalid action type.")
 
-        # TODO: Raise parsing exception
         parsed = method(cmd[1:])
 
         return parsed
@@ -307,9 +305,14 @@ class Action(DynamicDocument):
                 return ACTION_STATUSES.get('error', 'error')
             return ACTION_STATUSES.get('complete', 'complete')
 
-        # TODO: Raise an error if the session does not exist
+        session = self.session
+        if not session:
+            self.session_id = None
+            self.save()
+            raise UnboundException(
+                "Action is assigned to session that no longer exists. It has been unbound.")
 
-        session_status = self.session.status
+        session_status = session.status
 
         if session_status == SESSION_STATUSES.get('active', 'active'):
             return ACTION_STATUSES.get('sent', 'sent')
@@ -329,7 +332,6 @@ class Action(DynamicDocument):
             """
             Returns an action document for the config action type.
             """
-            # TODO: Throw exception if config is empty
             return {
                 'action_id': self.action_id,
                 'action_type': self.action_type,
@@ -432,9 +434,9 @@ class Action(DynamicDocument):
         """
         # TODO: Generate Event
 
-        if self.bound_session_id is not None and session.session_id != self.bound_session_id:
-            # TODO: Raise error for assigning to non-bound session
-            pass
+        if self.bound_session_id and session.session_id != self.bound_session_id:
+            raise CannotAssign(
+                'Action cannot be assigned to session, because it is bound to another.')
 
         self.session_id = session.session_id
         self.sent_time = time.time()
@@ -448,8 +450,8 @@ class Action(DynamicDocument):
         # TODO: Generate Event
 
         if self.bound_session_id is not None and session_id != self.bound_session_id:
-            # TODO: Raise error for assigning to non-bound session
-            pass
+            raise CannotAssign(
+                'Action cannot be assigned to session, because it is bound to another')
 
         self.session_id = session_id
         self.sent_time = time.time()

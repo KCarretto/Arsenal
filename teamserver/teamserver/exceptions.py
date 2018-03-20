@@ -4,8 +4,9 @@
     responses are returned when an error is encountered.
 """
 from functools import wraps
+from mongoengine.errors import DoesNotExist, NotUniqueError
 from .models import log
-from .config import LOG_LEVEL, LOG_LEVELS
+from .config import LOG_LEVEL
 
 class CannotCancel(Exception):
     """
@@ -14,24 +15,52 @@ class CannotCancel(Exception):
     """
     pass
 
-class TargetNotFound(Exception):
+class UnboundException(Exception):
     """
-    This exception is raised when the referenced target is not found.
+    This exception is raised when the session that an action was assigned to no longer exists.
     """
     pass
 
-def failed_response(status, description, debug_msg=None):
+class CannotAssign(Exception):
     """
-    A function to generate a failed JSON response.
+    This exception is raised when an action is unable to be assigned to the given session_id.
     """
-    if debug_msg is not None and LOG_LEVEL == LOG_LEVELS.get('DEBUG', 0):
-        log('DEBUG', '{}|{}'.format(description, debug_msg))
-        return {
-            'status': status,
-            'description': description,
-            'debug': debug_msg,
-            'error': True,
-        }
+    pass
+
+class ActionParseException(Exception):
+    """
+    This exception is raised when an error was encountered while parsing an action string.
+    """
+    pass
+
+class MembershipException(Exception):
+    """
+    This exception is raised when an attempt to modify group membership is made
+    and cannot be completed.
+    """
+    pass
+
+def failed_response(status, description, log_msg=None, log_level=None):
+    """
+    A function to generate a failed JSON response. If the LOG_LEVEL 'DEBUG' is set,
+    log messages will be included in the JSON response.
+
+    status: The status code to return.
+    description: A description of the error code to return.
+    log_msg: A log message to raise, default to DEBUG log level.
+    log_level: The level to raise the log message to.
+    """
+
+    if log_msg is not None and log_level is not None:
+        log(log_level, '{}|{}'.format(description, log_msg))
+
+        if LOG_LEVEL == 'DEBUG':
+            return {
+                'status': status,
+                'description': description,
+                'debug': log_msg,
+                'error': True,
+            }
     return {
         'status': status,
         'description': description,
@@ -47,23 +76,39 @@ def handle_exceptions(func):
     """
 
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs): #pylint: disable=too-many-return-statements
         """
         This uses the func tools library to wrap a function.
         """
         try:
             retval = func(*args, **kwargs)
             return retval
-        except TargetNotFound as exception:
-            msg = 'Referenced Target not found.'
-            log('INFO', msg)
-            return failed_response(404, msg, exception)
+
         except CannotCancel as exception:
             msg = 'Failed to cancel Action. Action has already been sent'
-            log('INFO', msg)
             return failed_response(423, msg, exception)
+
+        except ActionParseException as exception:
+            msg = 'Invalid action syntax. {}'.format(exception)
+            return failed_response(400, msg, exception)
+
+        except DoesNotExist as exception:
+            msg = 'Resource not found.'
+            return failed_response(404, msg, exception)
+
+        except NotUniqueError as exception:
+            msg = 'Resource already exists.'
+            return failed_response(422, msg, exception)
+
+        except MembershipException as exception:
+            return failed_response(400, exception)
+
+        except KeyError as exception:
+            msg = 'Missing required parameter: {}'.format(exception)
+            return failed_response(422, msg, exception)
+
         except Exception: #pylint: disable=broad-except
             msg = 'Server encountered unhandled exception.'
-            return failed_response(500, msg)
+            return failed_response(500, msg, exception, 'CRIT')
 
     return wrapper

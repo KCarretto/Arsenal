@@ -3,7 +3,9 @@
 """
 from .utils import success_response
 from ..models import Group, Target
+from ..exceptions import handle_exceptions
 
+@handle_exceptions
 def create_group(params):
     """
     This function creates a group object in the database.
@@ -19,6 +21,7 @@ def create_group(params):
 
     return success_response()
 
+@handle_exceptions
 def get_group(params):
     """
     Retrieves a group from the database based on name.
@@ -28,6 +31,7 @@ def get_group(params):
     group = Group.get_by_name(params['name'])
     return success_response(group=group.document)
 
+@handle_exceptions
 def add_group_member(params):
     """
     This whitelists a member into a group. This means that
@@ -44,6 +48,7 @@ def add_group_member(params):
 
     return success_response()
 
+@handle_exceptions
 def remove_group_member(params):
     """
     Removes a target from a group's membership whitelist.
@@ -58,6 +63,7 @@ def remove_group_member(params):
 
     return success_response()
 
+@handle_exceptions
 def blacklist_group_member(params):
     """
     Blacklist a target from ever being a member of a group.
@@ -72,6 +78,7 @@ def blacklist_group_member(params):
 
     return success_response()
 
+@handle_exceptions
 def delete_group(params):
     """
     Delete a group from the database.
@@ -82,6 +89,7 @@ def delete_group(params):
     group.delete()
     return success_response()
 
+@handle_exceptions
 def list_groups(params): #pylint: disable=unused-argument
     """
     List all groups that currently exist.

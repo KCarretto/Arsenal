@@ -9,6 +9,7 @@ from .utils import success_response
 from ..models import Action, log
 from ..exceptions import handle_exceptions
 
+@handle_exceptions
 def create_action(params, commit=True):
     """
     This API function creates a new action object in the database.
@@ -45,6 +46,7 @@ def create_action(params, commit=True):
 
     return success_response(action_id=action.action_id)
 
+@handle_exceptions
 def get_action(params):
     """
     Retrieves an action from the database based on action_id.
@@ -68,6 +70,7 @@ def cancel_action(params):
 
     return success_response()
 
+@handle_exceptions
 def list_actions(params): #pylint: disable=unused-argument
     """
     This API function will return a list of action documents.
