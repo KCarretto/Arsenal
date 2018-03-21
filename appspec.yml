@@ -1,0 +1,23 @@
+version: 0.0
+os: linux
+files:
+  - source: ./
+    destination: /opt/arsenal
+
+hooks:
+  AfterInstall:
+    - location: contrib/setup
+      timeout: 300
+      runas: root
+  ApplicationStart:
+    - location: contrib/arsenal-start
+      timeout: 300
+      runas: root
+  ValidateService:
+    - location: contrib/arsenal-status
+      timeout: 30
+      runas: root
+  ApplicationStop:
+    - location: contrib/arsenal-stop
+      timeout: 300
+      runas: root

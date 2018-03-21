@@ -1,6 +1,7 @@
 # Custom
 *.vscode*
 *TODO*
+*teamserver-latest.zip*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

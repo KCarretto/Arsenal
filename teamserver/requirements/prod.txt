@@ -10,3 +10,4 @@ pymongo==3.6.0
 six==1.11.0
 Werkzeug==0.14.1
 WTForms==2.1
+uWSGI==2.0.17
