@@ -3,9 +3,11 @@
 """
 from uuid import uuid4
 from .utils import success_response
-from ..models import GroupAction, Group, log
 from .action import create_action
+from ..models import GroupAction, Group, log
+from ..exceptions import handle_exceptions
 
+@handle_exceptions
 def create_group_action(params):
     """
     Creates an action and assigns it to a group of targets. Each target
@@ -50,6 +52,7 @@ def create_group_action(params):
     # Return successful response including the group_action_id for tracking
     return success_response(group_action_id=group_action.group_action_id)
 
+@handle_exceptions
 def get_group_action(params):
     """
     Retrieves a group action from the database based on the group_action_id.
@@ -60,6 +63,7 @@ def get_group_action(params):
 
     return success_response(group_action=group_action.document)
 
+@handle_exceptions
 def cancel_group_action(params):
     """
     Cancels all actions associated with a group action (only if status is queued).
@@ -71,6 +75,7 @@ def cancel_group_action(params):
 
     return success_response()
 
+@handle_exceptions
 def list_group_actions(params): #pylint: disable=unused-argument
     """
     This API function will return a list of group action documents.

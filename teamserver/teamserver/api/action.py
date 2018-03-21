@@ -7,7 +7,9 @@ import time
 
 from .utils import success_response
 from ..models import Action, log
+from ..exceptions import handle_exceptions
 
+@handle_exceptions
 def create_action(params, commit=True):
     """
     This API function creates a new action object in the database.
@@ -44,6 +46,7 @@ def create_action(params, commit=True):
 
     return success_response(action_id=action.action_id)
 
+@handle_exceptions
 def get_action(params):
     """
     Retrieves an action from the database based on action_id.
@@ -54,6 +57,7 @@ def get_action(params):
 
     return success_response(action=action.document)
 
+@handle_exceptions
 def cancel_action(params):
     """
     Cancels an action if it has not yet been sent.
@@ -62,12 +66,11 @@ def cancel_action(params):
     action_id(required): The action_id of the action to cancel. <str>
     """
     action = Action.get_by_id(params['action_id'])
-    if not action.cancel():
-        # TODO: Raise exception to return error response
-        pass
+    action.cancel()
 
     return success_response()
 
+@handle_exceptions
 def list_actions(params): #pylint: disable=unused-argument
     """
     This API function will return a list of action documents.

@@ -3,7 +3,9 @@
 """
 from .utils import success_response
 from ..models import Log, log
+from ..exceptions import handle_exceptions
 
+@handle_exceptions
 def create_log(params):
     """
     Log an entry (if current log level deems necessary)
@@ -12,13 +14,10 @@ def create_log(params):
     level (required): The log level that the message is at. <str, LOG_LEVELS from config.py>
     message (required): The message to log. <str>
     """
-    if params['application'] is None:
-        # TODO: Raise error
-        pass
-
     log(params['level'], params['message'], params['application'])
     return success_response()
 
+@handle_exceptions
 def list_logs(params):
     """
     Show filtered log entries
