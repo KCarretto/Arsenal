@@ -4,7 +4,7 @@
     responses are returned when an error is encountered.
 """
 from functools import wraps
-from mongoengine.errors import DoesNotExist, NotUniqueError
+from mongoengine.errors import DoesNotExist, NotUniqueError, ValidationError
 from .models import log
 from .config import LOG_LEVEL
 
@@ -84,12 +84,21 @@ def handle_exceptions(func):
             retval = func(*args, **kwargs)
             return retval
 
+        # Arsenal Specific Exceptions
         except CannotCancel as exception:
-            msg = 'Failed to cancel Action. Action has already been sent'
+            msg = 'Failed to cancel Action. Action has already been sent.'
             return failed_response(423, msg, exception)
 
         except ActionParseException as exception:
-            msg = 'Invalid action syntax. {}'.format(exception)
+            msg = 'Invalid action syntax.'
+            return failed_response(400, msg, exception)
+
+        except MembershipException as exception:
+            return failed_response(400, exception)
+
+        # Mongoengine Exceptions
+        except ValidationError as exception:
+            msg = 'Invalid field type.'
             return failed_response(400, msg, exception)
 
         except DoesNotExist as exception:
@@ -100,11 +109,9 @@ def handle_exceptions(func):
             msg = 'Resource already exists.'
             return failed_response(422, msg, exception)
 
-        except MembershipException as exception:
-            return failed_response(400, exception)
-
+        # Python Exceptions
         except KeyError as exception:
-            msg = 'Missing required parameter: {}'.format(exception)
+            msg = 'Missing required parameter.'
             return failed_response(422, msg, exception)
 
         except Exception: #pylint: disable=broad-except
