@@ -77,6 +77,11 @@ The existing Arsenal HTTP C2 utilizes JSON as a communication Format. The JSON t
 ```json
 {
   "session_id": "",
+  "config": {
+    "interval": 60,
+    "interval_delta": 120,
+    "servers": ["10.0.0.1", "https://something.com"] 
+  }
   "facts": {  
     "hostname": "host",
     "interfaces":  [
@@ -95,6 +100,7 @@ The existing Arsenal HTTP C2 utilizes JSON as a communication Format. The JSON t
 }
 ```
 * **session_id** - Must be empty string or not present in the initial beacon. The C2 will respond with a session_id that the Agent should keep track of, and send with all future call backs.<br>
+* **config** - This is a dictionary that represents the agent's initial configuration.
 * **facts** - A dictionary containing facts about the target system. The only required fact is "interfaces", which should be provided in the format shown above, however it is recommended that you collect at least the "min" subset on initial beacon (Which can be found under the target section of database.md Documentation). It is also likely that the "hostname" fact will be used for target auto-naming, so it is highly recommended that you collect this fact as well.<br>
 
 #### Standard Response
