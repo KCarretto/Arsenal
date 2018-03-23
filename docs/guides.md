@@ -81,7 +81,7 @@ The existing Arsenal HTTP C2 utilizes JSON as a communication Format. The JSON t
     "interval": 60,
     "interval_delta": 120,
     "servers": ["10.0.0.1", "https://something.com"] 
-  }
+  },
   "facts": {  
     "hostname": "host",
     "interfaces":  [
