@@ -120,17 +120,7 @@ This API call will fetch Target information from the teamserver.
 {
 "status": 200,
 "error": False,
-"target": {
-  "name": "<target_name>",
-  "status": "<target_status>",
-  "lastseen": <timestamp>,
-  "mac_addrs": ["Some Mac Addresses"],
-  "facts": {
-    "A Fact": "A Value"   
-  },
-  "sessions": [],
-  "credentials": "Not yet implemented",
- }
+"target": <Target Object>
 }
 ```
 ### SetTargetFacts
@@ -175,18 +165,7 @@ None.
 "status": 200,
 "error": False,
 "targets": {
-  "target_id": {
-      "name": "<target_name>",
-      "status": "<target_status>",
-      "lastseen": <timestamp>,
-      "mac_addrs": ["Some Mac Addresses"],
-      "facts": {
-        "A Fact": "A Value"   
-      },
-      "sessions": [],
-      "credentials": "Not yet implemented"
-  }
-}
+  "target_id": <Target Object>
 }
 ```
 
@@ -218,7 +197,7 @@ None.
 This API call queues an Action with the teamserver, and assigns it to a given Target. The first Session to check in for a given Target will receive any Actions in that Target's queue. On the next check in, the Session will submit responses for any Actions that were queued on the previous round. Special options may be given in the `action_string` parameter to specify how the Action is handled and executed.
 
 #### Parameters
-| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |   
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
 | :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
 | target_name      | yes          | yes        | str      | The name of the Target to queue the Action for.               |
 | action_string    | yes          | no         | str      | Conforms to Arsenal Action Syntax.                            |
@@ -235,25 +214,89 @@ This API call queues an Action with the teamserver, and assigns it to a given Ta
 
 ### CreateGroupAction
 #### Overview
-This API call queues Actions for an entire Group of Targets. TODO
+This API call queues Actions for an entire Group of Targets. It will provide an identifier for tracking the progress of each created Action.
+
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| group_name       | yes          | yes        | str      | The name of the Group to queue the Actions for.               |
+| action_string    | yes          | no         | str      | Conforms to Arsenal Action Syntax.                            |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"group_action_id": "The group action identifier."
+}
+```
+
 ### GetAction
 #### Overview
+Retrieve information about an Action object on the teamserver.
+
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| action_id        | yes          | yes        | str      | The unique identifier of the Action.                          |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"action": <Action Object>
+}
+```
+
+### GetGroupAction
+#### Parameters
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| group_action_id  | yes          | yes        | str      | The unique identifier of the Group Action.                    |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"action": <GroupAction Object>
+}
+```
+
 ### CancelAction
 #### Overview
+This API call attempts to cancel an Action before it is sent. This will fail if the Action is in any state other than queued.
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| action_id        | yes          | yes        | str      | The unique identifier of the Action.                          |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+}
+```
+
 ### CancelGroupAction
 #### Overview
+This API call attempts to cancel all Actions associated with a Group Action. This will fail if an Action is in any state other than queued.
+
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| group_action_id  | yes          | yes        | str      | The unique identifier of the Group Action.                    |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+}
+```
+
 ### ListActions
 #### Overview
 #### Parameters
