@@ -60,44 +60,24 @@ The Arsenal teamserver exposes a '/api' endpoint for users, applications, and c2
 ## Web Hooks
 Not yet implemented.
 ### RegisterWebhook
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 ### RemoveWebhook 
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 ### ListWebhooks
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 
 ## API Tokens
 Not yet implemented.
 ### CreateAPIToken
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 ### DeleteAPIToken
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 
 ## Targets
 ### CreateTarget 
 #### Overview
 This API call will create a Target object on the teamserver, which represents a server or machine that is being attacked.
 #### Parameters
-| **Name**   | **Required** | **Unique** | **Type** | **Description**                                |                         
-| :--------- | :----------- | :--------- | :------- | :--------------------------------------------- |
-| name       | yes          | yes        | str      | A human-readable unique identifier.            |
+| **Name**   | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| name       | yes          | yes        | str      | A human-readable unique identifier.                           |
 | mac_addrs  | yes          | yes        | list<str>| A list of mac addresses. Each target must have a unique list. |
-| facts      | no           | no         | dict     | Information that has been gathered about the target system. |
+| facts      | no           | no         | dict     | Information that has been gathered about the target system.   |
 
 #### Example Success Response
 ```
@@ -360,37 +340,45 @@ None
 #### Example Response
 
 ## Credentials
+Not yet implemented.
 ### CreateCredentials
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 ### GetValidCredentials
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 ### InvalidateCredentials
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 ### ListCredentials
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
+
 
 ## Logs
 ### CreateLog
 #### Overview
+Add a log entry to the log server. This is mostly useful for Agents and C2 servers, but may be utilized by any application that wishes to have a centralized and easy place to view logs.
 #### Parameters
-#### Example Request
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| application      | yes          | no         | str      | The name of the application submitting the log.               |
+
 #### Example Response
+```
+{
+"status": 200,
+"error": False
+}
+```
 ### ListLogs
 #### Overview
+View log entries that have been stored on the log server. You may filter by application, or timestamps.
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| application      | no           | no         | str      | The name of the application submitting the log to filter for. |
+| since            | no           | no         | float    | Filter for any logs before this timestamp.                    |
+| include_archived | no           | no         | bool     | Whether archived logs should be included in the search.       |
 
+#### Example Response
+```
+{
+"status": 200,
+"error": False,
+"logs": [ <Log Object> ]
+}
+```
 
