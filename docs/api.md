@@ -152,9 +152,24 @@ None.
 ## Sessions
 ### CreateSession 
 #### Overview
+This API call creates a new instance of an Agent on a given Target. We call this instance a Session.
 #### Parameters
-#### Example Request
+| **Name**      | **Required** | **Unique** | **Type**  | **Description**                                |                       
+| :------------ | :----------- | :--------- | :-------- | :--------------------------------------------- |
+| mac_addrs     | yes          | yes        | list<str> | The mac addresses of the system that the agent was run on. This is used to associate the Session with a target.  |   
+| servers       | no           | no         | list<str> | The C2 servers that the Agent is configured with. |
+| interval      | no           | no         | float     | The amount of time a Session will wait inbetween check ins. |
+| interval_delta| no           | no         | float     | The random delta to add to each interval (+ or -). |
+| config_dict   | no           | no         | dict      | Any additional configuration information from the Agent. |
+
 #### Example Response
+```
+{
+"status": 200,
+"error": False,
+"session_id": "<session_id>"
+}
+```
 ### GetSession 
 #### Overview
 #### Parameters
