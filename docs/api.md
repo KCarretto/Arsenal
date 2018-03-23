@@ -46,6 +46,7 @@ Read here about how to interact with the teamserver's API.
   * [ListLogs](#listlogs)
 
 ## Web Hooks
+Not yet implemented.
 ### RegisterWebhook
 #### Overview
 #### Parameters
@@ -63,6 +64,7 @@ Read here about how to interact with the teamserver's API.
 #### Example Response
 
 ## API Tokens
+Not yet implemented.
 ### CreateAPIToken
 #### Overview
 #### Parameters
@@ -77,29 +79,104 @@ Read here about how to interact with the teamserver's API.
 ## Targets
 ### CreateTarget 
 #### Overview
+This API call will create a Target object on the teamserver, which represents a server or machine that is being attacked.
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**   | **Required** | **Unique** | **Type** | **Description**                                |                         
+| :--------- | :----------- | :--------- | :------- | :--------------------------------------------- |
+| name       | yes          | yes        | str      | A human-readable unique identifier.            |
+| mac_addrs  | yes          | yes        | list<str>| A list of mac addresses. Each target must have a unique list. |
+| facts      | no           | no         | dict     | Information that has been gathered about the target system. |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False
+}
+```
+
 ### GetTarget
 #### Overview
+This API call will fetch Target information from the teamserver.
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**   | **Required** | **Unique** | **Type** | **Description**                                |                         
+| :--------- | :----------- | :--------- | :------- | :--------------------------------------------- |
+| name       | yes          | yes        | str      | A human-readable unique identifier.            |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"target": {
+  "name": "<target_name>",
+  "status": "<target_status>",
+  "lastseen": <timestamp>,
+  "mac_addrs": ["Some Mac Addresses"],
+  "facts": {
+    "A Fact": "A Value"   
+  },
+  "sessions": [],
+  "credentials": "Not yet implemented",
+ }
+}
+```
 ### SetTargetFacts
 #### Overview
+Update the Target's fact dictionary. This will override any existing facts.
+
 #### Parameters
-#### Example Request
-#### Example Response
-### ArchiveTarget 
+| **Name**   | **Required** | **Unique** | **Type** | **Description**                                |                         
+| :--------- | :----------- | :--------- | :------- | :--------------------------------------------- |
+| name       | yes          | yes        | str      | A human-readable unique identifier.            |
+| facts      | yes          | no         | dict     | A dictionary with key value pairs to update.   |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"target": {
+  "name": "<target_name>",
+  "facts": {
+    "A Fact": "A Value",
+    "Old Fact": "Old Value"
+  }
+}
+}
+```
+### ArchiveTarget
+Not yet implemented.
 #### Overview
 #### Parameters
 #### Example Request
 #### Example Response
+
 ### ListTargets
 #### Overview
+Return a list of Target objects tracked by the teamserver.
 #### Parameters
-#### Example Request
-#### Example Response
+None.
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"targets": {
+  "target_id": {
+      "name": "<target_name>",
+      "status": "<target_status>",
+      "lastseen": <timestamp>,
+      "mac_addrs": ["Some Mac Addresses"],
+      "facts": {
+        "A Fact": "A Value"   
+      },
+      "sessions": [],
+      "credentials": "Not yet implemented"
+  }
+}
+}
+```
 
 ## Sessions
 ### CreateSession 
