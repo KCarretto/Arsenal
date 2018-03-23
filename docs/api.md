@@ -215,11 +215,27 @@ None.
 ## Actions
 ### CreateAction
 #### Overview
+This API call queues an Action with the teamserver, and assigns it to a given Target. The first Session to check in for a given Target will receive any Actions in that Target's queue. On the next check in, the Session will submit responses for any Actions that were queued on the previous round. Special options may be given in the `action_string` parameter to specify how the Action is handled and executed.
+
 #### Parameters
-#### Example Request
-#### Example Response
-### CreateGroupAction 
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |   
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| target_name      | yes          | yes        | str      | The name of the Target to queue the Action for.               |
+| action_string    | yes          | no         | str      | Conforms to Arsenal Action Syntax.                            |
+| bound_session_id | no           | yes        | str      | Optionally specify which Session the Action will be given to. |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"action_id": "<action_id>"
+}
+```
+
+### CreateGroupAction
 #### Overview
+This API call queues Actions for an entire Group of Targets. TODO
 #### Parameters
 #### Example Request
 #### Example Response
