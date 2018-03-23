@@ -276,7 +276,7 @@ This API call attempts to cancel an Action before it is sent. This will fail if 
 ```
 {
 "status": 200,
-"error": False,
+"error": False
 }
 ```
 
@@ -293,15 +293,39 @@ This API call attempts to cancel all Actions associated with a Group Action. Thi
 ```
 {
 "status": 200,
-"error": False,
+"error": False
 }
 ```
 
 ### ListActions
 #### Overview
+This API call will provide a list of Action objects.
 #### Parameters
-#### Example Request
-#### Example Response
+None
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"actions": [ <Action Object> ]
+}
+```
+
+### ListGroupActions
+#### Overview
+This API call will provide a list of Group Action objects.
+#### Parameters
+None
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"group_actions": [ <GroupAction Object> ]
+}
+```
 
 ## Groups
 ### CreateGroup 
