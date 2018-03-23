@@ -45,6 +45,18 @@ Read here about how to interact with the teamserver's API.
   * [CreateLog](#createlog)
   * [ListLogs](#listlogs)
 
+## Interacting with the API
+### Overview
+The Arsenal teamserver exposes a '/api' endpoint for users, applications, and c2 servers to integrate with. By submitting a POST request to this endpoint with JSON data, you can invoke API functions. The `method` field has been reserved to denote which API method to call. All other JSON keys will be passed as parameters to the function.
+
+### Example Request
+```
+{
+"method": "GetTarget",
+"name": "Bob"
+}
+```
+
 ## Web Hooks
 Not yet implemented.
 ### RegisterWebhook
