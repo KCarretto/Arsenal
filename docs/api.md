@@ -147,6 +147,7 @@ None.
 "targets": {
   "target_id": <Target Object>
 }
+}
 ```
 
 ## Sessions
