@@ -190,19 +190,61 @@ This API call retrieves Session information from the teamserver.
 ### SessionCheckin
 #### Overview
 This API call will check in a Session, and update appropriate timestamps. This will allow the Session to submit Responses to any Actions it was tasked with, and will also provide any new Actions that the Session should perform.
-#### Parameters
+
 #### Parameters
 | **Name**   | **Required** | **Unique** | **Type** | **Description**                                |                         
 | :--------- | :----------- | :--------- | :------- | :--------------------------------------------- |
 | session_id | yes          | yes        | str      | A unique identifier.                           |
-| responses  | no           | no         | list     | 
-#### Example Request
-#### Example Response
+| responses  | no           | no         | list     | Any output from Actions that were executed by the Session.|
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"session_id": "<session_id>",
+"actions": [ <Action Object> ] 
+}
+```
+
+### UpdateSessionConfig
+#### Overview
+This API method is used to update the teamserver's perspective of what the Session's configuration currently is. This method will usually be called by the C2, and can not be used to update the Sessions config. It's only used for tracking purposes. In order to actually modify the Session's config, a config Action must be queued which will be sent to the session.
+
+#### Parameters
+| **Name**      | **Required** | **Unique** | **Type** | **Description**                                |                     
+| :------------ | :----------- | :--------- | :------- | :--------------------------------------------- |
+| session_id    | yes          | yes        | str      | A unique identifier.                           |
+| servers       | no           | no         | list<str> | The C2 servers that the Agent is configured with. |
+| interval      | no           | no         | float     | The amount of time a Session will wait inbetween check ins. |
+| interval_delta| no           | no         | float     | The random delta to add to each interval (+ or -). |
+| config_dict   | no           | no         | dict      | Any additional configuration information from the Agent. |
+
+#### Example Success Response 
+```
+{
+"status": 200,
+"error": False,
+"config": {
+    <Session Config>
+}
+}
+```
+
 ### ListSessions
 #### Overview
+This API will return a list of Session objects.
 #### Parameters
-#### Example Request
-#### Example Response
+None
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"sessions": {
+    "<session_id>": <Session Object>
+}
+}
+```
 
 ## Actions
 ### CreateAction
