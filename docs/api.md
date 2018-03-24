@@ -172,12 +172,30 @@ This API call creates a new instance of an Agent on a given Target. We call this
 ```
 ### GetSession 
 #### Overview
+This API call retrieves Session information from the teamserver.
 #### Parameters
-#### Example Request
+| **Name**   | **Required** | **Unique** | **Type** | **Description**                                |                         
+| :--------- | :----------- | :--------- | :------- | :--------------------------------------------- |
+| session_id | yes          | yes        | str      | A unique identifier.                           |
+
 #### Example Response
+```
+{
+"status": 200,
+"error": False,
+"session": <Session Object>
+}
+```
+
 ### SessionCheckin
 #### Overview
+This API call will check in a Session, and update appropriate timestamps. This will allow the Session to submit Responses to any Actions it was tasked with, and will also provide any new Actions that the Session should perform.
 #### Parameters
+#### Parameters
+| **Name**   | **Required** | **Unique** | **Type** | **Description**                                |                         
+| :--------- | :----------- | :--------- | :------- | :--------------------------------------------- |
+| session_id | yes          | yes        | str      | A unique identifier.                           |
+| responses  | no           | no         | list     | 
 #### Example Request
 #### Example Response
 ### ListSessions
