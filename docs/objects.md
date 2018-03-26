@@ -67,6 +67,41 @@ A Session represents a running instance of an Agent on the Target system.
 | inactive   | The Session has not been seen in a significant amount of time.  |
 
 ## Action
+### Overview
+An Action represents something for an Agent to execute, such as a command or configuration update.
+### Example
+```
+{
+"action_id": "14a10277-9d89-40f6-8174-4c8dc6fbea22",
+"action_string": "exec ls",
+"action_type": 1,
+"args": [],
+"bound_session_id": "",
+"command": "ls",
+"complete_time": None,
+"queue_time": 1521675403.4228077,
+"sent_time": None,
+"session_id": None,
+"status": "stale",
+"target_name": "test"
+}
+```
+### Field Description
+| **Name**         | **Unique** | **Type**   | **Description**                                                   |
+| :--------------- | :--------- | :--------- | :---------------------------------------------------------------- |
+| action_id        | yes        | str        | A  unique identifier.                                             |
+| action_string    | no         | str        | The Arsenal Action Syntax action to perform.                      |
+| action_type      | no         | int        | The parsed type of the Action.                                    |
+| bound_session_id | no         | str        | Restrict Action such that only this Session may retrieve the Action. Used for configuration updates. |
+| session_id       | no         | str        | The unique identifier of the Session that has retrieved the Action, or None if unretrieved. |
+| queue_time       | no         | float      | The timestamp of when the Action was queued.                      |     
+| sent_time        | no         | float      | The timestamp of when the Action was sent to a Session.           |     
+| complete_time    | no         | float      | The timestamp of when the Action response was recieved.           |    
+| status           | no         | str        | The current status of the Action. See below for details.          |    
+| command          | no         | str        | **PARAMETER** Only included for execution based Action types. A command to perform. |
+| args             | no         | list<str>  | **PARAMETER** Only included for execution based Action types. A list of string arguments to provide to the given command. |
+
+
 ## Group
 ### Overview
 A Group represents a collection of Targets.
