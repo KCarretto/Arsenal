@@ -68,5 +68,22 @@ A Session represents a running instance of an Agent on the Target system.
 
 ## Action
 ## Group
+### Overview
+A Group represents a collection of Targets.
+### Example
+```
+{
+"name": "Team 1",
+"whitelist_members": ["Target A", "Target B"],
+"blacklist_members": ["Target C"],
+}
+```
+### Field Description
+| **Name**          | **Unique** | **Type**   | **Description**                                                   |
+| :---------------- | :--------- | :--------- | :---------------------------------------------------------------- |
+| name              | yes        | str        | A human-readable unique identifier.                               |
+| whitelist_members | no         | list<str>  | A list of Target members of the Group (Will change once automember rules are implemented) |
+| blacklist_members | no         | list<str>  | A list of Targets that have been blacklisted from the Group.      |
+
 ## GroupAction
 ## Log
