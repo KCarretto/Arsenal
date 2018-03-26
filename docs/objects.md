@@ -101,6 +101,18 @@ An Action represents something for an Agent to execute, such as a command or con
 | command          | no         | str        | **PARAMETER** Only included for execution based Action types. A command to perform. |
 | args             | no         | list<str>  | **PARAMETER** Only included for execution based Action types. A list of string arguments to provide to the given command. |
 
+### Action Statuses
+| **Status** | **Description**                                                 |
+| :--------- | :-------------------------------------------------------------- |
+| cancelled  | The Action has been cancelled and will not be sent.             |
+| queued     | The Action is queued for a Target, and awaiting retrieval.      |
+| stale      | The Action has been queued for a significant amount of time.    |
+| sent       | The Action has been sent to a Session.                          |
+| failing    | The Action has been sent to a Session that is now missing.      |
+| failed     | The Action has been sent to a Session that is now inactive.     |
+| error      | The Action has a submitted response, but there was an error while executing the Action. |
+| complete   | The Action has a submitted response, and has been completed successfully. |
+
 
 ## Group
 ### Overview
@@ -121,4 +133,26 @@ A Group represents a collection of Targets.
 | blacklist_members | no         | list<str>  | A list of Targets that have been blacklisted from the Group.      |
 
 ## GroupAction
+### Overview
+A GroupAction tracks Action objects that were queued for a Group of Targets.
+### Example
+```
+{
+"group_action_id": "7447dbac-e974-4833-a407-e1e2c05f962c",
+"action_string": "exec ls -al",
+"status": "in progress",
+"action_ids": ["14a10277-9d89-40f6-8174-4c8dc6fbea22"],
+"actions": [ <Action Object> ]
+}
+```
+### Group Action Statuses
+| **Status**    | **Description**                                                 |
+| :------------ | :-------------------------------------------------------------- |
+| cancelled     | The Group Action has been cancelled.                            |
+| queued        | All Actions are still awaiting retrieval.                       |
+| in progress   | One or more Actions have been sent.                             |
+| mixed success | 
+| success       | 
+| failed        |
 ## Log
+
