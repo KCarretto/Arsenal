@@ -129,10 +129,6 @@ Update the Target's fact dictionary. This will override any existing facts.
 ```
 ### ArchiveTarget
 Not yet implemented.
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 
 ### ListTargets
 #### Overview
@@ -386,34 +382,118 @@ None
 ## Groups
 ### CreateGroup 
 #### Overview
+Create a Group of Targets, uniquely identified by a name. This allows for easily batched Actions, as well as viewing the status information for each Target in the Group.
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| name             | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False
+}
+```
 ### GetGroup
 #### Overview
+Retrieve a Group object from the teamserver. This will include a list of Target names that exist within the group.
 #### Parameters
-#### Example Request
-#### Example Response
-### AddGroupMembers
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| name             | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"group": <Group Object> 
+}
+```
+### AddGroupMember
 #### Overview
+Add a Target to the Group. This will whitelist the Target, so regardless of features and auto member rules, this Target will always be included in the Group until removed or blacklisted.
+
 #### Parameters
-#### Example Request
-#### Example Response
-### RemoveGroupMembers
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| group_name       | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
+| target_name      | yes          | yes        | str      | The human-readable unique identifier of the Target.           |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False
+}
+```
+### RemoveGroupMember
 #### Overview
+Removes a Target from the Group whitelist. This will only remove members that have been added through the AddGroupMember API call, it will not prevent Targets from being included as members due to Automember rules.
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| group_name       | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
+| target_name      | yes          | yes        | str      | The human-readable unique identifier of the Target.           |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False
+}
+```
+
+### BlacklistGroupMember
+#### Overview
+This blacklists a Target from the Group. If the Target is currently a member, it is removed. This will prevent the Target from being included as a member due to Automember rules.
+
+#### Parameters
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| group_name       | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
+| target_name      | yes          | yes        | str      | The human-readable unique identifier of the Target.           |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False
+}
+```
+
 ### ListGroups
 #### Overview
+This operation will list each Group, along with all of the membership details for each Group.
+
 #### Parameters
-#### Example Request
-#### Example Response
+None
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"groups": [ <Group Object> ]
+}
+```
+
 ### DeleteGroup
 #### Overview
+Delete a Group from the teamserver.
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| name             | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False
+}
+```
 
 ## Credentials
 Not yet implemented.
