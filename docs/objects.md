@@ -31,6 +31,33 @@ A Target represents a system to attack.
 | sessions   | no         | list<dict> | A list of Session objects associated with this Target.            |
 
 ## Session
+### Overview
+A Session represents a running instance of an Agent on the Target system.
+
+### Example 
+```
+{
+"session_id": "ac198dd6-94be-4b6a-988f-dd9e0ba61f0e",
+"target_name": "Target A",
+"status": "inactive",
+"timestamp": 1522096823,
+"config": {
+  "interval": 600,
+  "interval_delta": 60,
+  "servers": [ "8.8.8.8" ],
+  "some_configuration_option": True
+}
+}
+```
+
+### Field Description
+| **Name**    | **Unique** | **Type**   | **Description**                                                   |
+| :---------- | :--------- | :--------- | :---------------------------------------------------------------- |
+| session_id  | yes        | str        | A  unique identifier.                                             |
+| target_name | no         | str        | The human-readable unique identifier of the associated Target.    |
+| status      | no         | str        | The current status of the Session. See below for details.         |
+| timestamp   | no         | float      | The time of the Session's last check in.                          |
+| config      | no         | dict       | Contains the current configuration information for the Session.   |
 
 ### Session Statuses
 | **Status** | **Description**                                                 |
