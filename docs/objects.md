@@ -145,14 +145,44 @@ A GroupAction tracks Action objects that were queued for a Group of Targets.
 "actions": [ <Action Object> ]
 }
 ```
+### Field Description
+| **Name**         | **Unique** | **Type**   | **Description**                                                   |
+| :--------------- | :--------- | :--------- | :---------------------------------------------------------------- |
+| group_action_id  | yes        | str        | A unique identifier.                                              |
+| action_string    | no         | str        | The Arsenal Action Syntax action to perform.                      |
+| status           | no         | str        | The current status of the Action. See below for details.          |
+| action_ids       | no         | list<str>  | An array containing Action ID's for each tracked Action.          |
+| actions          | no         | list<dict> | An array of associated Action Objects.                            |
+
 ### Group Action Statuses
 | **Status**    | **Description**                                                 |
 | :------------ | :-------------------------------------------------------------- |
 | cancelled     | The Group Action has been cancelled.                            |
 | queued        | All Actions are still awaiting retrieval.                       |
 | in progress   | One or more Actions have been sent.                             |
-| mixed success | 
-| success       | 
-| failed        |
+| mixed success | Some Actions have been completed successfully.                  |
+| success       | All Actions were completed successfully.                        |
+| failed        | No Actions were completed successfully.                         |
+
 ## Log
+### Overview
+A Log object represents an entry of a log message that was submitted to the log server.
+
+### Example
+```
+{
+"timestamp": 1522109247.231,
+"application": "teamserver-internal",
+"level": "DEBUG",
+"message": "Calling API method CancelAction"
+}
+```
+
+### Field Jobs
+| **Name**         | **Unique** | **Type**   | **Description**                                                   |
+| :--------------- | :--------- | :--------- | :---------------------------------------------------------------- |
+| timestamp        | no         | float      | The timestamp when the log was submitte.                          |
+| application      | no         | str        | The application that submitted the log.                           |
+| level            | no         | str        | The level that the message was logged at. (DEBUG, INFO, WARN, CRIT, FATAL)|
+| message          | no         | str        | The message being recorded.                                       |
 
