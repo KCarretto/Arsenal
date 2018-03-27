@@ -6,8 +6,8 @@ from uuid import uuid4
 import time
 
 from .utils import success_response
-from ..models import Action, log
-from ..exceptions import handle_exceptions
+from ..models import Action, Target, log
+from ..exceptions import NoTarget, handle_exceptions
 
 @handle_exceptions
 def create_action(params, commit=True):
@@ -22,6 +22,11 @@ def create_action(params, commit=True):
     target_name = params['target_name']
     action_string = params['action_string']
     bound_session_id = params.get('bound_session_id')
+
+    # Ensure Target exists
+    target = Target.get_by_name(target_name)
+    if not target:
+        raise NoTarget(target_name)
 
     parsed_action = Action.parse_action_string(action_string)
 

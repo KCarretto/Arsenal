@@ -17,13 +17,20 @@ class CannotCancel(Exception):
 
 class UnboundException(Exception):
     """
-    This exception is raised when the session that an action was assigned to no longer exists.
+    This exception is raised when the Session that an Action was assigned to no longer exists.
     """
     pass
 
 class CannotAssign(Exception):
     """
-    This exception is raised when an action is unable to be assigned to the given session_id.
+    This exception is raised when an Action is unable to be assigned to the given session_id.
+    """
+    pass
+
+class NoTarget(Exception):
+    """
+    This exception is raised when an Action is attempted to be assigned to a
+    Target that does not exist.
     """
     pass
 
@@ -88,6 +95,10 @@ def handle_exceptions(func):
         except CannotCancel as exception:
             msg = 'Failed to cancel Action. Action has already been sent.'
             return failed_response(423, msg, exception)
+
+        except NoTarget as exception:
+            msg = 'Failed to create Action. No such Target.'
+            return failed_response(404, msg, exception)
 
         except ActionParseException as exception:
             msg = 'Invalid action syntax.'
