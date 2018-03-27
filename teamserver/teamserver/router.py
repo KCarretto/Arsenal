@@ -4,7 +4,7 @@
     that will do the heavy lifting.
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, Response
 from .api import create_target, get_target, set_target_facts, list_targets, get_target_groups
 from .api import create_session, get_session, session_check_in
 from .api import update_session_config, list_sessions
@@ -134,4 +134,6 @@ def api_entry():
     # TODO: Trigger method post-hooks
 
     # Return method output
-    return jsonify(response)
+    resp = jsonify(response)
+    resp.status_code = response.get('status', 500)
+    return resp
