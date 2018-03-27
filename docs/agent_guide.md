@@ -1,41 +1,37 @@
-# Guides
+# Creating an Agent
 
-This documentation file will provide you with any guides necessary in extending / customizing this framework.
 
 ## Table of Contents
-- [Guides](#guides)
-  - [Table of Contents](#table-of-contents)
-  - [Creating an Agent](#creating-an-agent)
-    - [Overview](#overview)
-    - [Agent Requirements](#agent-requirements)
-      - [Target Identification Information](#target-identification-information)
-      - [Session ID Tracking](#session-id-tracking)
-      - [Config Tracking](#config-tracking)
-      - [Action ID Tracking](#action-id-tracking)
-      - [Action Types](#action-types)
-      - [Fact Collection](#fact-collection)
-    - [Working with the Arsenal HTTP C2](#working-with-the-arsenal-http-c2)
-      - [Initial Beacon](#initial-beacon)
-      - [Standard Response](#standard-response)
-      - [Standard Beacon](#standard-beacon)
+
+- [Overview](#overview)
+- [Agent Requirements](#agent-requirements)
+    - [Target Identification Information](#target-identification-information)
+    - [Session ID Tracking](#session-id-tracking)
+    - [Config Tracking](#config-tracking)
+    - [Action ID Tracking](#action-id-tracking)
+    - [Action Types](#action-types)
+    - [Fact Collection](#fact-collection)
+- [Working with the Arsenal HTTP C2](#working-with-the-arsenal-http-c2)
+    - [Initial Beacon](#initial-beacon)
+    - [Standard Response](#standard-response)
+    - [Standard Beacon](#standard-beacon)
 
 
-## Creating an Agent
 
-### Overview
+## Overview
 An Agent is a program that will be run on a target system, and will callback to a C2 that has been integrated with Arsenal. The goal of Arsenal is to allow Red Teamers to create their own Agents and C2 servers, but not need to deal with any of the backend management. This guide will cover how to create an Agent to work with the Arsenal HTTP C2 Server. It is recommended that you review the contents of this guide before attempting to create your own Agent / C2, because the framework does impose some light requirements on the Agent.
 
-### Agent Requirements
-#### Target Identification Information
+## Agent Requirements
+### Target Identification Information
 When an Agent calls back to a C2, it is important that the Teamserver is able to identify what machine / target the Agent is running on. IP Addresses alone cannot accurately identify a system, because NAT would cause many systems to appear the same from the C2's perspective. To solve this asset management problem, Arsenal utilizes a combination of the following information:
   - All MAC Addresses
   - External IP Address (Collected by the C2)
 When a Session calls back with that criteria, identical to an already existing Target, the Session is associated with the already existing Target. If no Target with the given criteria exists, a new Target is created and is given an automatically generated name. Target naming rules may be created to assign Target names in an automated fashion. The order of the array of MAC Addresses does not matter.
 
-#### Session ID Tracking
+### Session ID Tracking
 When an Agent calls back to the C2 for the first time, the C2 must register the newly created Session with the Arsenal Teamserver (If you are unfamiliar, we define a Session as a running instance of an Agent). It uses the Arsenal Teamserver API to do this. Once registered, the C2 is then provided with a Session ID that the Agent must keep track of, and send in every callback request. Without this, the Teamserver will be unable to track which Target a Session belongs to.
 
-#### Config Tracking
+### Config Tracking
 Each Agent should be configured with a (preferably JSON, or you will need to convert to JSON) config, that instructs the Agent on how to behave. The following configuration options must be supported, but you may add custom options as you see fit.
 ```json
 {
@@ -48,10 +44,10 @@ Each Agent should be configured with a (preferably JSON, or you will need to con
 * **interval** - The base number of seconds that an Agent should sleep for.<br>
 * **interval_delta** - The maximum value that can be added or subtracted from the interval for randomization. This means that the actual interval delta should be calculated as interval + Random.Range(-interval_delta, interval_delta) where Random.Range would return a floating point value between the two parameters given (inclusive).<br>
 
-#### Action ID Tracking
+### Action ID Tracking
 When a Red Teamer wishes to run a command or perform some other action on the Target system, they queue an Action with the Arsenal Teamserver. Upon creation, that Action is given a unique identifier. Agents should receive this information with every command that they run, and upon completion, ensure that the Response also includes this Action identifier. Without this information, the Arsenal Teamserver cannot associate the given Response with an Action.
 
-#### Action Types
+### Action Types
 It is required that Agents support the following action types, or return a specified error when an unsupported action type is attempted.
 
 | **Name**   | **Code** | **Description**                                                                                             | **Required Parameters**                                                                                          |
@@ -66,14 +62,14 @@ It is required that Agents support the following action types, or return a speci
 | reset      | 999      | Reinitialize session.<br>Agent should perform another initial beacon.<br> C2 will provide a new Session ID. | N/A                                                                                                              |
 More information on Actions can be found in the database.md documentation file.
 
-#### Fact Collection
+### Fact Collection
 It is recommended that the Agent be capable of collecting facts about a Target system for ease of use. While the only two required facts are the Target's hostname and MAC addresses, many other facts are useful for collection. Please see the database.md documentation's Target section for more information on the default factsets.
 
-### Working with the Arsenal HTTP C2
+## Working with the Arsenal HTTP C2
 
 The existing Arsenal HTTP C2 utilizes JSON as a communication Format. The JSON tokens that it will receive from and send to the Agent are as follows (in order):
 
-#### Initial Beacon
+### Initial Beacon
 ```json
 {
   "session_id": "",
@@ -103,7 +99,7 @@ The existing Arsenal HTTP C2 utilizes JSON as a communication Format. The JSON t
 * **config** - This is a dictionary that represents the agent's initial configuration.
 * **facts** - A dictionary containing facts about the target system. The only required fact is "interfaces", which should be provided in the format shown above, however it is recommended that you collect at least the "min" subset on initial beacon (Which can be found under the target section of database.md Documentation). It is also likely that the "hostname" fact will be used for target auto-naming, so it is highly recommended that you collect this fact as well.<br>
 
-#### Standard Response
+### Standard Response
 The following is sent in response to an Agent's beacon. The same response format is used for both initial and standard beacons.
 ```json
 {
@@ -134,7 +130,7 @@ The following is sent in response to an Agent's beacon. The same response format
   * **args** - This is a parameter for several action types, and may not always be included. Please see the Action section in database.md for more information on how Action types should be handled.<br>
   * **config** - Any key / value pairs in this dictionary should override the Agent's existing configuration settings. It is the Agent's responsibility to validate that these configuration options are valid. Please see the Action section in database.md for more information on how Action types should be handled.<br>
 
-#### Standard Beacon
+### Standard Beacon
 After the session has been initialized, it should respond with the format below:
 ```json
 {

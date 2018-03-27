@@ -45,180 +45,496 @@ Read here about how to interact with the teamserver's API.
   * [CreateLog](#createlog)
   * [ListLogs](#listlogs)
 
+## Interacting with the API
+### Overview
+The Arsenal teamserver exposes a '/api' endpoint for users, applications, and c2 servers to integrate with. By submitting a POST request to this endpoint with JSON data, you can invoke API functions. The `method` field has been reserved to denote which API method to call. All other JSON keys will be passed as parameters to the function.
+
+### Example Request
+```
+{
+"method": "GetTarget",
+"name": "Bob"
+}
+```
+
 ## Web Hooks
+Not yet implemented.
 ### RegisterWebhook
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 ### RemoveWebhook 
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 ### ListWebhooks
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 
 ## API Tokens
+Not yet implemented.
 ### CreateAPIToken
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 ### DeleteAPIToken
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 
 ## Targets
 ### CreateTarget 
 #### Overview
+This API call will create a Target object on the teamserver, which represents a server or machine that is being attacked.
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**   | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| name       | yes          | yes        | str      | A human-readable unique identifier.                           |
+| mac_addrs  | yes          | yes        | list<str>| A list of mac addresses. Each target must have a unique list. |
+| facts      | no           | no         | dict     | Information that has been gathered about the target system.   |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False
+}
+```
+
 ### GetTarget
 #### Overview
+This API call will fetch Target information from the teamserver.
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**   | **Required** | **Unique** | **Type** | **Description**                                |                         
+| :--------- | :----------- | :--------- | :------- | :--------------------------------------------- |
+| name       | yes          | yes        | str      | A human-readable unique identifier.            |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"target": <Target Object>
+}
+```
 ### SetTargetFacts
 #### Overview
+Update the Target's fact dictionary. This will override any existing facts.
+
 #### Parameters
-#### Example Request
-#### Example Response
-### ArchiveTarget 
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
+| **Name**   | **Required** | **Unique** | **Type** | **Description**                                |                         
+| :--------- | :----------- | :--------- | :------- | :--------------------------------------------- |
+| name       | yes          | yes        | str      | A human-readable unique identifier.            |
+| facts      | yes          | no         | dict     | A dictionary with key value pairs to update.   |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"target": {
+  "name": "<target_name>",
+  "facts": {
+    "A Fact": "A Value",
+    "Old Fact": "Old Value"
+  }
+}
+}
+```
+### ArchiveTarget
+Not yet implemented.
+
 ### ListTargets
 #### Overview
+Return a list of Target objects tracked by the teamserver.
 #### Parameters
-#### Example Request
-#### Example Response
+None.
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"targets": {
+  "target_id": <Target Object>
+}
+}
+```
 
 ## Sessions
 ### CreateSession 
 #### Overview
+This API call creates a new instance of an Agent on a given Target. We call this instance a Session.
 #### Parameters
-#### Example Request
+| **Name**      | **Required** | **Unique** | **Type**  | **Description**                                |                       
+| :------------ | :----------- | :--------- | :-------- | :--------------------------------------------- |
+| mac_addrs     | yes          | yes        | list<str> | The mac addresses of the system that the agent was run on. This is used to associate the Session with a target.  |   
+| servers       | no           | no         | list<str> | The C2 servers that the Agent is configured with. |
+| interval      | no           | no         | float     | The amount of time a Session will wait inbetween check ins. |
+| interval_delta| no           | no         | float     | The random delta to add to each interval (+ or -). |
+| config_dict   | no           | no         | dict      | Any additional configuration information from the Agent. |
+
 #### Example Response
+```
+{
+"status": 200,
+"error": False,
+"session_id": "<session_id>"
+}
+```
 ### GetSession 
 #### Overview
+This API call retrieves Session information from the teamserver.
 #### Parameters
-#### Example Request
+| **Name**   | **Required** | **Unique** | **Type** | **Description**                                |                         
+| :--------- | :----------- | :--------- | :------- | :--------------------------------------------- |
+| session_id | yes          | yes        | str      | A unique identifier.                           |
+
 #### Example Response
+```
+{
+"status": 200,
+"error": False,
+"session": <Session Object>
+}
+```
+
 ### SessionCheckin
 #### Overview
+This API call will check in a Session, and update appropriate timestamps. This will allow the Session to submit Responses to any Actions it was tasked with, and will also provide any new Actions that the Session should perform.
+
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**   | **Required** | **Unique** | **Type** | **Description**                                |                         
+| :--------- | :----------- | :--------- | :------- | :--------------------------------------------- |
+| session_id | yes          | yes        | str      | A unique identifier.                           |
+| responses  | no           | no         | list     | Any output from Actions that were executed by the Session.|
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"session_id": "<session_id>",
+"actions": [ <Action Object> ] 
+}
+```
+
+### UpdateSessionConfig
+#### Overview
+This API method is used to update the teamserver's perspective of what the Session's configuration currently is. This method will usually be called by the C2, and can not be used to update the Sessions config. It's only used for tracking purposes. In order to actually modify the Session's config, a config Action must be queued which will be sent to the session.
+
+#### Parameters
+| **Name**      | **Required** | **Unique** | **Type** | **Description**                                |                     
+| :------------ | :----------- | :--------- | :------- | :--------------------------------------------- |
+| session_id    | yes          | yes        | str      | A unique identifier.                           |
+| servers       | no           | no         | list<str> | The C2 servers that the Agent is configured with. |
+| interval      | no           | no         | float     | The amount of time a Session will wait inbetween check ins. |
+| interval_delta| no           | no         | float     | The random delta to add to each interval (+ or -). |
+| config_dict   | no           | no         | dict      | Any additional configuration information from the Agent. |
+
+#### Example Success Response 
+```
+{
+"status": 200,
+"error": False,
+"config": {
+    <Session Config>
+}
+}
+```
+
 ### ListSessions
 #### Overview
+This API will return a list of Session objects.
 #### Parameters
-#### Example Request
-#### Example Response
+None
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"sessions": {
+    "<session_id>": <Session Object>
+}
+}
+```
 
 ## Actions
 ### CreateAction
 #### Overview
+This API call queues an Action with the teamserver, and assigns it to a given Target. The first Session to check in for a given Target will receive any Actions in that Target's queue. On the next check in, the Session will submit responses for any Actions that were queued on the previous round. Special options may be given in the `action_string` parameter to specify how the Action is handled and executed.
+
 #### Parameters
-#### Example Request
-#### Example Response
-### CreateGroupAction 
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| target_name      | yes          | yes        | str      | The name of the Target to queue the Action for.               |
+| action_string    | yes          | no         | str      | Conforms to Arsenal Action Syntax.                            |
+| bound_session_id | no           | yes        | str      | Optionally specify which Session the Action will be given to. |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"action_id": "<action_id>"
+}
+```
+
+### CreateGroupAction
 #### Overview
+This API call queues Actions for an entire Group of Targets. It will provide an identifier for tracking the progress of each created Action.
+
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| group_name       | yes          | yes        | str      | The name of the Group to queue the Actions for.               |
+| action_string    | yes          | no         | str      | Conforms to Arsenal Action Syntax.                            |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"group_action_id": "The group action identifier."
+}
+```
+
 ### GetAction
 #### Overview
+Retrieve information about an Action object on the teamserver.
+
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| action_id        | yes          | yes        | str      | The unique identifier of the Action.                          |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"action": <Action Object>
+}
+```
+
+### GetGroupAction
+#### Parameters
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| group_action_id  | yes          | yes        | str      | The unique identifier of the Group Action.                    |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"action": <GroupAction Object>
+}
+```
+
 ### CancelAction
 #### Overview
+This API call attempts to cancel an Action before it is sent. This will fail if the Action is in any state other than queued.
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| action_id        | yes          | yes        | str      | The unique identifier of the Action.                          |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False
+}
+```
+
 ### CancelGroupAction
 #### Overview
+This API call attempts to cancel all Actions associated with a Group Action. This will fail if an Action is in any state other than queued.
+
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| group_action_id  | yes          | yes        | str      | The unique identifier of the Group Action.                    |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False
+}
+```
+
 ### ListActions
 #### Overview
+This API call will provide a list of Action objects.
 #### Parameters
-#### Example Request
-#### Example Response
+None
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"actions": [ <Action Object> ]
+}
+```
+
+### ListGroupActions
+#### Overview
+This API call will provide a list of Group Action objects.
+#### Parameters
+None
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"group_actions": [ <GroupAction Object> ]
+}
+```
 
 ## Groups
 ### CreateGroup 
 #### Overview
+Create a Group of Targets, uniquely identified by a name. This allows for easily batched Actions, as well as viewing the status information for each Target in the Group.
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| name             | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False
+}
+```
 ### GetGroup
 #### Overview
+Retrieve a Group object from the teamserver. This will include a list of Target names that exist within the group.
 #### Parameters
-#### Example Request
-#### Example Response
-### AddGroupMembers
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| name             | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"group": <Group Object> 
+}
+```
+### AddGroupMember
 #### Overview
+Add a Target to the Group. This will whitelist the Target, so regardless of features and auto member rules, this Target will always be included in the Group until removed or blacklisted.
+
 #### Parameters
-#### Example Request
-#### Example Response
-### RemoveGroupMembers
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| group_name       | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
+| target_name      | yes          | yes        | str      | The human-readable unique identifier of the Target.           |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False
+}
+```
+### RemoveGroupMember
 #### Overview
+Removes a Target from the Group whitelist. This will only remove members that have been added through the AddGroupMember API call, it will not prevent Targets from being included as members due to Automember rules.
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| group_name       | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
+| target_name      | yes          | yes        | str      | The human-readable unique identifier of the Target.           |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False
+}
+```
+
+### BlacklistGroupMember
+#### Overview
+This blacklists a Target from the Group. If the Target is currently a member, it is removed. This will prevent the Target from being included as a member due to Automember rules.
+
+#### Parameters
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| group_name       | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
+| target_name      | yes          | yes        | str      | The human-readable unique identifier of the Target.           |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False
+}
+```
+
 ### ListGroups
 #### Overview
+This operation will list each Group, along with all of the membership details for each Group.
+
 #### Parameters
-#### Example Request
-#### Example Response
+None
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False,
+"groups": [ <Group Object> ]
+}
+```
+
 ### DeleteGroup
 #### Overview
+Delete a Group from the teamserver.
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| name             | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
+
+#### Example Success Response
+```
+{
+"status": 200,
+"error": False
+}
+```
 
 ## Credentials
+Not yet implemented.
 ### CreateCredentials
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 ### GetValidCredentials
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 ### InvalidateCredentials
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
 ### ListCredentials
-#### Overview
-#### Parameters
-#### Example Request
-#### Example Response
+
 
 ## Logs
 ### CreateLog
 #### Overview
+Add a log entry to the log server. This is mostly useful for Agents and C2 servers, but may be utilized by any application that wishes to have a centralized and easy place to view logs.
 #### Parameters
-#### Example Request
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| application      | yes          | no         | str      | The name of the application submitting the log.               |
+
 #### Example Response
+```
+{
+"status": 200,
+"error": False
+}
+```
 ### ListLogs
 #### Overview
+View log entries that have been stored on the log server. You may filter by application, or timestamps.
 #### Parameters
-#### Example Request
-#### Example Response
+| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
+| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
+| application      | no           | no         | str      | The name of the application submitting the log to filter for. |
+| since            | no           | no         | float    | Filter for any logs before this timestamp.                    |
+| include_archived | no           | no         | bool     | Whether archived logs should be included in the search.       |
 
+#### Example Response
+```
+{
+"status": 200,
+"error": False,
+"logs": [ <Log Object> ]
+}
+```
 
