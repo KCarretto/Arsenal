@@ -88,14 +88,26 @@ class SessionAPITest(BaseTest):
         self.assertEqual(assigned_action.response.stdout, 'hello')
 
         # Verify new actions
-        action1 = Database.get_action(action1_id)
-        action2 = Database.get_action(action2_id)
+        actions_raw = [
+            Database.get_action(action1_id),
+            Database.get_action(action2_id)
+        ]
         actions = {}
         for action in check_data['actions']:
             actions[action['action_id']] = action
 
-        self.assertDictEqual(actions[action1_id], action1.agent_document)
-        self.assertDictEqual(actions[action2_id], action2.agent_document)
+        # Note that priorities are calculated when sessions retrieve actions, based on queue time
+        # Therefore, they are not tracked in the database. We know what they should be though,
+        # based on the order they were queued.
+        agent_docs = [
+            actions_raw[0].agent_document,
+            actions_raw[1].agent_document
+        ]
+        agent_docs[0]['priority'] = 0
+        agent_docs[1]['priority'] = 1
+
+        self.assertDictEqual(actions[action1_id], agent_docs[0])
+        self.assertDictEqual(actions[action2_id], agent_docs[1])
 
     def test_update_config(self):
         """
