@@ -104,9 +104,13 @@ def session_check_in(params):
     actions_raw = Action.get_target_unassigned_actions(session.target_name)
     actions = []
     # Assign each action to this status, and append it's document to the list
-    for action in actions_raw:
+    priority = 0
+    for action in sorted(actions_raw, key=lambda action: action.queue_time):
         action.assign_to(session)
-        actions.append(action.agent_document)
+        doc = action.agent_document
+        doc['priority'] = priority
+        actions.append(doc)
+        priority += 1
     # TODO: Look for 'upload' actions and read file from disk
 
     # Respond
