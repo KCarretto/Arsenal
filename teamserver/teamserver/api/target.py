@@ -51,7 +51,6 @@ def set_target_facts(params):
     target = Target.get_by_name(params['name'])
 
     target.set_facts(params['facts'])
-    target.save()
 
     return success_response(target={'name': target.name, 'facts': target.facts})
 

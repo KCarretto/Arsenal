@@ -146,3 +146,4 @@ class Target(Document):
         """
         for key, value in facts.items():
             self.facts[key] = value #pylint: disable=unsupported-assignment-operation
+        self.save()
