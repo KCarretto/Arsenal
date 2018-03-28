@@ -59,13 +59,13 @@ def failed_response(status, description, log_msg=None, log_level=None):
     """
 
     if log_msg is not None and log_level is not None:
-        log(log_level, '{}|{}'.format(description, log_msg))
+        log(log_level, '{}|{}'.format(description, str(log_msg)))
 
         if LOG_LEVEL == 'DEBUG':
             return {
                 'status': status,
                 'description': description,
-                'debug': log_msg,
+                'debug': str(log_msg),
                 'error': True,
             }
     return {
