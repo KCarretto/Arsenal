@@ -7,7 +7,7 @@ from flask import Flask
 from flask_mongoengine import MongoEngine
 
 from mongoengine import connect, MongoEngineConnectionError
-
+from .config import DB_HOST, DB_PORT, DB_NAME
 DB = MongoEngine()
 
 def create_app(**config_overrides):
@@ -17,7 +17,11 @@ def create_app(**config_overrides):
     """
     app = Flask(__name__)
     app.config.from_object('teamserver.config')
-    app.config['MONGODB_SETTINGS'] = {'db': 'arsenal_default'}
+    app.config['MONGODB_SETTINGS'] = {
+        'db': DB_NAME,
+        'host': DB_HOST,
+        'port': DB_PORT
+    }
     from teamserver.router import API
     app.register_blueprint(API)
     app.config.update(config_overrides)
