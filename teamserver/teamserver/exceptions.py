@@ -125,7 +125,7 @@ def handle_exceptions(func):
             msg = 'Missing required parameter.'
             return failed_response(422, msg, exception)
 
-        except Exception: #pylint: disable=broad-except
+        except Exception as exception: #pylint: disable=broad-except
             msg = 'Server encountered unhandled exception.'
             return failed_response(500, msg, exception, 'CRIT')
 
