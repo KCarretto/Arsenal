@@ -4,6 +4,7 @@
 import time
 
 from uuid import uuid4
+from mongoengine.errors import DoesNotExist
 
 from .utils import success_response
 from ..exceptions import handle_exceptions
@@ -24,7 +25,14 @@ def create_session(params):
     config_dict (optional): Any other configuration options that the agent is initially
                             configured with. <dict>
     """
-    target = Target.get_by_macs(params['mac_addrs'])
+    try:
+        target = Target.get_by_macs(params['mac_addrs'])
+    except DoesNotExist:
+        target = Target(
+            name=str(uuid4()),
+            mac_addrs=params['mac_addrs'],
+        )
+        target.save(force_insert=True)
 
     session = Session(
         session_id=str(uuid4()),
