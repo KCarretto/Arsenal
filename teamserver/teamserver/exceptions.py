@@ -132,25 +132,25 @@ def handle_exceptions(func):
         # Mongoengine Exceptions
         except ValidationError as exception:
             msg = 'Invalid field type.'
-            return failed_response(400, msg, exception)
+            return failed_response(400, msg, 'validation-error')
 
         except DoesNotExist as exception:
             msg = 'Resource not found.'
-            return failed_response(404, msg, exception)
+            return failed_response(404, msg, 'resource-not-found')
 
         except NotUniqueError as exception:
             msg = 'Resource already exists.'
-            return failed_response(422, msg, exception)
+            return failed_response(422, msg, 'resource-already-exists')
 
         # Python Exceptions
         except KeyError as exception:
             msg = 'Missing required parameter.'
-            return failed_response(422, msg, exception)
+            return failed_response(400, msg, 'missing-parameter')
 
         # Broad Except for all other cases
         except Exception as exception: #pylint: disable=broad-except
             msg = 'Server encountered unhandled exception.'
             print(exception)
-            return failed_response(500, msg, exception, 'CRIT')
+            return failed_response(500, msg, 'unhandled-exception', exception, 'CRIT')
 
     return wrapper
