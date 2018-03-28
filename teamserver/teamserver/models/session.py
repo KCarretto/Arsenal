@@ -52,7 +52,7 @@ class SessionHistory(Document):
         of session checkin timestamps.
         """
         self.checkin_timestamps.append(timestamp) #pylint: disable=no-member
-
+        self.save()
 
 class Session(Document):
     """
@@ -174,3 +174,4 @@ class Session(Document):
         """
         self.timestamp = new_timestamp
         self.history.add_checkin(new_timestamp)
+        self.save()
