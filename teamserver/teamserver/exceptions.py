@@ -127,6 +127,7 @@ def handle_exceptions(func):
 
         except Exception as exception: #pylint: disable=broad-except
             msg = 'Server encountered unhandled exception.'
+            print(exception)
             return failed_response(500, msg, exception, 'CRIT')
 
     return wrapper

@@ -90,7 +90,9 @@ def session_check_in(params):
     session.update_timestamp(time.time())
 
     # Submit responses
-    for response in params.get('responses', []):
+    responses = params.get('responses')
+    responses = responses if responses else []
+    for response in responses:
         action = Action.get_by_id(response['action_id'])
 
         if response['stderr'] is None:
