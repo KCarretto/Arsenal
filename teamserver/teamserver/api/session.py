@@ -24,7 +24,9 @@ def create_session(params):
                                configured with. <float>
     config_dict (optional): Any other configuration options that the agent is initially
                             configured with. <dict>
+    facts (optional): An optional facts dictionary to update the target with.
     """
+    # Fetch Target, create it automatically if it does not exist
     try:
         target = Target.get_by_macs(params['mac_addrs'])
     except DoesNotExist:
@@ -34,6 +36,7 @@ def create_session(params):
         )
         target.save(force_insert=True)
 
+    # Create Session and SessionHistory documents
     session = Session(
         session_id=str(uuid4()),
         timestamp=time.time(),
@@ -49,6 +52,11 @@ def create_session(params):
     )
     session_history.save()
     session.save()
+
+    # Update Target facts if they were included
+    facts = params.get('facts')
+    if facts and isinstance(facts, dict):
+        target.set_facts(facts)
 
     log(
         'INFO',
@@ -69,13 +77,15 @@ def get_session(params):
     return success_response(session=session.document)
 
 @handle_exceptions
-def session_check_in(params):
+def session_check_in(params): #pylint: disable=too-many-locals
     """
     This API function checks in a session, updating timestamps and history, submitting
     action responses, and will return new actions for the session to complete.
 
     session_id (required): The session_id of the session to check in. <str>
     responses (optional): Any responses to actions that the session is submitting. <[dict, dict]>
+    facts (optional): Any updates to the Target's fact collection. <dict>
+    config (optional): Any updates to the Session's config. <dict>
     """
     # Fetch session object
     session = Session.get_by_id(params['session_id'])
@@ -122,6 +132,20 @@ def session_check_in(params):
         actions.append(doc)
         priority += 1
     # TODO: Look for 'upload' actions and read file from disk
+
+    # Update config if it was included
+    config = params.get('config')
+    if config and isinstance(config, dict):
+        interval = config.get('interval')
+        interval_delta = config.get('interval_delta')
+        servers = config.get('servers')
+        session.update_config(interval, interval_delta, servers, config)
+
+    # Update facts if they were included
+    facts = params.get('facts')
+    if facts and isinstance(facts, dict):
+        target = Target.get_by_name(session.target_name)
+        target.set_facts(facts)
 
     # Respond
     return success_response(session_id=session.session_id, actions=actions)
