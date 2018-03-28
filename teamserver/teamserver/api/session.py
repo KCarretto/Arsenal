@@ -7,7 +7,7 @@ from uuid import uuid4
 from mongoengine.errors import DoesNotExist
 
 from .utils import success_response
-from ..exceptions import handle_exceptions
+from ..exceptions import handle_exceptions, UnattachedException
 from ..models import Target, Session, SessionHistory, Action, Response, log
 from ..config import DEFAULT_AGENT_SERVERS, DEFAULT_AGENT_INTERVAL
 from ..config import DEFAULT_AGENT_INTERVAL_DELTA, DEFAULT_AGENT_CONFIG_DICT
@@ -50,8 +50,8 @@ def create_session(params):
         session_id=session.session_id,
         checkin_timestamps=[session.timestamp]
     )
-    session_history.save()
-    session.save()
+    session_history.save(force_insert=True)
+    session.save(force_insert=True)
 
     # Update Target facts if they were included
     facts = params.get('facts')
@@ -87,7 +87,7 @@ def session_check_in(params): #pylint: disable=too-many-locals
     facts (optional): Any updates to the Target's fact collection. <dict>
     config (optional): Any updates to the Session's config. <dict>
     """
-    # Fetch session object
+    # Fetch session object, create one if it does not exist
     session = Session.get_by_id(params['session_id'])
 
     log(
@@ -144,8 +144,11 @@ def session_check_in(params): #pylint: disable=too-many-locals
     # Update facts if they were included
     facts = params.get('facts')
     if facts and isinstance(facts, dict):
-        target = Target.get_by_name(session.target_name)
-        target.set_facts(facts)
+        try:
+            target = Target.get_by_name(session.target_name)
+            target.set_facts(facts)
+        except DoesNotExist:
+            raise UnattachedException("Target for session does not exist.")
 
     # Respond
     return success_response(session_id=session.session_id, actions=actions)

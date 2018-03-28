@@ -21,6 +21,12 @@ class UnboundException(Exception):
     """
     pass
 
+class UnattachedException(Exception):
+    """
+    This exception is raised when a Session's Target does not exist.
+    """
+    pass
+
 class CannotAssign(Exception):
     """
     This exception is raised when an Action is unable to be assigned to the given session_id.
@@ -99,6 +105,10 @@ def handle_exceptions(func):
         except NoTarget as exception:
             msg = 'Failed to create Action. No such Target.'
             return failed_response(404, msg, exception)
+
+        except UnattachedException as exception:
+            msg = 'Failed to find Target that session is attached to.'
+            return failed_response(410, msg, exception)
 
         except ActionParseException as exception:
             msg = 'Invalid action syntax.'
