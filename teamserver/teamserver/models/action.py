@@ -12,7 +12,8 @@ from mongoengine.fields import BooleanField, EmbeddedDocumentField
 
 from .session import Session
 
-from ..exceptions import CannotCancel, ActionParseException, UnboundException, CannotAssign
+from ..exceptions import CannotCancelAction, CannotAssignAction
+from ..exceptions import ActionSyntaxError, ActionUnboundSession
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, ACTION_STATUSES, SESSION_STATUSES
 from ..config import COLLECTION_ACTIONS, ACTION_STALE_THRESHOLD
 from ..config import ACTION_TYPES, DEFAULT_SUBSET
@@ -270,7 +271,7 @@ class Action(DynamicDocument):
         }
         method = cmds.get(cmd[0].lower())
         if method is None or not callable(method):
-            raise ActionParseException("Invalid action type.")
+            raise ActionSyntaxError("Invalid action type.")
 
         parsed = method(cmd[1:])
 
@@ -309,7 +310,7 @@ class Action(DynamicDocument):
         if not session:
             self.session_id = None
             self.save()
-            raise UnboundException(
+            raise ActionUnboundSession(
                 "Action is assigned to session that no longer exists. It has been unbound.")
 
         session_status = session.status
@@ -435,7 +436,7 @@ class Action(DynamicDocument):
         # TODO: Generate Event
 
         if self.bound_session_id and session.session_id != self.bound_session_id:
-            raise CannotAssign(
+            raise CannotAssignAction(
                 'Action cannot be assigned to session, because it is bound to another.')
 
         self.session_id = session.session_id
@@ -450,7 +451,7 @@ class Action(DynamicDocument):
         # TODO: Generate Event
 
         if self.bound_session_id is not None and session_id != self.bound_session_id:
-            raise CannotAssign(
+            raise CannotAssignAction(
                 'Action cannot be assigned to session, because it is bound to another')
 
         self.session_id = session_id
@@ -477,7 +478,7 @@ class Action(DynamicDocument):
             self.cancel_time = time.time()
             self.save()
         else:
-            raise CannotCancel('Action status is not queued.')
+            raise CannotCancelAction('Action status is not queued.')
 
     def update_fields(self, parsed_action):
         """

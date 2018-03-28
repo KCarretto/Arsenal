@@ -12,7 +12,7 @@ from .target import Target
 from ..config import MAX_STR_LEN
 from ..config import COLLECTION_GROUPS
 
-from ..exceptions import MembershipException
+from ..exceptions import MembershipError
 
 class GroupAutomemberRule(EmbeddedDocument):
     """
@@ -106,7 +106,7 @@ class Group(Document):
         """
 
         if target.name in self.blacklist_members: #pylint: disable=unsupported-membership-test
-            raise MembershipException('Cannot whitelist a member that is on the blacklist.')
+            raise MembershipError('Cannot whitelist a member that is on the blacklist.')
 
         self.whitelist_members.append(target.name) #pylint: disable=no-member
         self.save()
@@ -116,7 +116,7 @@ class Group(Document):
         This function removes a target from the member whitelist.
         """
         if not target.name in self.whitelist_members: #pylint: disable=unsupported-membership-test
-            raise MembershipException('Cannot remove member, member is not whitelisted.')
+            raise MembershipError('Cannot remove member, member is not whitelisted.')
         self.whitelist_members.remove(target.name) #pylint: disable=no-member
         self.save()
 
@@ -131,7 +131,7 @@ class Group(Document):
             pass
 
         if target.name in self.blacklist_members: #pylint: disable=unsupported-membership-test
-            raise MembershipException('Member is already blacklisted.')
+            raise MembershipError('Member is already blacklisted.')
         self.blacklist_members.append(target.name) #pylint: disable=no-member
         self.save()
 

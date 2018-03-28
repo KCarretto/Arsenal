@@ -8,58 +8,65 @@ from mongoengine.errors import DoesNotExist, NotUniqueError, ValidationError
 from .models import log
 from .config import LOG_LEVEL
 
-class CannotCancel(Exception):
+class ArsenalException(Exception):
+    """
+    A base class for Arsenal Exceptions.
+    """
+    name = 'arsenal-exception'
+
+class ActionUnboundSession(ArsenalException):
+    """
+    This exception is raised when the Session that an Action was assigned to no longer exists.
+    """
+    name = 'action-unbound-session'
+
+class SessionUnboundTarget(ArsenalException):
+    """
+    This exception is raised when a Session's Target does not exist.
+    """
+    name = 'session-unbound-target'
+
+class CannotCancelAction(ArsenalException):
     """
     This exception is raised when an attempt to cancel an action is made
     but cannot be completed.
     """
-    pass
+    name = 'cannot-cancel-action'
 
-class UnboundException(Exception):
-    """
-    This exception is raised when the Session that an Action was assigned to no longer exists.
-    """
-    pass
-
-class UnattachedException(Exception):
-    """
-    This exception is raised when a Session's Target does not exist.
-    """
-    pass
-
-class CannotAssign(Exception):
+class CannotAssignAction(ArsenalException):
     """
     This exception is raised when an Action is unable to be assigned to the given session_id.
     """
-    pass
+    name = 'cannot-assign-action'
 
-class NoTarget(Exception):
+class CannotBindAction(ArsenalException):
     """
     This exception is raised when an Action is attempted to be assigned to a
     Target that does not exist.
     """
-    pass
+    name = 'cannot-bind-action'
 
-class ActionParseException(Exception):
+class ActionSyntaxError(ArsenalException):
     """
     This exception is raised when an error was encountered while parsing an action string.
     """
-    pass
+    name = 'action-syntax-error'
 
-class MembershipException(Exception):
+class MembershipError(ArsenalException):
     """
     This exception is raised when an attempt to modify group membership is made
     and cannot be completed.
     """
-    pass
+    name = 'membership-error'
 
-def failed_response(status, description, log_msg=None, log_level=None):
+def failed_response(status, description, error_type, log_msg=None, log_level=None):
     """
     A function to generate a failed JSON response. If the LOG_LEVEL 'DEBUG' is set,
     log messages will be included in the JSON response.
 
     status: The status code to return.
     description: A description of the error code to return.
+    exception: The exception that was raised.
     log_msg: A log message to raise, default to DEBUG log level.
     log_level: The level to raise the log message to.
     """
@@ -72,11 +79,13 @@ def failed_response(status, description, log_msg=None, log_level=None):
                 'status': status,
                 'description': description,
                 'debug': str(log_msg),
+                'error_type': error_type,
                 'error': True,
             }
     return {
         'status': status,
         'description': description,
+        'error_type': error_type,
         'error': True,
     }
 
@@ -97,25 +106,28 @@ def handle_exceptions(func):
             retval = func(*args, **kwargs)
             return retval
 
-        # Arsenal Specific Exceptions
-        except CannotCancel as exception:
-            msg = 'Failed to cancel Action. Action has already been sent.'
-            return failed_response(423, msg, exception)
-
-        except NoTarget as exception:
-            msg = 'Failed to create Action. No such Target.'
-            return failed_response(404, msg, exception)
-
-        except UnattachedException as exception:
-            msg = 'Failed to find Target that session is attached to.'
-            return failed_response(410, msg, exception)
-
-        except ActionParseException as exception:
-            msg = 'Invalid action syntax.'
-            return failed_response(400, msg, exception)
-
-        except MembershipException as exception:
-            return failed_response(400, exception)
+        # Arsenal Exceptions
+        except ActionUnboundSession as exception:
+            msg = 'Action no longer can find assigned Session.'
+            return failed_response(500, msg, exception.name, exception, 'WARN')
+        except SessionUnboundTarget as exception:
+            msg = 'Session no longer can find assigned Target.'
+            return failed_response(500, msg, exception.name, exception, 'WARN')
+        except CannotCancelAction as exception:
+            msg = 'Cannot cancel Action.'
+            return failed_response(400, msg, exception.name)
+        except CannotAssignAction as exception:
+            msg = 'Action cannot be assigned to Session because it is bound.'
+            return failed_response(400, msg, exception.name)
+        except CannotBindAction as exception:
+            msg = 'Target for Action does not exist.'
+            return failed_response(400, msg, exception.name)
+        except ActionSyntaxError as exception:
+            msg = 'Invalid Action Syntax.'
+            return failed_response(400, msg, exception.name)
+        except MembershipError as exception:
+            msg = 'Invalid membership modification request.'
+            return failed_response(400, msg, exception.name)
 
         # Mongoengine Exceptions
         except ValidationError as exception:
@@ -135,6 +147,7 @@ def handle_exceptions(func):
             msg = 'Missing required parameter.'
             return failed_response(422, msg, exception)
 
+        # Broad Except for all other cases
         except Exception as exception: #pylint: disable=broad-except
             msg = 'Server encountered unhandled exception.'
             print(exception)

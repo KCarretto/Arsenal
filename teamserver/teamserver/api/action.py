@@ -7,7 +7,7 @@ import time
 
 from .utils import success_response
 from ..models import Action, Target, log
-from ..exceptions import NoTarget, handle_exceptions
+from ..exceptions import handle_exceptions, CannotBindAction
 
 @handle_exceptions
 def create_action(params, commit=True):
@@ -26,7 +26,7 @@ def create_action(params, commit=True):
     # Ensure Target exists
     target = Target.get_by_name(target_name)
     if not target:
-        raise NoTarget(target_name)
+        raise CannotBindAction(target_name)
 
     parsed_action = Action.parse_action_string(action_string)
 

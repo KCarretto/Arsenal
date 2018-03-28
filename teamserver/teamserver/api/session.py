@@ -7,7 +7,7 @@ from uuid import uuid4
 from mongoengine.errors import DoesNotExist
 
 from .utils import success_response
-from ..exceptions import handle_exceptions, UnattachedException
+from ..exceptions import handle_exceptions, SessionUnboundTarget
 from ..models import Target, Session, SessionHistory, Action, Response, log
 from ..config import DEFAULT_AGENT_SERVERS, DEFAULT_AGENT_INTERVAL
 from ..config import DEFAULT_AGENT_INTERVAL_DELTA, DEFAULT_AGENT_CONFIG_DICT
@@ -148,7 +148,7 @@ def session_check_in(params): #pylint: disable=too-many-locals
             target = Target.get_by_name(session.target_name)
             target.set_facts(facts)
         except DoesNotExist:
-            raise UnattachedException("Target for session does not exist.")
+            raise SessionUnboundTarget("Target for session does not exist.")
 
     # Respond
     return success_response(session_id=session.session_id, actions=actions)
