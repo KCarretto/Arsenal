@@ -82,4 +82,4 @@ def get_target_actions(params):
     name (required): The name of the target to search for. <str>
     """
     target = Target.get_by_name(params['name'])
-    return success_response(actions=[action.document for action in Action.get_target_actions(target.name))]
+    return success_response(actions=[action.document for action in Action.get_target_actions(target.name)])
