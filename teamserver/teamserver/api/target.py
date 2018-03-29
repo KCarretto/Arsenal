@@ -3,25 +3,9 @@
 """
 from mongoengine.errors import DoesNotExist
 
-from .utils import success_response
+from .utils import success_response, _get_filtered_target
 from ..models import Target, Action, Group
 from ..exceptions import handle_exceptions, CannotRenameTarget
-
-def _get_filtered_target(target, params):
-    """
-    Return a filtered target document based on includes.
-    """
-    doc = target.document(
-        params.get('include_status', True),
-        params.get('include_facts', False),
-        params.get('include_sessions', False),
-        params.get('include_credentials', False)
-    )
-    if params.get('include_actions', False):
-        doc['actions'] = [action.document for action in Action.get_target_actions(target.name)]
-    if params.get('include_groups', False):
-        doc['groups'] = [group.document for group in Group.get_target_groups(target.name)]
-    return doc
 
 @handle_exceptions
 def create_target(params):
