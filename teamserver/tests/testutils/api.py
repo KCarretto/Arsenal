@@ -117,6 +117,24 @@ class APIClient(object): # pylint: disable=too-many-public-methods
             )
         return json.loads(resp.data)
 
+    @staticmethod
+    def get_target_actions(
+            client,
+            name):
+        """
+        Invoke the GetTargetActions API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='GetTargetActions',
+                name=name,
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
+
     #@staticmethod
     #def archive_target(client):
     #    pass

@@ -122,5 +122,25 @@ class TargetAPITest(BaseTest):
             sorted(data['groups'])
         )
 
+    def test_target_actions(self):
+        """
+        Tests the GetTargetActions API function.
+        """
+        target = Database.create_target()
+        actions = [
+            Database.create_action(target.name),
+            Database.create_action(target.name),
+            Database.create_action(target.name),
+            Database.create_action(target.name),
+            Database.create_action(target.name),
+        ]
+
+        data = APIClient.get_target_actions(self.client, target.name)
+        self.assertEqual(data['error'], False)
+        self.assertListEqual(
+            sorted([action.action_id for action in actions]),
+            sorted(action['action_id'] for action in data['actions'])
+        )
+
 if __name__ == '__main__':
     unittest.main()

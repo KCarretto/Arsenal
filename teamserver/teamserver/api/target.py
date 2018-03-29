@@ -2,7 +2,7 @@
     This module contains all 'Target' API functions.
 """
 from .utils import success_response
-from ..models import Target, Group
+from ..models import Target, Action, Group
 from ..exceptions import handle_exceptions
 
 @handle_exceptions
@@ -73,3 +73,13 @@ def get_target_groups(params):
     """
     target = Target.get_by_name(params['name'])
     return success_response(groups=[group.name for group in Group.target_groups(target.name)])
+
+@handle_exceptions
+def get_target_actions(params):
+    """
+    List all actions for a target.
+
+    name (required): The name of the target to search for. <str>
+    """
+    target = Target.get_by_name(params['name'])
+    return success_response(actions=Action.get_target_actions(target.name))
