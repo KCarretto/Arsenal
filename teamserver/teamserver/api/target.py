@@ -1,15 +1,18 @@
 """
     This module contains all 'Target' API functions.
 """
+from mongoengine.errors import DoesNotExist
+
 from .utils import success_response
 from ..models import Target, Action, Group
-from ..exceptions import handle_exceptions
+from ..exceptions import handle_exceptions, CannotRenameTarget
 
 def _get_filtered_target(target, params):
     """
     Return a filtered target document based on includes.
     """
     doc = target.document(
+        params.get('include_status', True),
         params.get('include_facts', False),
         params.get('include_sessions', False),
         params.get('include_credentials', False)
@@ -48,6 +51,7 @@ def get_target(params):
     This API function queries and returns a target object with the given name.
 
     name (required): The name of the target to search for. <str>
+    include_status (optional): Should status be included, default: True. <bool>
     include_facts (optional): Should facts be included, default: False. <bool>
     include_sessions (optional): Should sessions be included, default: False. <bool>
     include_credentials (optional): Should credentials be included, default: False. <bool>
@@ -66,7 +70,30 @@ def rename_target(params):
     new_name (required): The new name to assign the target. <str>
     """
     target = Target.get_by_name(params['name'])
-    target.rename(params['new_name'])
+    new_name = params['new_name']
+
+    try:
+        Target.get_by_name(new_name)
+        raise CannotRenameTarget('Target with new_name already exists.')
+    except DoesNotExist:
+        pass
+
+    for session in target.sessions:
+        session.target_name = new_name
+        session.save()
+
+    for action in Action.get_target_actions(target.name):
+        action.target_name = new_name
+        action.save()
+
+    for group in Group.get_target_groups(target.name):
+        # TODO: Pull from whitelist, not dynamic members
+        group.remove_member_by_name(target.name)
+        group.whitelist_member_by_name(new_name)
+        group.save()
+
+    target.name = new_name
+    target.save()
 
     return success_response()
 
@@ -91,6 +118,7 @@ def list_targets(params): #pylint: disable=unused-argument
     """
     This API function will return a list of target documents.
 
+    include_status (optional): Should status be included, default: True. <bool>
     include_facts (optional): Should facts be included, default: False. <bool>
     include_sessions (optional): Should sessions be included, default: False. <bool>
     include_credentials (optional): Should credentials be included, default: False. <bool>

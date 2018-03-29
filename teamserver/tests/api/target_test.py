@@ -124,12 +124,14 @@ class TargetAPITest(BaseTest):
         """
         Tests the RenameTarget API function.
         """
-        target = Database.create_target()
+        target = Database.create_target('NOTTHIS')
         data = APIClient.rename_target(self.client, target.name, 'TEST')
         self.assertEqual(data['error'], False)
-        self.assertIsNotNone(Database.get_target('TEST'))
+        target = Database.get_target('TEST')
+        self.assertIsNotNone(target)
+        self.assertEqual(target.name, 'TEST')
         with self.assertRaises(DoesNotExist):
-            Database.get_target(target.name)
+            Database.get_target('NOTTHIS')
 
         target2 = Database.create_target()
         data = APIClient.rename_target(self.client, target2.name, 'TEST')
@@ -137,6 +139,34 @@ class TargetAPITest(BaseTest):
         self.assertEqual(data['error_type'], 'cannot-rename-target')
         self.assertIsNotNone(Database.get_target(target2.name))
 
+    def test_target_rename_association(self):
+        """
+        Tests the RenameTarget API function, check to make sure Sessions, Targets, and Groups.
+        """
+        target = Database.create_target()
+        target_name = target.name
+        session_id = Database.create_session(target_name).session_id
+        orig_group = Database.create_group('some_group')
+        orig_group.whitelist_member(target)
+        action_id = Database.create_action(target_name).action_id
+
+        data = APIClient.rename_target(self.client, target_name, 'TEST')
+        self.assertEqual(data['error'], False)
+        target = Database.get_target('TEST')
+        self.assertIsNotNone(target)
+        with self.assertRaises(DoesNotExist):
+            Database.get_target(target_name)
+
+        self.assertEqual(target.name, 'TEST')
+
+        session = Database.get_session(session_id)
+        self.assertEqual(session.target_name, 'TEST')
+
+        action = Database.get_action(action_id)
+        self.assertEqual(action.target_name, 'TEST')
+
+        group = Database.get_group(orig_group.name)
+        self.assertIn(target.name, group.member_names)
 
 if __name__ == '__main__':
     unittest.main()

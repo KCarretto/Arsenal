@@ -6,11 +6,9 @@
 from mongoengine import Document, DynamicEmbeddedDocument
 from mongoengine.fields import StringField, DictField, ListField
 from mongoengine.fields import EmbeddedDocumentListField
-from mongoengine.errors import DoesNotExist
 
 from .session import Session
-
-from ..exceptions import CannotRenameTarget
+from .action import Action
 
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN
 from ..config import COLLECTION_TARGETS
@@ -97,6 +95,14 @@ class Target(Document):
         return Session.objects(target_name=self.name) #pylint: disable=no-member
 
     @property
+    def actions(self):
+        """
+        This property returns all action objects that are
+        associated with this target.
+        """
+        return Action.get_target_actions(self.name)
+
+    @property
     def status(self):
         """
         This property returns the target status, which is calculated
@@ -129,6 +135,7 @@ class Target(Document):
 
     def document(
             self,
+            include_status=True,
             include_facts=False,
             include_sessions=False,
             include_credentials=False):
@@ -137,10 +144,11 @@ class Target(Document):
         """
         doc = {
             'name': self.name,
-            'status': self.status,
-            'lastseen': self.lastseen,
             'mac_addrs': self.mac_addrs,
         }
+        if include_status:
+            doc['status'] = self.status
+            doc['lastseen'] = self.lastseen
         if include_facts:
             doc['facts'] = self.facts
         if include_sessions:
@@ -158,15 +166,3 @@ class Target(Document):
             self.facts[key] = value #pylint: disable=unsupported-assignment-operation
         self.save()
 
-    def rename(self, new_name):
-        """
-        This method renames the target.
-        """
-        try:
-            Target.get_by_name(new_name)
-            raise CannotRenameTarget('Target with new_name already exists.')
-        except DoesNotExist:
-            pass
-
-        self.name = new_name
-        self.save()

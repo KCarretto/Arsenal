@@ -38,7 +38,7 @@ def create_test_app():
         TESTING=True,
         MONGODB_SETTINGS=
         {
-            'db': 'arsenal_test',
+            'db': 'arsenal_testing',
             'host': 'mongomock://localhost',
             'is_mock': True
         })
