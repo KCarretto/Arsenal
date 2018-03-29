@@ -105,7 +105,7 @@ def handle_exceptions(func):
     """
 
     @wraps(func)
-    def wrapper(*args, **kwargs): #pylint: disable=too-many-return-statements
+    def wrapper(*args, **kwargs): #pylint: disable=too-many-return-statements,too-many-branches
         """
         This uses the func tools library to wrap a function.
         """

@@ -6,6 +6,7 @@
 from mongoengine import Document, DynamicEmbeddedDocument
 from mongoengine.fields import StringField, DictField, ListField
 from mongoengine.fields import EmbeddedDocumentListField
+from mongoengine.errors import DoesNotExist
 
 from .session import Session
 
@@ -52,8 +53,7 @@ class Target(Document):
         required=True,
         null=False,
         max_length=MAX_STR_LEN,
-        unique=True,
-        primary_key=True)
+        unique=True)
 
     mac_addrs = ListField(
         StringField(required=True, null=False, max_length=20),
@@ -154,7 +154,11 @@ class Target(Document):
         """
         This method renames the target.
         """
-        if Target.get_by_name(new_name) is not None:
+        try:
+            Target.get_by_name(new_name)
             raise CannotRenameTarget('Target with new_name already exists.')
+        except DoesNotExist:
+            pass
+
         self.name = new_name
         self.save()

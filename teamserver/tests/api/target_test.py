@@ -150,11 +150,14 @@ class TargetAPITest(BaseTest):
         data = APIClient.rename_target(self.client, target.name, 'TEST')
         self.assertEqual(data['error'], False)
         self.assertIsNotNone(Database.get_target('TEST'))
-        self.assertIsNone(Database.get_target(target.name))
+        with self.assertRaises(DoesNotExist):
+            Database.get_target(target.name)
 
         target2 = Database.create_target()
         data = APIClient.rename_target(self.client, target2.name, 'TEST')
         self.assertEqual(data['error'], True)
+        self.assertEqual(data['error_type'], 'cannot-rename-target')
+        self.assertIsNotNone(Database.get_target(target2.name))
 
 
 if __name__ == '__main__':
