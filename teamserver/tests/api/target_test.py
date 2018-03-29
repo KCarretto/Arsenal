@@ -52,6 +52,25 @@ class TargetAPITest(BaseTest):
         self.assertIsInstance(data['target']['mac_addrs'], list)
         self.assertListEqual(data['target']['mac_addrs'], target.mac_addrs)
 
+    def test_get_params(self):
+        """
+        This test will pass if get returns the correct parameters.
+        """
+        target = Database.create_target('PARAMS TEST')
+        action = Database.create_action(target.name)
+        data = APIClient.get_target(self.client, 'PARAMS TEST', False, False, True)
+        self.assertEqual(data['error'], False)
+        self.assertIsInstance(data['target'], dict)
+        self.assertEqual(data['target']['name'], 'PARAMS TEST')
+        self.assertIsInstance(data['target']['mac_addrs'], list)
+        self.assertListEqual(data['target']['mac_addrs'], target.mac_addrs)
+        self.assertIsNotNone(data['target']['actions'])
+        self.assertEqual(data['target']['actions'][0]['action_id'], action.action_id)
+        with self.assertRaises(KeyError):
+            data['target']['sessions'] #pylint: disable=pointless-statement
+        with self.assertRaises(KeyError):
+            data['target']['facts'] #pylint: disable=pointless-statement
+
     def test_target_set_facts(self):
         """
         This test will pass if the facts are correctly set.
@@ -100,47 +119,6 @@ class TargetAPITest(BaseTest):
         self.assertListEqual(
             sorted(list(data['targets'].keys())),
             sorted([target.name for target in targets]))
-
-    def test_target_groups(self):
-        """
-        Tests the GetTargetGroups API function.
-        """
-        target = Database.create_target()
-        groups = [
-            Database.create_group(),
-            Database.create_group(),
-            Database.create_group(),
-            Database.create_group(),
-        ]
-        for group in groups:
-            group.whitelist_member(target)
-
-        data = APIClient.get_target_groups(self.client, target.name)
-        self.assertEqual(data['error'], False)
-        self.assertListEqual(
-            sorted([group.name for group in groups]),
-            sorted(data['groups'])
-        )
-
-    def test_target_actions(self):
-        """
-        Tests the GetTargetActions API function.
-        """
-        target = Database.create_target()
-        actions = [
-            Database.create_action(target.name),
-            Database.create_action(target.name),
-            Database.create_action(target.name),
-            Database.create_action(target.name),
-            Database.create_action(target.name),
-        ]
-
-        data = APIClient.get_target_actions(self.client, target.name)
-        self.assertEqual(data['error'], False)
-        self.assertListEqual(
-            sorted([action.action_id for action in actions]),
-            sorted(action['action_id'] for action in data['actions'])
-        )
 
     def test_target_rename(self):
         """

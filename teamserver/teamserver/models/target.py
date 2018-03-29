@@ -127,20 +127,28 @@ class Target(Document):
             return min([session.timestamp for session in sessions]) #pylint: disable=not-an-iterable
         return -1
 
-    @property
-    def document(self):
+    def document(
+            self,
+            include_facts=False,
+            include_sessions=False,
+            include_credentials=False):
         """
         This property returns a filtered JSON document representation of the target.
         """
-        return {
+        doc = {
             'name': self.name,
             'status': self.status,
             'lastseen': self.lastseen,
             'mac_addrs': self.mac_addrs,
-            'facts': self.facts,
-            'sessions': self.sessions,
-            'credentials': self.credentials,
         }
+        if include_facts:
+            doc['facts'] = self.facts
+        if include_sessions:
+            doc['sessions'] = self.sessions
+        if include_credentials:
+            doc['credentials'] = self.credentials
+
+        return doc
 
     def set_facts(self, facts):
         """

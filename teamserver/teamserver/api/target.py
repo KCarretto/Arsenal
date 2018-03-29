@@ -5,6 +5,21 @@ from .utils import success_response
 from ..models import Target, Action, Group
 from ..exceptions import handle_exceptions
 
+def _get_filtered_target(target, params):
+    """
+    Return a filtered target document based on includes.
+    """
+    doc = target.document(
+        params.get('include_facts', False),
+        params.get('include_sessions', False),
+        params.get('include_credentials', False)
+    )
+    if params.get('include_actions', False):
+        doc['actions'] = [action.document for action in Action.get_target_actions(target.name)]
+    if params.get('include_groups', False):
+        doc['groups'] = [group.document for group in Group.get_target_groups(target.name)]
+    return doc
+
 @handle_exceptions
 def create_target(params):
     """
@@ -33,10 +48,14 @@ def get_target(params):
     This API function queries and returns a target object with the given name.
 
     name (required): The name of the target to search for. <str>
+    include_facts (optional): Should facts be included, default: False. <bool>
+    include_sessions (optional): Should sessions be included, default: False. <bool>
+    include_credentials (optional): Should credentials be included, default: False. <bool>
+    include_actions (optional): Should actions be included, default: False. <bool>
+    include_groups (optional): Should groups be included, default: False. <bool>
     """
     target = Target.get_by_name(params['name'])
-
-    return success_response(target=target.document)
+    return success_response(target=_get_filtered_target(target, params))
 
 @handle_exceptions
 def rename_target(params):
@@ -71,29 +90,13 @@ def set_target_facts(params):
 def list_targets(params): #pylint: disable=unused-argument
     """
     This API function will return a list of target documents.
-    WARNING: It is highly recommended to avoid using this function, as it
-    can be very expensive.
-    """
-    targets = Target.list()
-    return success_response(targets={target.name: target.document for target in targets})
 
-@handle_exceptions
-def get_target_groups(params):
+    include_facts (optional): Should facts be included, default: False. <bool>
+    include_sessions (optional): Should sessions be included, default: False. <bool>
+    include_credentials (optional): Should credentials be included, default: False. <bool>
+    include_actions (optional): Should actions be included, default: False. <bool>
+    include_groups (optional): Should groups be included, default: False. <bool>
     """
-    List which groups a target is in.
-
-    name (required): The name of target to search for. <str>
-    """
-    target = Target.get_by_name(params['name'])
-    return success_response(groups=[group.name for group in Group.target_groups(target.name)])
-
-@handle_exceptions
-def get_target_actions(params):
-    """
-    List all actions for a target.
-
-    name (required): The name of the target to search for. <str>
-    """
-    target = Target.get_by_name(params['name'])
-    return success_response(actions=[
-        action.document for action in Action.get_target_actions(target.name)])
+    return success_response(targets={
+        target.name: _get_filtered_target(target, params) for target in Target.list()
+    })

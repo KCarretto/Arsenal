@@ -46,7 +46,7 @@ class Group(Document):
     membership_rules = EmbeddedDocumentListField(GroupAutomemberRule, null=False)
 
     @staticmethod
-    def target_groups(target_name):
+    def get_target_groups(target_name):
         """
         WARNING: Expensive Method
         This method returns a list of groups that a target is in.

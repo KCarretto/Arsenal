@@ -25,7 +25,7 @@ class GroupModelTest(BaseTest):
     """
     def test_target_groups(self):
         """
-        Test the target_groups function.
+        Test the get_target_groups function.
         """
         target = Database.create_target()
         group1 = Database.create_group('group1')
@@ -34,7 +34,7 @@ class GroupModelTest(BaseTest):
 
         group1.whitelist_member(target)
         group2.whitelist_member(target)
-        group_names = [group.name for group in Group.target_groups(target.name)]
+        group_names = [group.name for group in Group.get_target_groups(target.name)]
 
         self.assertIn('group1', group_names)
         self.assertIn('group2', group_names)
