@@ -69,7 +69,7 @@ class ActionModelTest(BaseTest):
         self.assertEqual(action1.status, ACTION_STATUSES.get('stale'))
 
         session1 = Database.create_session()
-        action1.assign_to(session1)
+        action1.assign_to(session1.session_id)
         self.assertEqual(action1.status, ACTION_STATUSES.get('sent'))
 
         Database.missing_session(session1)

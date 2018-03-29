@@ -273,7 +273,7 @@ class Database(object):
         """
         List logs for an application.
         """
-        return Log.list(False, application)
+        return Log.list_logs(False, application)
 
     #####################################
     #           Utility Methods         #

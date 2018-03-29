@@ -88,8 +88,8 @@ def rename_target(params):
 
     for group in Group.get_target_groups(target.name):
         # TODO: Pull from whitelist, not dynamic members
-        group.remove_member_by_name(target.name)
-        group.whitelist_member_by_name(new_name)
+        group.remove_member(target.name)
+        group.whitelist_member(new_name)
         group.save()
 
     target.name = new_name
@@ -126,5 +126,5 @@ def list_targets(params): #pylint: disable=unused-argument
     include_groups (optional): Should groups be included, default: False. <bool>
     """
     return success_response(targets={
-        target.name: _get_filtered_target(target, params) for target in Target.list()
+        target.name: _get_filtered_target(target, params) for target in Target.list_targets()
     })

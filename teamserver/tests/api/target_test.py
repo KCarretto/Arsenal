@@ -147,7 +147,7 @@ class TargetAPITest(BaseTest):
         target_name = target.name
         session_id = Database.create_session(target_name).session_id
         orig_group = Database.create_group('some_group')
-        orig_group.whitelist_member(target)
+        orig_group.whitelist_member(target.name)
         action_id = Database.create_action(target_name).action_id
 
         data = APIClient.rename_target(self.client, target_name, 'TEST')

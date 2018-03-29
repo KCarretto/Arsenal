@@ -26,7 +26,7 @@ def list_logs(params):
     since (optional): The timestamp that logs must be newer than. <float>
     include_archived (optional): Should archived messages be included (default=False). <boolean>
     """
-    logs = Log.list(
+    logs = Log.list_logs(
         params.get('include_archived', False),
         params.get('application'),
         params.get('since', 0))

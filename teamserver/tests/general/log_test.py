@@ -25,7 +25,7 @@ class LogTest(BaseTest):
         This test will attempt to create a log.
         """
         log(LOG_LEVEL, 'Internal Logging Test')
-        self.assertEqual(len(Log.list()), 1)
+        self.assertEqual(len(Log.list_logs()), 1)
 
 if __name__ == '__main__':
     unittest.main()

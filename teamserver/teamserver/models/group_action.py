@@ -31,7 +31,7 @@ class GroupAction(Document):
     cancelled = BooleanField(default=False)
 
     @staticmethod
-    def list():
+    def list_group_actions():
         """
         This method queries for all group action objects.
         """
@@ -53,7 +53,7 @@ class GroupAction(Document):
 
 
     @property
-    def document(self):
+    def document(self): #TODO: Add filter options
         """
         This property returns a document describing statuses for all of it's included actions.
         """
@@ -65,18 +65,6 @@ class GroupAction(Document):
             'status': self.get_status(actions),
             'action_ids': self.action_ids,
             'actions': [action.document for action in actions]
-        }
-
-    @property
-    def brief_document(self):
-        """
-        This property returns a document describing basic information about the action
-        without querying for all of it's included actions.
-        """
-        return {
-            'group_action_id': self.group_action_id,
-            'action_string': self.action_string,
-            'action_ids': self.action_ids
         }
 
     def get_status(self, actions=None):

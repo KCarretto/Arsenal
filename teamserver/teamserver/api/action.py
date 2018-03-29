@@ -82,5 +82,5 @@ def list_actions(params): #pylint: disable=unused-argument
     It is highly recommended to avoid using this function, as it
     can be very expensive.
     """
-    actions = Action.list()
+    actions = Action.list_actions()
     return success_response(actions={action.action_id: action.document for action in actions})

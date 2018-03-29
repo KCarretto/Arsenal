@@ -61,7 +61,7 @@ class BaseTest(unittest.TestCase):
         """
         This clears the database after each test.
         """
-        for entry in Log.list(False, APPLICATION):
+        for entry in Log.list_logs(False, APPLICATION):
             print('[{}]\t{}\t{}:\t{}'.format(
                 entry.timestamp,
                 entry.level,

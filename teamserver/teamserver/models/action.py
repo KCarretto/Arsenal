@@ -114,7 +114,7 @@ class Action(DynamicDocument):
         return actions
 
     @staticmethod
-    def list():
+    def list_actions():
         """
         This method queries for all action objects.
         """
@@ -428,29 +428,14 @@ class Action(DynamicDocument):
             doc['response'] = self.response.document
         return doc
 
-    def assign_to(self, session):
-        """
-        This function assigns this action to a session. It will update
-        the current action object.
-        """
-        # TODO: Generate Event
-
-        if self.bound_session_id and session.session_id != self.bound_session_id:
-            raise CannotAssignAction(
-                'Action cannot be assigned to session, because it is bound to another.')
-
-        self.session_id = session.session_id
-        self.sent_time = time.time()
-        self.save()
-
-    def assign_to_id(self, session_id):
+    def assign_to(self, session_id):
         """
         This function will assign the action to the given session_id.
         It does not attempt to lookup the session.
         """
         # TODO: Generate Event
 
-        if self.bound_session_id is not None and session_id != self.bound_session_id:
+        if self.bound_session_id and session_id != self.bound_session_id:
             raise CannotAssignAction(
                 'Action cannot be assigned to session, because it is bound to another')
 

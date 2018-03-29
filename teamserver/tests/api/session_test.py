@@ -64,7 +64,7 @@ class SessionAPITest(BaseTest):
         session = Database.create_session(target.name)
 
         # Assign old action
-        assigned_action.assign_to(session)
+        assigned_action.assign_to(session.session_id)
 
         # Session Check in, submit response for old action
         check_data = APIClient.session_check_in(

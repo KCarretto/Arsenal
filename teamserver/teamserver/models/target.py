@@ -8,7 +8,6 @@ from mongoengine.fields import StringField, DictField, ListField
 from mongoengine.fields import EmbeddedDocumentListField
 
 from .session import Session
-from .action import Action
 
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN
 from ..config import COLLECTION_TARGETS
@@ -80,7 +79,7 @@ class Target(Document):
         return Target.objects.get(mac_addrs=mac_addrs) #pylint: disable=no-member
 
     @staticmethod
-    def list():
+    def list_targets():
         """
         This method queries for all target objects.
         """
@@ -93,14 +92,6 @@ class Target(Document):
         associated with this target.
         """
         return Session.objects(target_name=self.name) #pylint: disable=no-member
-
-    @property
-    def actions(self):
-        """
-        This property returns all action objects that are
-        associated with this target.
-        """
-        return Action.get_target_actions(self.name)
 
     @property
     def status(self):

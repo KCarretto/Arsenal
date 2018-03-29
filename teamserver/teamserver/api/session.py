@@ -126,7 +126,7 @@ def session_check_in(params): #pylint: disable=too-many-locals
     # Assign each action to this status, and append it's document to the list
     priority = 0
     for action in sorted(actions_raw, key=lambda action: action.queue_time):
-        action.assign_to(session)
+        action.assign_to(session.session_id)
         doc = action.agent_document
         doc['priority'] = priority
         actions.append(doc)
@@ -187,5 +187,5 @@ def list_sessions(params): #pylint: disable=unused-argument
     It is highly recommended to avoid using this function, as it
     can be very expensive.
     """
-    sessions = Session.list()
+    sessions = Session.list_sessions()
     return success_response(sessions={session.session_id: session.document for session in sessions})

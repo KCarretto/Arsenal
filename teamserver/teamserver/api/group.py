@@ -44,7 +44,7 @@ def add_group_member(params):
     group = Group.get_by_name(params['group_name'])
     target = Target.get_by_name(params['target_name'])
 
-    group.whitelist_member(target)
+    group.whitelist_member(target.name)
 
     return success_response()
 
@@ -59,7 +59,7 @@ def remove_group_member(params):
     group = Group.get_by_name(params['group_name'])
     target = Target.get_by_name(params['target_name'])
 
-    group.remove_member(target)
+    group.remove_member(target.name)
 
     return success_response()
 
@@ -74,7 +74,7 @@ def blacklist_group_member(params):
     group = Group.get_by_name(params['group_name'])
     target = Target.get_by_name(params['target_name'])
 
-    group.blacklist_member(target)
+    group.blacklist_member(target.name)
 
     return success_response()
 
@@ -95,5 +95,5 @@ def list_groups(params): #pylint: disable=unused-argument
     List all groups that currently exist.
     WARNING: This will be quite an expensive operation.
     """
-    groups = Group.list()
+    groups = Group.list_groups()
     return success_response(groups={group.name: group.document for group in groups})

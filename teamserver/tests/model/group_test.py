@@ -32,8 +32,8 @@ class GroupModelTest(BaseTest):
         group2 = Database.create_group('group2')
         Database.create_group('group3')
 
-        group1.whitelist_member(target)
-        group2.whitelist_member(target)
+        group1.whitelist_member(target.name)
+        group2.whitelist_member(target.name)
         group_names = [group.name for group in Group.get_target_groups(target.name)]
 
         self.assertIn('group1', group_names)
@@ -60,8 +60,8 @@ class GroupModelTest(BaseTest):
         target2 = Database.create_target()
         target3 = Database.create_target()
         group = Database.create_group('test_group')
-        group.whitelist_member(target1)
-        group.whitelist_member(target2)
+        group.whitelist_member(target1.name)
+        group.whitelist_member(target2.name)
 
         member_names = [member.name for member in group.members]
 
@@ -77,8 +77,8 @@ class GroupModelTest(BaseTest):
         target2 = Database.create_target()
         target3 = Database.create_target()
         group = Database.create_group('test_group')
-        group.whitelist_member(target1)
-        group.whitelist_member(target3)
+        group.whitelist_member(target1.name)
+        group.whitelist_member(target3.name)
 
         member_names = group.member_names
 
@@ -93,9 +93,9 @@ class GroupModelTest(BaseTest):
         target1 = Database.create_target()
         target2 = Database.create_target()
         group = Database.create_group('test_group')
-        group.whitelist_member(target1)
-        group.whitelist_member(target2)
-        group.remove_member(target2)
+        group.whitelist_member(target1.name)
+        group.whitelist_member(target2.name)
+        group.remove_member(target2.name)
 
         member_names = group.member_names
 
@@ -107,7 +107,7 @@ class GroupModelTest(BaseTest):
         """
         group = Database.create_group('SOME GROUP')
         target = Database.create_target()
-        group.whitelist_member(target)
+        group.whitelist_member(target.name)
         group = Database.get_group('SOME GROUP')
         self.assertListEqual([target.name], group.whitelist_members)
 

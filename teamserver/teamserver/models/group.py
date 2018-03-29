@@ -66,7 +66,7 @@ class Group(Document):
         return Group.objects.get(name=name) #pylint: disable=no-member
 
     @staticmethod
-    def list():
+    def list_groups():
         """
         This method queries for all group objects.
         """
@@ -99,19 +99,7 @@ class Group(Document):
             'blacklist_members': self.blacklist_members
         }
 
-    def whitelist_member(self, target):
-        """
-        This function attempts to add a target to the member whitelist.
-        The target will not be added if the target is in the blacklist.
-        """
-
-        if target.name in self.blacklist_members: #pylint: disable=unsupported-membership-test
-            raise MembershipError('Cannot whitelist a member that is on the blacklist.')
-
-        self.whitelist_members.append(target.name) #pylint: disable=no-member
-        self.save()
-
-    def whitelist_member_by_name(self, target_name):
+    def whitelist_member(self, target_name):
         """
         This function attempts to add a target to the member whitelist.
         The target will not be added if the target is in the blacklist.
@@ -123,16 +111,7 @@ class Group(Document):
         self.whitelist_members.append(target_name) #pylint: disable=no-member
         self.save()
 
-    def remove_member(self, target):
-        """
-        This function removes a target from the member whitelist.
-        """
-        if not target.name in self.whitelist_members: #pylint: disable=unsupported-membership-test
-            raise MembershipError('Cannot remove member, member is not whitelisted.')
-        self.whitelist_members.remove(target.name) #pylint: disable=no-member
-        self.save()
-
-    def remove_member_by_name(self, target_name):
+    def remove_member(self, target_name):
         """
         This function removes a target from the member whitelist.
         """
@@ -141,29 +120,13 @@ class Group(Document):
         self.whitelist_members.remove(target_name) #pylint: disable=no-member
         self.save()
 
-
-    def blacklist_member(self, target):
+    def blacklist_member(self, target_name):
         """
         This function removes a target from the member whitelist (if they exist),
         and add them to the blacklist (if they are not yet on there).
         """
         try:
-            self.remove_member(target)
-        except ValueError:
-            pass
-
-        if target.name in self.blacklist_members: #pylint: disable=unsupported-membership-test
-            raise MembershipError('Member is already blacklisted.')
-        self.blacklist_members.append(target.name) #pylint: disable=no-member
-        self.save()
-
-    def blacklist_member_by_name(self, target_name):
-        """
-        This function removes a target from the member whitelist (if they exist),
-        and add them to the blacklist (if they are not yet on there).
-        """
-        try:
-            self.remove_member_by_name(target_name)
+            self.remove_member(target_name)
         except ValueError:
             pass
 

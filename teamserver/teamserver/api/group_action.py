@@ -82,6 +82,6 @@ def list_group_actions(params): #pylint: disable=unused-argument
     It is highly recommended to avoid using this function, as it
     can be very expensive.
     """
-    group_actions = GroupAction.list()
+    group_actions = GroupAction.list_group_actions()
     return success_response(group_actions={
         group_action.group_action_id: group_action.document for group_action in group_actions})

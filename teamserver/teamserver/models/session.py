@@ -30,14 +30,14 @@ class SessionHistory(Document):
     checkin_timestamps = ListField(FloatField(required=True, null=False), required=True, null=False)
 
     @staticmethod
-    def get_by_session_id(session_id):
+    def get_by_id(session_id):
         """
         This method queries for the session object matching the name provided.
         """
         return SessionHistory.objects.get(session_id=session_id) #pylint: disable=no-member
 
     @staticmethod
-    def list():
+    def list_session_history():
         """
         This method queries for all session history objects.
 
@@ -96,7 +96,7 @@ class Session(Document):
         return Session.objects.get(session_id=session_id) #pylint: disable=no-member
 
     @staticmethod
-    def list():
+    def list_sessions():
         """
         This method queries for all session objects.
         """
