@@ -6,7 +6,8 @@
 
 from flask import Blueprint, request, jsonify
 from .api import create_target, get_target, set_target_facts, list_targets, get_target_groups
-from .api import get_target_actions, create_session, get_session, session_check_in
+from .api import get_target_actions, rename_target
+from .api import create_session, get_session, session_check_in
 from .api import update_session_config, list_sessions
 from .api import create_action, get_action, cancel_action, list_actions
 from .api import create_group_action, get_group_action, cancel_group_action, list_group_actions
@@ -56,6 +57,7 @@ def api_entry():
         'CreateTarget': create_target,
         'GetTarget': get_target,
         'SetTargetFacts': set_target_facts,
+        'RenameTarget': rename_target,
         'ArchiveTarget': None,
         'ListTargets': list_targets,
         'GetTargetGroups': get_target_groups,

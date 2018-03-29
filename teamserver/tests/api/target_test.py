@@ -142,5 +142,20 @@ class TargetAPITest(BaseTest):
             sorted(action['action_id'] for action in data['actions'])
         )
 
+    def test_target_rename(self):
+        """
+        Tests the RenameTarget API function.
+        """
+        target = Database.create_target()
+        data = APIClient.rename_target(self.client, target.name, 'TEST')
+        self.assertEqual(data['error'], False)
+        self.assertIsNotNone(Database.get_target('TEST'))
+        self.assertIsNone(Database.get_target(target.name))
+
+        target2 = Database.create_target()
+        data = APIClient.rename_target(self.client, target2.name, 'TEST')
+        self.assertEqual(data['error'], True)
+
+
 if __name__ == '__main__':
     unittest.main()

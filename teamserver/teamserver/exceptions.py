@@ -46,6 +46,13 @@ class CannotBindAction(ArsenalException):
     """
     name = 'cannot-bind-action'
 
+class CannotRenameTarget(ArsenalException):
+    """
+    This exception is raised when an attempt to rename a target is made, but a target with
+    the new name already exists.
+    """
+    name = 'cannot-rename-target'
+
 class ActionSyntaxError(ArsenalException):
     """
     This exception is raised when an error was encountered while parsing an action string.
@@ -121,6 +128,9 @@ def handle_exceptions(func):
             return failed_response(400, msg, exception.name)
         except CannotBindAction as exception:
             msg = 'Target for Action does not exist.'
+            return failed_response(400, msg, exception.name)
+        except CannotRenameTarget as exception:
+            msg = 'Target with new name already exists.'
             return failed_response(400, msg, exception.name)
         except ActionSyntaxError as exception:
             msg = 'Invalid Action Syntax.'

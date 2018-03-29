@@ -9,6 +9,8 @@ from mongoengine.fields import EmbeddedDocumentListField
 
 from .session import Session
 
+from ..exceptions import CannotRenameTarget
+
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN
 from ..config import COLLECTION_TARGETS
 from ..config import SESSION_STATUSES
@@ -146,4 +148,13 @@ class Target(Document):
         """
         for key, value in facts.items():
             self.facts[key] = value #pylint: disable=unsupported-assignment-operation
+        self.save()
+
+    def rename(self, new_name):
+        """
+        This method renames the target.
+        """
+        if Target.get_by_name(new_name) is not None:
+            raise CannotRenameTarget('Target with new_name already exists.')
+        self.name = new_name
         self.save()

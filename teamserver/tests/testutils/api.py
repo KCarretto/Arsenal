@@ -154,6 +154,22 @@ class APIClient(object): # pylint: disable=too-many-public-methods
             )
         return json.loads(resp.data)
 
+    @staticmethod
+    def rename_target(client, name, new_name):
+        """
+        Invoke the RenameTarget API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='RenameTarget',
+                name=name,
+                new_name=new_name,
+            )),
+            content_type='application/json',
+            follow_redirects=True
+            )
+        return json.loads(resp.data)
 
     #####################################
     #          Session Methods          #
