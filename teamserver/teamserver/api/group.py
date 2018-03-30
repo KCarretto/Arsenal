@@ -95,5 +95,6 @@ def list_groups(params): #pylint: disable=unused-argument
     List all groups that currently exist.
     WARNING: This will be quite an expensive operation.
     """
+    # TODO: Filter output based on params
     groups = Group.list_groups()
     return success_response(groups={group.name: group.document for group in groups})
