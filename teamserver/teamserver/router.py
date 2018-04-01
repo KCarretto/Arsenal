@@ -83,10 +83,6 @@ def api_entry(): # pylint: disable=too-many-return-statements
         'RemoveWebhook': None,
         'ListWebhooks': None,
 
-        # API Tokens
-        'CreateAPIToken': None,
-        'DeleteAPIToken': None,
-
         # Targets
         'CreateTarget': create_target,
         'GetTarget': get_target,
