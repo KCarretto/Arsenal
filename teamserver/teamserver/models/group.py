@@ -105,9 +105,10 @@ class Group(Document):
         The target will not be added if the target is in the blacklist.
         """
 
-        self.whitelist_members.append(target_name) #pylint: disable=no-member
         if target_name in self.blacklist_members: #pylint: disable=unsupported-membership-test
-            self.blacklist_members.remove(target_name) #pylint: disable=no-member
+            raise MembershipError('Cannot whitelist a member that is on the blacklist.')
+
+        self.whitelist_members.append(target_name) #pylint: disable=no-member
         self.save()
 
     def remove_member(self, target_name):
