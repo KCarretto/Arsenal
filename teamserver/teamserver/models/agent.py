@@ -3,7 +3,7 @@
     in the backend MongoDB database.
 """
 from mongoengine import Document
-from mongoengine.fields import ListField, StringField, IntField
+from mongoengine.fields import ListField, StringField, IntField, DictField
 
 from ..config import MAX_STR_LEN, COLLECTION_AGENTS
 
@@ -23,6 +23,7 @@ class Agent(Document):
     }
     agent_version = StringField(required=True, null=False, unique=True, max_length=MAX_STR_LEN)
     supported_actions = ListField(IntField(required=True, null=False), required=True, null=False)
+    default_config = DictField()
 
     @staticmethod
     def get_by_version(agent_version):
@@ -46,6 +47,7 @@ class Agent(Document):
         return {
             'agent_version': self.agent_version,
             'supported_actions': self.supported_actions,
+            'default_config': self.default_config,
         }
 
     def remove(self):

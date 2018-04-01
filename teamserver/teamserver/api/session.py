@@ -6,9 +6,10 @@ import time
 from uuid import uuid4
 from mongoengine.errors import DoesNotExist
 
+from .action import create_action
 from .utils import success_response
 from ..exceptions import handle_exceptions, SessionUnboundTarget
-from ..models import Target, Session, SessionHistory, Action, Response, log
+from ..models import Target, Session, SessionHistory, Action, Response, Agent, log
 from ..config import DEFAULT_AGENT_SERVERS, DEFAULT_AGENT_INTERVAL
 from ..config import DEFAULT_AGENT_INTERVAL_DELTA, DEFAULT_AGENT_CONFIG_DICT
 
@@ -24,7 +25,8 @@ def create_session(params):
                                configured with. <float>
     config_dict (optional): Any other configuration options that the agent is initially
                             configured with. <dict>
-    facts (optional): An optional facts dictionary to update the target with.
+    facts (optional): An optional facts dictionary to update the target with. <dict>
+    agent_version (optional): The agent_version to register. <str>
     """
     # Fetch Target, create it automatically if it does not exist
     try:
@@ -36,6 +38,9 @@ def create_session(params):
         )
         target.save(force_insert=True)
 
+    # Determine Agent Version
+    agent_version = params.get('agent_version')
+
     # Create Session and SessionHistory documents
     session = Session(
         session_id=str(uuid4()),
@@ -44,7 +49,8 @@ def create_session(params):
         servers=params.get('servers', DEFAULT_AGENT_SERVERS),
         interval=params.get('interval', DEFAULT_AGENT_INTERVAL),
         interval_delta=params.get('interval_delta', DEFAULT_AGENT_INTERVAL_DELTA),
-        config_dict=params.get('config_dict', DEFAULT_AGENT_CONFIG_DICT)
+        config_dict=params.get('config_dict', DEFAULT_AGENT_CONFIG_DICT),
+        agent_version=agent_version,
     )
     session_history = SessionHistory(
         session_id=session.session_id,
@@ -62,7 +68,23 @@ def create_session(params):
         'INFO',
         'New Session on (target: {}) (session: {})'.format(target.name, session.session_id))
 
-    # TODO: Queue default config action
+    if agent_version:
+        try:
+            agent = Agent.get_by_version(agent_version)
+            if agent.default_config:
+                create_action({
+                    'target_name': target.name,
+                    'action_string': 'config -c {}'.format(agent.default_config),
+                    'bound_session_id': session.session_id
+                })
+                log(
+                    'INFO',
+                    'Queued default config action for new session {} (agent_version: {})'.format(
+                        session.session_id,
+                        agent.agent_version)
+                    )
+        except DoesNotExist:
+            pass
 
     return success_response(session_id=session.session_id)
 
