@@ -4,7 +4,7 @@
     that will do the heavy lifting.
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from .exceptions import PermissionDenied
 from .auth import authenticate
 from .api import create_target, get_target, rename_target, set_target_facts, list_targets
@@ -153,6 +153,12 @@ def api_entry(): # pylint: disable=too-many-return-statements
             'description': 'Method not implemented.',
             'error': True
         })
+
+    # Allow DISABLE_AUTH debug setting for unit tests
+    if current_app.config.get('DISABLE_AUTH', False):
+        log('WARN', 'Authentication and authorization have been disabled by application setting.')
+        log('DEBUG', 'Calling API method {}'.format(data['method']))
+        return respond(method(data))
 
     # Peform authentication check
     valid, response = authenticate(request)
