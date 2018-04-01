@@ -139,14 +139,17 @@ class Action(DynamicDocument):
                 -i, --interval: Set the session's interval
                 -d, --delta: Set the session's interval delta
                 -s, --servers: Set a list of the sessions servers
+                -c, --config: Set the configuration dictionary
             """
             parser = argparse.ArgumentParser('config_action_parser')
             parser.add_argument('-i', '--interval', type=float)
             parser.add_argument('-d', '--delta', type=float)
+            parser.add_argument('-c', '--config', type=dict)
             parser.add_argument('-s', '--servers', nargs='+', type=list)
             args = parser.parse_args(tokens)
             config = {}
-
+            if args.config and isinstance(config, dict):
+                config = args.config
             if args.servers:
                 config['servers'] = [''.join(server) for server in args.servers]
             if args.interval:
