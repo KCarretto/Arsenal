@@ -20,30 +20,30 @@ script:
   # Run all unit tests
   - cd teamserver; python run_tests.py
 
-before_deploy:
-  # Package the repository for deployment
-  - cd ..
-  - zip -r teamserver-latest *
-  - mkdir -p upload
-  - mv teamserver-latest.zip upload/teamserver-latest.zip
-
-deploy:
-  # Upload the repository to S3
-  - provider: s3
-    access_key_id: $AWS_ACCESS_KEY
-    secret_access_key: $AWS_SECRET_KEY
-    local_dir: upload
-    skip_cleanup: true
-    bucket: arsenal-deploy
-    region: us-east-1
-
-  # Deploy the code from S3 using AWS code deploy
-  - provider: codedeploy
-    access_key_id: $AWS_ACCESS_KEY
-    secret_access_key: $AWS_SECRET_KEY
-    bucket: arsenal-deploy
-    key: teamserver-latest.zip
-    bundle_type: zip
-    application: arsenal-teamserver
-    deployment_group: arsenal-teamservers
-    region: us-east-1
+#before_deploy:
+#  # Package the repository for deployment
+#  - cd ..
+#  - zip -r teamserver-latest *
+#  - mkdir -p upload
+#  - mv teamserver-latest.zip upload/teamserver-latest.zip
+#
+#deploy:
+#  # Upload the repository to S3
+#  - provider: s3
+#    access_key_id: $AWS_ACCESS_KEY
+#    secret_access_key: $AWS_SECRET_KEY
+#    local_dir: upload
+#    skip_cleanup: true
+#    bucket: arsenal-deploy
+#    region: us-east-1
+#
+#  # Deploy the code from S3 using AWS code deploy
+#  - provider: codedeploy
+#    access_key_id: $AWS_ACCESS_KEY
+#    secret_access_key: $AWS_SECRET_KEY
+#    bucket: arsenal-deploy
+#    key: teamserver-latest.zip
+#    bundle_type: zip
+#    application: arsenal-teamserver
+#    deployment_group: arsenal-teamservers
+#    region: us-east-1
