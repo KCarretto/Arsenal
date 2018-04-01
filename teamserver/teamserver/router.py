@@ -16,6 +16,10 @@ from .api import get_group, create_group, delete_group, list_groups
 from .api import remove_group_member, add_group_member, blacklist_group_member
 from .api import create_log, list_logs
 from .api import register_agent, get_agent, list_agents, unregister_agent
+from .api import create_user, create_role, create_api_key
+from .api import update_role_permissions, update_user_password
+from .api import add_role_member, remove_role_member
+
 from .models import APIKey, User, log
 
 API = Blueprint('router', __name__)
@@ -137,15 +141,15 @@ def api_entry(): # pylint: disable=too-many-return-statements
         'UnregisterAgent': unregister_agent,
 
         # Auth
-        #'CreateUser': create_user,
-        #'CreateAPIKey': create_api_key,
-        #'CreateRole': create_role,
+        'CreateUser': create_user,
+        'CreateAPIKey': create_api_key,
+        'CreateRole': create_role,
 
-        #'UpdateUserPassword': update_user_password,
-        #'UpdateRolePermissions': update_role_permissions,
+        'UpdateUserPassword': update_user_password,
+        'UpdateRolePermissions': update_role_permissions,
 
-        #'AddRoleMember': add_role_member,
-        #'RemoveRoleMember': remove_role_member,
+        'AddRoleMember': add_role_member,
+        'RemoveRoleMember': remove_role_member,
 
         #'DeleteUser': delete_user,
         #'DeleteAPIKey': delete_api_key,
@@ -187,11 +191,23 @@ def api_entry(): # pylint: disable=too-many-return-statements
 
     # Perform authorization check
     try:
+        # Ensure the response we recieved is a valid auth object
         if isinstance(response, (User, APIKey)) and response.is_permitted(data['method']):
             # Trigger method pre-hooks
             # TODO: Trigger method pre-hooks
 
-            log('DEBUG', 'Calling API method {}'.format(data['method']))
+            # Generate a DEBUG log message
+            if isinstance(response, User):
+                log('DEBUG', '{} calling API method {}'.format(response.username, data['method']))
+            else:
+                log('DEBUG', '{} calling API method {} using API Key'.format(
+                    response.owner,
+                    data['method']))
+
+            # Override the reserved 'arsenal_auth_object' field with the given auth object
+            data['arsenal_auth_object'] = response
+
+            # Call the API function, passing the received JSON
             return respond(method(data))
     except PermissionDenied:
         return respond({

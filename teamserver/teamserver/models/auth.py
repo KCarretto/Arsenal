@@ -7,10 +7,11 @@
     Roles have permissions
 """
 from mongoengine import Document
-from mongoengine.fields import ListField, StringField
+from mongoengine.fields import ListField, StringField, BooleanField
 from passlib.hash import bcrypt
 from ..exceptions import InvalidCredentials, PermissionDenied
-from ..config import MAX_STR_LEN, COLLECTION_USERS, COLLECTION_ROLES, COLLECTION_APIKEYS
+from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN
+from ..config import COLLECTION_USERS, COLLECTION_ROLES, COLLECTION_APIKEYS
 
 class Role(Document):
     """
@@ -26,13 +27,38 @@ class Role(Document):
         ]
     }
     name = StringField(required=True, null=False, unique=True, max_length=MAX_STR_LEN)
+    description = StringField(required=False, max_length=MAX_BIGSTR_LEN)
     allowed_api_calls = ListField(
         StringField(required=True, null=False, max_length=MAX_STR_LEN),
         required=True,
         null=False)
-    users = ListField(
-        StringField(required=True, null=False, max_length=MAX_STR_LEN),
-        required=True)
+    users = ListField(StringField(required=True, null=False, max_length=MAX_STR_LEN))
+
+    @staticmethod
+    def get_role(role_name):
+        """
+        Fetch a role by name.
+        """
+        return Role.objects.get(name=role_name) # pylint: disable=no-member
+
+    def add_member(self, username):
+        """
+        Add a user to this role if it exists.
+        """
+        user = User.get_user(username)
+        if user.username not in self.users: #pylint: disable=unsupported-membership-test
+            self.users.append(user.username) # pylint: disable=no-member
+            self.save()
+        # TODO: Raise exception
+
+    def remove_member(self, username):
+        """
+        Remove a user from this role.
+        """
+        if username in self.users: #pylint: disable=unsupported-membership-test
+            self.users.remove(username) #pylint: disable=no-member
+            self.save()
+        # TODO: Raise exception if user not in list
 
 class APIKey(Document):
     """
@@ -65,7 +91,7 @@ class APIKey(Document):
         """
         Query for a key from the database.
         """
-        return APIKey.objects().get(key=key) # pylint: disable=no-member
+        return APIKey.objects.get(key=key) # pylint: disable=no-member
 
     def is_permitted(self, api_method):
         """
@@ -93,13 +119,14 @@ class User(Document):
     }
     username = StringField(required=True, null=False, unique=True, max_length=MAX_STR_LEN)
     password = StringField(required=True, null=False, unique=True, max_length=MAX_STR_LEN)
+    administrator = BooleanField(required=True, null=False, default=False)
 
     @staticmethod
     def get_user(username):
         """
         Query for a user by username.
         """
-        return User.objects().get(username=username) # pylint: disable=no-member
+        return User.objects.get(username=username) # pylint: disable=no-member
 
     @property
     def api_keys(self):
@@ -125,15 +152,35 @@ class User(Document):
         """
         return Role.objects(users=self.username) # pylint: disable=no-member
 
+    @staticmethod
+    def hash_password(password):
+        """
+        Returns a hash of a password.
+        """
+        return bcrypt.hash(password)
+
+    @property
+    def allowed_api_calls(self):
+        """
+        Return a list of all API methods this user may execute.
+        """
+        allowed_methods = []
+        for role in self.roles:
+            allowed_methods += role.allowed_api_calls
+        return list(set(allowed_methods))
+
     def is_permitted(self, api_method):
         """
         Determines if a user is allowed to execute an API call based on the given roles.
         """
-        for role in self.roles:
-            if api_method in role.allowed_api_calls:
-                return True
-            if '*' in role.allowed_api_calls:
-                return True
+        if self.administrator:
+            return True
+
+        allowed_methods = self.allowed_api_calls
+        if isinstance(allowed_methods, list) and '*' in allowed_methods:
+            return True
+        if isinstance(allowed_methods, list) and api_method in allowed_methods:
+            return True
         raise PermissionDenied('Permission denied.')
 
     def authenticate(self, password):
@@ -150,8 +197,9 @@ class User(Document):
         Updates a user's password.
         """
         if self.authenticate(current_password):
-            self.password = bcrypt.hash(new_password)
+            self.password = self.hash_password(new_password)
             self.save()
+        return True
 
     def remove(self):
         """

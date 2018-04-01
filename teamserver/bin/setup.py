@@ -66,13 +66,14 @@ def create_role(name, allowed_api_calls, users):
     role.save()
     return role
 
-def create_user(username, password):
+def create_user(username, password, administrator=False):
     """
     Create a user with the given password.
     """
     user = User(
         username=username,
         password=password,
+        administrator=administrator
     )
     user.save()
     return user
@@ -104,7 +105,7 @@ def main():
 
     print('Generating authentication schema...')
     for username, password in CONFIG['users'].items():
-        user = create_user(username, password)
+        user = create_user(username, password, username=='admin')
         print('[+][Created User] {}:{}'.format(user.username, user.password))
     print('')
     for rolename, roleconfig in CONFIG['roles'].items():
