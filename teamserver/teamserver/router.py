@@ -5,7 +5,7 @@
 """
 
 from flask import Blueprint, request, jsonify
-from .api import create_target, get_target, set_target_facts, list_targets, get_target_groups
+from .api import create_target, get_target, rename_target, set_target_facts, list_targets
 from .api import create_session, get_session, session_check_in
 from .api import update_session_config, list_sessions
 from .api import create_action, get_action, cancel_action, list_actions
@@ -13,6 +13,7 @@ from .api import create_group_action, get_group_action, cancel_group_action, lis
 from .api import get_group, create_group, delete_group, list_groups
 from .api import remove_group_member, add_group_member, blacklist_group_member
 from .api import create_log, list_logs
+from .api import register_agent, get_agent, list_agents, unregister_agent
 from .models import log
 
 API = Blueprint('router', __name__)
@@ -56,9 +57,9 @@ def api_entry():
         'CreateTarget': create_target,
         'GetTarget': get_target,
         'SetTargetFacts': set_target_facts,
+        'RenameTarget': rename_target,
         'ArchiveTarget': None,
         'ListTargets': list_targets,
-        'GetTargetGroups': get_target_groups,
 
         # Sessions
         'CreateSession': create_session,
@@ -98,6 +99,12 @@ def api_entry():
         # Logs
         'CreateLog': create_log,
         'ListLogs': list_logs,
+
+        # Agents
+        'RegisterAgent': register_agent,
+        'GetAgent': get_agent,
+        'ListAgents': list_agents,
+        'UnregisterAgent': unregister_agent,
     }
 
     # Attempt to find method

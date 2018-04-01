@@ -50,8 +50,7 @@ class Target(Document):
         required=True,
         null=False,
         max_length=MAX_STR_LEN,
-        unique=True,
-        primary_key=True)
+        unique=True)
 
     mac_addrs = ListField(
         StringField(required=True, null=False, max_length=20),
@@ -80,7 +79,7 @@ class Target(Document):
         return Target.objects.get(mac_addrs=mac_addrs) #pylint: disable=no-member
 
     @staticmethod
-    def list():
+    def list_targets():
         """
         This method queries for all target objects.
         """
@@ -125,20 +124,30 @@ class Target(Document):
             return min([session.timestamp for session in sessions]) #pylint: disable=not-an-iterable
         return -1
 
-    @property
-    def document(self):
+    def document(
+            self,
+            include_status=True,
+            include_facts=False,
+            include_sessions=False,
+            include_credentials=False):
         """
         This property returns a filtered JSON document representation of the target.
         """
-        return {
+        doc = {
             'name': self.name,
-            'status': self.status,
-            'lastseen': self.lastseen,
             'mac_addrs': self.mac_addrs,
-            'facts': self.facts,
-            'sessions': self.sessions,
-            'credentials': self.credentials,
         }
+        if include_status:
+            doc['status'] = self.status
+            doc['lastseen'] = self.lastseen
+        if include_facts:
+            doc['facts'] = self.facts
+        if include_sessions:
+            doc['sessions'] = self.sessions
+        if include_credentials:
+            doc['credentials'] = self.credentials
+
+        return doc
 
     def set_facts(self, facts):
         """
@@ -146,3 +155,5 @@ class Target(Document):
         """
         for key, value in facts.items():
             self.facts[key] = value #pylint: disable=unsupported-assignment-operation
+        self.save()
+

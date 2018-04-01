@@ -69,14 +69,14 @@ class GroupActionModelTest(BaseTest):
 
         # Send to a session, status should be in progress
         session = Database.create_session()
-        group_action.actions[0].assign_to(session)
+        group_action.actions[0].assign_to(session.session_id)
         self.assertEqual(
             group_action.get_status(),
             GROUP_ACTION_STATUSES.get('in progress', 'in progress'))
 
         # Submit a response to all actions, status should be success
         for action in group_action.actions:
-            action.assign_to(session)
+            action.assign_to(session.session_id)
             response = Database.create_response()
             action.submit_response(response)
         self.assertEqual(group_action.get_status(), GROUP_ACTION_STATUSES.get('success', 'success'))
@@ -89,7 +89,7 @@ class GroupActionModelTest(BaseTest):
         self.assertEqual(group_action.get_status(), GROUP_ACTION_STATUSES.get('failed', 'failed'))
 
         # Have a session check in, status should update to in progress
-        group_action.actions[0].assign_to(session)
+        group_action.actions[0].assign_to(session.session_id)
         self.assertEqual(
             group_action.get_status(),
             GROUP_ACTION_STATUSES.get('in progress', 'in progress'))

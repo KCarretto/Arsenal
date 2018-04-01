@@ -38,7 +38,7 @@ def create_test_app():
         TESTING=True,
         MONGODB_SETTINGS=
         {
-            'db': 'arsenal_test',
+            'db': 'arsenal_testing',
             'host': 'mongomock://localhost',
             'is_mock': True
         })
@@ -61,7 +61,7 @@ class BaseTest(unittest.TestCase):
         """
         This clears the database after each test.
         """
-        for entry in Log.list(False, APPLICATION):
+        for entry in Log.list_logs(False, APPLICATION):
             print('[{}]\t{}\t{}:\t{}'.format(
                 entry.timestamp,
                 entry.level,

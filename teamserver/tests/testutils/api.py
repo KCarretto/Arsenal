@@ -61,9 +61,14 @@ class APIClient(object): # pylint: disable=too-many-public-methods
         return json.loads(resp.data)
 
     @staticmethod
-    def get_target(
+    def get_target( # pylint: disable=too-many-arguments
             client,
-            name):
+            name,
+            include_facts=False,
+            include_sessions=False,
+            include_actions=False,
+            include_groups=False,
+            include_credentials=False):
         """
         Invoke the GetTarget API function using the provided client.
         """
@@ -72,6 +77,11 @@ class APIClient(object): # pylint: disable=too-many-public-methods
             data=json.dumps(dict(
                 method='GetTarget',
                 name=name,
+                include_facts=include_facts,
+                include_sessions=include_sessions,
+                include_actions=include_actions,
+                include_groups=include_groups,
+                include_credentials=include_credentials,
             )),
             content_type='application/json',
             follow_redirects=True
@@ -99,24 +109,6 @@ class APIClient(object): # pylint: disable=too-many-public-methods
             )
         return json.loads(resp.data)
 
-    @staticmethod
-    def get_target_groups(
-            client,
-            name):
-        """
-        Invoke the GetTargetGroups API function using the provided client.
-        """
-        resp = client.post(
-            '/api',
-            data=json.dumps(dict(
-                method='GetTargetGroups',
-                name=name,
-            )),
-            content_type='application/json',
-            follow_redirects=True
-            )
-        return json.loads(resp.data)
-
     #@staticmethod
     #def archive_target(client):
     #    pass
@@ -136,6 +128,22 @@ class APIClient(object): # pylint: disable=too-many-public-methods
             )
         return json.loads(resp.data)
 
+    @staticmethod
+    def rename_target(client, name, new_name):
+        """
+        Invoke the RenameTarget API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='RenameTarget',
+                name=name,
+                new_name=new_name,
+            )),
+            content_type='application/json',
+            follow_redirects=True
+            )
+        return json.loads(resp.data)
 
     #####################################
     #          Session Methods          #

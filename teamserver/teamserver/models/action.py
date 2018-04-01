@@ -12,7 +12,8 @@ from mongoengine.fields import BooleanField, EmbeddedDocumentField
 
 from .session import Session
 
-from ..exceptions import CannotCancel, ActionParseException, UnboundException, CannotAssign
+from ..exceptions import CannotCancelAction, CannotAssignAction
+from ..exceptions import ActionSyntaxError, ActionUnboundSession
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, ACTION_STATUSES, SESSION_STATUSES
 from ..config import COLLECTION_ACTIONS, ACTION_STALE_THRESHOLD
 from ..config import ACTION_TYPES, DEFAULT_SUBSET
@@ -113,7 +114,7 @@ class Action(DynamicDocument):
         return actions
 
     @staticmethod
-    def list():
+    def list_actions():
         """
         This method queries for all action objects.
         """
@@ -138,14 +139,17 @@ class Action(DynamicDocument):
                 -i, --interval: Set the session's interval
                 -d, --delta: Set the session's interval delta
                 -s, --servers: Set a list of the sessions servers
+                -c, --config: Set the configuration dictionary
             """
             parser = argparse.ArgumentParser('config_action_parser')
             parser.add_argument('-i', '--interval', type=float)
             parser.add_argument('-d', '--delta', type=float)
+            parser.add_argument('-c', '--config', type=dict)
             parser.add_argument('-s', '--servers', nargs='+', type=list)
             args = parser.parse_args(tokens)
             config = {}
-
+            if args.config and isinstance(config, dict):
+                config = args.config
             if args.servers:
                 config['servers'] = [''.join(server) for server in args.servers]
             if args.interval:
@@ -270,7 +274,7 @@ class Action(DynamicDocument):
         }
         method = cmds.get(cmd[0].lower())
         if method is None or not callable(method):
-            raise ActionParseException("Invalid action type.")
+            raise ActionSyntaxError("Invalid action type.")
 
         parsed = method(cmd[1:])
 
@@ -309,7 +313,7 @@ class Action(DynamicDocument):
         if not session:
             self.session_id = None
             self.save()
-            raise UnboundException(
+            raise ActionUnboundSession(
                 "Action is assigned to session that no longer exists. It has been unbound.")
 
         session_status = session.status
@@ -427,30 +431,15 @@ class Action(DynamicDocument):
             doc['response'] = self.response.document
         return doc
 
-    def assign_to(self, session):
-        """
-        This function assigns this action to a session. It will update
-        the current action object.
-        """
-        # TODO: Generate Event
-
-        if self.bound_session_id and session.session_id != self.bound_session_id:
-            raise CannotAssign(
-                'Action cannot be assigned to session, because it is bound to another.')
-
-        self.session_id = session.session_id
-        self.sent_time = time.time()
-        self.save()
-
-    def assign_to_id(self, session_id):
+    def assign_to(self, session_id):
         """
         This function will assign the action to the given session_id.
         It does not attempt to lookup the session.
         """
         # TODO: Generate Event
 
-        if self.bound_session_id is not None and session_id != self.bound_session_id:
-            raise CannotAssign(
+        if self.bound_session_id and session_id != self.bound_session_id:
+            raise CannotAssignAction(
                 'Action cannot be assigned to session, because it is bound to another')
 
         self.session_id = session_id
@@ -477,7 +466,7 @@ class Action(DynamicDocument):
             self.cancel_time = time.time()
             self.save()
         else:
-            raise CannotCancel('Action status is not queued.')
+            raise CannotCancelAction('Action status is not queued.')
 
     def update_fields(self, parsed_action):
         """

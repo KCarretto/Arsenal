@@ -135,7 +135,8 @@ class Database(object):
             interval_delta=5,
             servers=None,
             config_dict=None,
-            create_history=True):
+            create_history=True,
+            agent_version=None):
         """
         Create an session object in the database.
         """
@@ -156,7 +157,8 @@ class Database(object):
             interval=interval,
             interval_delta=interval_delta,
             config_dict=config_dict,
-            timestamp=timestamp
+            timestamp=timestamp,
+            agent_version=agent_version,
         )
         session.save(force_insert=True)
 
@@ -259,7 +261,7 @@ class Database(object):
         """
         Get a session history object from the database.
         """
-        return SessionHistory.get_by_session_id(session_id)
+        return SessionHistory.get_by_id(session_id)
 
     @staticmethod
     def get_target(name):
@@ -273,7 +275,7 @@ class Database(object):
         """
         List logs for an application.
         """
-        return Log.list(False, application)
+        return Log.list_logs(False, application)
 
     #####################################
     #           Utility Methods         #

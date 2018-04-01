@@ -8,3 +8,4 @@ from .group_action import GroupAction
 from .group import Group, GroupAutomemberRule
 from .session import Session, SessionHistory
 from .target import Target, Credential
+from .agent import Agent

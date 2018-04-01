@@ -44,7 +44,7 @@ class Log(Document):
     archived = BooleanField(default=False)
 
     @staticmethod
-    def list(include_archived=False, application=None, since=0):
+    def list_logs(include_archived=False, application=None, since=0):
         """
         Return a list of logs.
         Optionally include archived logs.

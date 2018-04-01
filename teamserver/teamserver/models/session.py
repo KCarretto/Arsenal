@@ -30,14 +30,14 @@ class SessionHistory(Document):
     checkin_timestamps = ListField(FloatField(required=True, null=False), required=True, null=False)
 
     @staticmethod
-    def get_by_session_id(session_id):
+    def get_by_id(session_id):
         """
         This method queries for the session object matching the name provided.
         """
         return SessionHistory.objects.get(session_id=session_id) #pylint: disable=no-member
 
     @staticmethod
-    def list():
+    def list_session_history():
         """
         This method queries for all session history objects.
 
@@ -52,7 +52,7 @@ class SessionHistory(Document):
         of session checkin timestamps.
         """
         self.checkin_timestamps.append(timestamp) #pylint: disable=no-member
-
+        self.save()
 
 class Session(Document):
     """
@@ -88,6 +88,8 @@ class Session(Document):
     interval_delta = FloatField(required=True, null=False)
     config_dict = DictField(null=False)
 
+    agent_version = StringField(null=True, max_length=MAX_STR_LEN)
+
     @staticmethod
     def get_by_id(session_id):
         """
@@ -96,7 +98,7 @@ class Session(Document):
         return Session.objects.get(session_id=session_id) #pylint: disable=no-member
 
     @staticmethod
-    def list():
+    def list_sessions():
         """
         This method queries for all session objects.
         """
@@ -174,3 +176,4 @@ class Session(Document):
         """
         self.timestamp = new_timestamp
         self.history.add_checkin(new_timestamp)
+        self.save()
