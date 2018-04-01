@@ -73,6 +73,8 @@ class APIKey(Document):
         """
         if api_method in self.allowed_api_calls: # pylint: disable=unsupported-membership-test
             return True
+        if '*' in self.allowed_api_calls: # pylint: disable=unsupported-membership-test
+            return True
         raise PermissionDenied('API Key does not have access to this method.')
 
 class User(Document):
@@ -129,6 +131,8 @@ class User(Document):
         """
         for role in self.roles:
             if api_method in role.allowed_api_calls:
+                return True
+            if '*' in role.allowed_api_calls:
                 return True
         raise PermissionDenied('Permission denied.')
 
