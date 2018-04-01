@@ -9,8 +9,8 @@ from os.path import abspath, dirname
 from mongoengine import connect
 
 sys.path.insert(0, abspath(dirname(abspath(dirname(__file__)))))
-from teamserver.models import User, Role, APIKey
-from teamserver.config import DB_NAME, DB_HOST, DB_PORT
+from teamserver.models import User, Role, APIKey # pylint: disable-all
+from teamserver.config import DB_NAME, DB_HOST, DB_PORT # pylint: disable-all
 
 CONFIG = {
     'users': {
