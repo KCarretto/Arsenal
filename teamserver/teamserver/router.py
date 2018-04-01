@@ -13,6 +13,7 @@ from .api import create_group_action, get_group_action, cancel_group_action, lis
 from .api import get_group, create_group, delete_group, list_groups
 from .api import remove_group_member, add_group_member, blacklist_group_member
 from .api import create_log, list_logs
+from .api import register_agent, get_agent, list_agents, unregister_agent
 from .models import log
 
 API = Blueprint('router', __name__)
@@ -98,6 +99,12 @@ def api_entry():
         # Logs
         'CreateLog': create_log,
         'ListLogs': list_logs,
+
+        # Agents
+        'RegisterAgent': register_agent,
+        'GetAgent': get_agent,
+        'ListAgents': list_agents,
+        'UnregisterAgent': unregister_agent,
     }
 
     # Attempt to find method

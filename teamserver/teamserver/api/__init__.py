@@ -16,3 +16,5 @@ from .target import create_target, get_target, set_target_facts, list_targets
 from .target import rename_target
 
 from .log import create_log, list_logs
+
+from .agent import register_agent, get_agent, list_agents, unregister_agent

@@ -47,3 +47,9 @@ class Agent(Document):
             'agent_version': self.agent_version,
             'supported_actions': self.supported_actions,
         }
+
+    def remove(self):
+        """
+        Remove this document from the database, and perform any related cleanup.
+        """
+        self.delete()
