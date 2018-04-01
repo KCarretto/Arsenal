@@ -66,6 +66,19 @@ class MembershipError(ArsenalException):
     """
     name = 'membership-error'
 
+class InvalidCredentials(ArsenalException):
+    """
+    This exception is raised when a user provides invalid credentials.
+    """
+    name = 'invalid-credentials'
+
+class PermissionDenied(ArsenalException):
+    """
+    This exception is raised when an authenticated user attempts to perform
+    an action that they do not have access to.
+    """
+    name = 'permission-denied'
+
 def failed_response(status, description, error_type, log_msg=None, log_level=None):
     """
     A function to generate a failed JSON response. If the LOG_LEVEL 'DEBUG' is set,
@@ -138,6 +151,12 @@ def handle_exceptions(func):
         except MembershipError as exception:
             msg = 'Invalid membership modification request.'
             return failed_response(400, msg, exception.name)
+        except InvalidCredentials as exception:
+            msg = 'Provided credentials are invalid.'
+            return failed_response(403, msg, exception.name)
+        except PermissionDenied as exception:
+            msg = 'Permission denied.'
+            return failed_response(403, msg, exception.name)
 
         # Mongoengine Exceptions
         except ValidationError as exception:

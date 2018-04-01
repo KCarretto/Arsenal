@@ -5,6 +5,8 @@
 """
 
 from flask import Blueprint, request, jsonify
+from .exceptions import PermissionDenied
+from .auth import authenticate
 from .api import create_target, get_target, rename_target, set_target_facts, list_targets
 from .api import create_session, get_session, session_check_in
 from .api import update_session_config, list_sessions
@@ -14,9 +16,17 @@ from .api import get_group, create_group, delete_group, list_groups
 from .api import remove_group_member, add_group_member, blacklist_group_member
 from .api import create_log, list_logs
 from .api import register_agent, get_agent, list_agents, unregister_agent
-from .models import log
+from .models import APIKey, User, log
 
 API = Blueprint('router', __name__)
+
+def respond(response):
+    """
+    This method will return a jsonfied response, with the correct http headers.
+    """
+    resp = jsonify(response)
+    resp.status_code = response.get('status', 500)
+    return resp
 
 @API.route('/status')
 def teamserver_status():
@@ -34,7 +44,7 @@ def teamserver_status():
 @API.route('/', methods=['POST'])
 @API.route('/api', methods=['POST'])
 @API.route('/api/v1', methods=['POST'])
-def api_entry():
+def api_entry(): # pylint: disable=too-many-return-statements
     """
     This function serves as the entry point for the v1 JSON API.
     """
@@ -105,6 +115,23 @@ def api_entry():
         'GetAgent': get_agent,
         'ListAgents': list_agents,
         'UnregisterAgent': unregister_agent,
+
+        # Auth
+        #'CreateUser': create_user,
+        #'CreateAPIKey': create_api_key,
+        #'CreateRole': create_role,
+
+        #'UpdateUserPassword': update_user_password,
+        #'UpdateRolePermissions': update_role_permissions,
+
+        #'AddRoleMember': add_role_member,
+        #'RemoveRoleMember': remove_role_member,
+
+        #'DeleteUser': delete_user,
+        #'DeleteAPIKey': delete_api_key,
+        #'DeleteRole': delete_role,
+        #'KillSession': kill_session,
+        #'KillSessions': kill_sessions,
     }
 
     # Attempt to find method
@@ -113,7 +140,7 @@ def api_entry():
         method = api_functions[data['method']]
     except KeyError:
         # Return method not found
-        return jsonify({
+        return respond({
             'status': 404,
             'description': 'Method not found.',
             'error': True
@@ -121,26 +148,32 @@ def api_entry():
 
     # If method was found but is None, return not implemented
     if method is None or not callable(method):
-        return jsonify({
+        return respond({
             'status': 501,
             'description': 'Method not implemented.',
             'error': True
         })
 
-    # Peform auth check, ensure user has permissions
-    # TODO: Enable Authentication
+    # Peform authentication check
+    valid, response = authenticate(request)
+    if not valid:
+        return respond(response)
 
-    # Trigger method pre-hooks
-    # TODO: Trigger method pre-hooks
+    # Perform authorization check
+    try:
+        if isinstance(response, (User, APIKey)) and response.is_permitted(data['method']):
+            # Trigger method pre-hooks
+            # TODO: Trigger method pre-hooks
 
-    # Call method
-    log('DEBUG', 'Calling API method {}'.format(data['method']))
-    response = method(data)
+            log('DEBUG', 'Calling API method {}'.format(data['method']))
+            return respond(method(data))
+    except PermissionDenied:
+        return respond({
+            'status': 403,
+            'description': 'Permission Denied.'
+        })
 
-    # Trigger method post-hooks
-    # TODO: Trigger method post-hooks
-
-    # Return method output
-    resp = jsonify(response)
-    resp.status_code = response.get('status', 500)
-    return resp
+    return respond({
+        'status': 500,
+        'description': 'An unknown error occurred.',
+    })
