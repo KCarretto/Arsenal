@@ -261,7 +261,7 @@ class Database(object):
         """
         Get a session history object from the database.
         """
-        return SessionHistory.get_by_session_id(session_id)
+        return SessionHistory.get_by_id(session_id)
 
     @staticmethod
     def get_target(name):
