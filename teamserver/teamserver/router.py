@@ -41,6 +41,26 @@ def teamserver_status():
         }
     )
 
+@API.route('/api/login', methods=['POST'])
+@API.route('/api/v1/login', methods=['POST'])
+def login():
+    """
+    This endpoint can be used to authenticate a User or API key.
+    It will return a session token in the Set-Cookie header as well as in the JSON response,
+    that has the same permissions as the User or API key that was used to authenticate.
+    The session token will expire, and then the user will need to reauthenticate.
+    """
+    valid, response = authenticate(request)
+    if not valid:
+        return respond(response)
+    # TODO: Create session token
+    # TODO: Set-Cookie session token
+    return respond({
+        'status': 200,
+        'error': False,
+        'session_token': None
+    })
+
 @API.route('/', methods=['POST'])
 @API.route('/api', methods=['POST'])
 @API.route('/api/v1', methods=['POST'])
