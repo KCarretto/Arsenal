@@ -88,7 +88,7 @@ class Session(Document):
     interval_delta = FloatField(required=True, null=False)
     config_dict = DictField(null=False)
 
-    agent_version = StringField(max_length=MAX_STR_LEN)
+    agent_version = StringField(null=True, max_length=MAX_STR_LEN)
 
     @staticmethod
     def get_by_id(session_id):

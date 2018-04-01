@@ -112,6 +112,14 @@ def session_check_in(params): #pylint: disable=too-many-locals
     # Fetch session object, create one if it does not exist
     session = Session.get_by_id(params['session_id'])
 
+    # Attempt to find an associated agent
+    agent = None
+    try:
+        agent = Agent.get_by_version(session.agent_version)
+    except DoesNotExist:
+        pass
+
+
     log(
         'INFO',
         'Session checked in from (target: {}) (session: {})'.format(
@@ -145,9 +153,15 @@ def session_check_in(params): #pylint: disable=too-many-locals
     # Gather new actions
     actions_raw = Action.get_target_unassigned_actions(session.target_name)
     actions = []
+
     # Assign each action to this status, and append it's document to the list
     priority = 0
     for action in sorted(actions_raw, key=lambda action: action.queue_time):
+        # Bypass unsupported actions
+        if agent and action.action_type not in agent.supported_actions:
+            continue
+
+        # Assign the action
         action.assign_to(session.session_id)
         doc = action.agent_document
         doc['priority'] = priority
