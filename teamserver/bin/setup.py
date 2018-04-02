@@ -29,7 +29,20 @@ CONFIG = {
             'users': ['admin'],
             'allowed_api_calls': ['*']
         },
-        'guest': {
+        'logger': {
+            'users': [],
+            'allowed_api_calls': [
+                'CreateLog',
+            ]
+        },
+        'attacker': {
+            'users': [],
+            'allowed_api_calls': [
+                'CreateAction',
+                'CreateGroupAction',
+            ]
+        },
+        'spectator': {
             'users': ['guest'],
             'allowed_api_calls': [
                 'GetTarget',
@@ -48,7 +61,9 @@ CONFIG = {
             'users': ['default-c2'],
             'allowed_api_calls': [
                 'CreateSession',
-                'SessionCheckIn'
+                'SessionCheckIn',
+                'UpdateSessionConfig',
+                'SetTargetFacts',
             ]
         }
     }
