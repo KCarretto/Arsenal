@@ -7,6 +7,7 @@ import sys
 from uuid import uuid4
 from os.path import abspath, dirname
 from mongoengine import connect
+from passlib.hash import bcrypt
 
 sys.path.insert(0, abspath(dirname(abspath(dirname(__file__)))))
 from teamserver.models import User, Role, APIKey # pylint: disable-all
@@ -32,19 +33,30 @@ CONFIG = {
         'logger': {
             'users': [],
             'allowed_api_calls': [
+                'GetCurrentContext',
                 'CreateLog',
             ]
         },
         'attacker': {
             'users': [],
             'allowed_api_calls': [
+                'GetCurrentContext',
                 'CreateAction',
                 'CreateGroupAction',
+            ]
+        },
+        'manage-self': {
+            'users': [],
+            'allowed_api_calls': [
+                'GetCurrentContext',
+                'UpdateUserPassword',
+                'CreateAPIKey',
             ]
         },
         'spectator': {
             'users': ['guest'],
             'allowed_api_calls': [
+                'GetCurrentContext',
                 'GetTarget',
                 'GetAction',
                 'GetSession',
@@ -60,6 +72,7 @@ CONFIG = {
         'c2': {
             'users': ['default-c2'],
             'allowed_api_calls': [
+                'GetCurrentContext',
                 'CreateSession',
                 'SessionCheckIn',
                 'UpdateSessionConfig',
@@ -85,9 +98,10 @@ def create_user(username, password, administrator=False):
     """
     Create a user with the given password.
     """
+    hashed_password = User.hash_password(password)
     user = User(
         username=username,
-        password=password,
+        password=hashed_password,
         administrator=administrator
     )
     user.save()
@@ -121,7 +135,7 @@ def main():
     print('Generating authentication schema...')
     for username, password in CONFIG['users'].items():
         user = create_user(username, password, username=='admin')
-        print('[+][Created User] {}:{}'.format(user.username, user.password))
+        print('[+][Created User] {}:{}'.format(user.username, password))
     print('')
     for rolename, roleconfig in CONFIG['roles'].items():
         role = create_role(rolename, roleconfig['allowed_api_calls'], roleconfig['users'])

@@ -5,7 +5,6 @@
 """
 
 from flask import Blueprint, request, jsonify, current_app
-from .exceptions import PermissionDenied
 from .auth import authenticate
 from .api import create_target, get_target, rename_target, set_target_facts, list_targets
 from .api import create_session, get_session, session_check_in
@@ -17,6 +16,7 @@ from .api import remove_group_member, add_group_member, blacklist_group_member
 from .api import create_log, list_logs
 from .api import register_agent, get_agent, list_agents, unregister_agent
 from .api import create_user, create_role, create_api_key
+from .api import get_user, get_current_context
 from .api import update_role_permissions, update_user_password
 from .api import add_role_member, remove_role_member
 
@@ -86,7 +86,7 @@ def api_entry(): # pylint: disable=too-many-return-statements
         # Targets
         'CreateTarget': create_target,
         'GetTarget': get_target,
-        'SetTargetFacts': set_target_facts,
+        'SetTargetFacts': set_target_facts, # TODO: Deprecate
         'RenameTarget': rename_target,
         'ArchiveTarget': None,
         'ListTargets': list_targets,
@@ -95,7 +95,7 @@ def api_entry(): # pylint: disable=too-many-return-statements
         'CreateSession': create_session,
         'GetSession': get_session,
         'SessionCheckIn': session_check_in,
-        'UpdateSessionConfig': update_session_config,
+        'UpdateSessionConfig': update_session_config, # TODO: Deprecate
         'ArchiveSession': None,
         'ListSessions': list_sessions,
 
@@ -140,6 +140,9 @@ def api_entry(): # pylint: disable=too-many-return-statements
         'CreateUser': create_user,
         'CreateAPIKey': create_api_key,
         'CreateRole': create_role,
+
+        'GetUser': get_user,
+        'GetCurrentContext': get_current_context,
 
         'UpdateUserPassword': update_user_password,
         'UpdateRolePermissions': update_role_permissions,
@@ -186,26 +189,25 @@ def api_entry(): # pylint: disable=too-many-return-statements
         return respond(response)
 
     # Perform authorization check
-    try:
-        # Ensure the response we recieved is a valid auth object
-        if isinstance(response, (User, APIKey)) and response.is_permitted(data['method']):
-            # Trigger method pre-hooks
-            # TODO: Trigger method pre-hooks
+    # Ensure the response we recieved is a valid auth object
+    if isinstance(response, (User, APIKey)) and response.is_permitted(data['method']):
+        # Trigger method pre-hooks
+        # TODO: Trigger method pre-hooks
 
-            # Generate a DEBUG log message
-            if isinstance(response, User):
-                log('DEBUG', '{} calling API method {}'.format(response.username, data['method']))
-            else:
-                log('DEBUG', '{} calling API method {} using API Key'.format(
-                    response.owner,
-                    data['method']))
+        # Generate a DEBUG log message
+        if isinstance(response, User):
+            log('DEBUG', '{} calling API method {}'.format(response.username, data['method']))
+        else:
+            log('DEBUG', '{} calling API method {} using API Key'.format(
+                response.owner,
+                data['method']))
 
-            # Override the reserved 'arsenal_auth_object' field with the given auth object
-            data['arsenal_auth_object'] = response
+        # Override the reserved 'arsenal_auth_object' field with the given auth object
+        data['arsenal_auth_object'] = response
 
-            # Call the API function, passing the received JSON
-            return respond(method(data))
-    except PermissionDenied:
+        # Call the API function, passing the received JSON
+        return respond(method(data))
+    else:
         return respond({
             'status': 403,
             'description': 'Permission Denied.'
