@@ -87,7 +87,6 @@ class APIKey(Document):
         ]
     }
     key = StringField(
-        primary_key=True,
         required=True,
         null=False,
         unique=True,
