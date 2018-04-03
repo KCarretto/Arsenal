@@ -55,12 +55,14 @@ def authenticate(request):
             return (False, {
                 'status': 403,
                 'description': 'Invalid User.',
+                'error_type': 'invalid-user',
                 'error': True
             })
         except InvalidCredentials:
             return (False, {
                 'status': 403,
                 'description': 'Invalid Credentials.',
+                'error_type': 'invalid-credentials',
                 'error': True
             })
 
