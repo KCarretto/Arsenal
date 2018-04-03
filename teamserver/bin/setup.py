@@ -53,6 +53,7 @@ CONFIG = {
         'spectator': {
             'users': ['guest'],
             'allowed_api_calls': [
+                'GetCurrentContext',
                 'GetTarget',
                 'GetAction',
                 'GetSession',
