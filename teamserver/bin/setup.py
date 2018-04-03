@@ -22,7 +22,8 @@ CONFIG = {
     'api_keys': {
         'default-c2': [
             'CreateSession',
-            'SessionCheckIn'
+            'SessionCheckIn',
+            'GetCurrentContext',
         ]
     },
     'roles': {
