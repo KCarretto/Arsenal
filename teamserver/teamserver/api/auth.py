@@ -185,6 +185,8 @@ def get_current_context(params):
     """
     user, allowed_methods, _ = _get_context(params)
     return success_response(
-        username=user.username,
-        allowed_api_calls=allowed_methods
+        user={
+            'username': user.username,
+            'allowed_api_calls': allowed_methods
+        }
     )

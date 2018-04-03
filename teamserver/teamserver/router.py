@@ -210,10 +210,12 @@ def api_entry(): # pylint: disable=too-many-return-statements
     else:
         return respond({
             'status': 403,
-            'description': 'Permission Denied.'
+            'error': True,
+            'description': 'Permission Denied.',
         })
 
     return respond({
         'status': 500,
+        'error': True,
         'description': 'An unknown error occurred.',
     })
