@@ -79,7 +79,7 @@ class APIKey(Document):
         required=True,
         null=False,
         unique=True,
-        max_length=MAX_STR_LEN)
+        max_length=MAX_BIGSTR_LEN)
     owner = StringField(required=True, null=False, max_length=MAX_STR_LEN)
     allowed_api_calls = ListField(
         StringField(required=True, null=False, max_length=MAX_STR_LEN),
