@@ -48,7 +48,8 @@ def create_api_key(params):
 
     # Verify allowed api calls
     if any(method not in allowed_methods for method in params['allowed_api_calls']):
-        raise PermissionDenied('Cannot create API key with more permissions than key owner.')
+        if '*' not in allowed_methods:
+            raise PermissionDenied('Cannot create API key with more permissions than key owner.')
 
     # Create the key
     key = APIKey(
@@ -180,5 +181,8 @@ def get_current_context(params):
     """
     Return the currently authenticated username.
     """
-    user, _, _ = _get_context(params)
-    return success_response(username=user.username)
+    user, allowed_methods, _ = _get_context(params)
+    return success_response(
+        username=user.username,
+        allowed_api_calls=allowed_methods
+    )
