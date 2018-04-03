@@ -53,7 +53,8 @@ def create_api_key(params):
     if allowed_api_calls:
         if any(method not in allowed_methods for method in allowed_api_calls):
             if '*' not in allowed_methods:
-                raise PermissionDenied('Cannot create API key with more permissions than key owner.')
+                raise PermissionDenied(
+                    'Cannot create API key with more permissions than key owner.')
     else:
         allowed_api_calls = allowed_methods
 
@@ -182,6 +183,17 @@ def get_user(params):
             params.get('include_roles', False),
             params.get('include_api_calls', False)
         ))
+
+@handle_exceptions
+def get_role(params):
+    """
+    Retrieve a role object.
+
+    role_name (required): The name of the role to fetch. <str>
+    """
+    role = Role.get_role(params['role_name'])
+
+    return success_response(role=role.document)
 
 @handle_exceptions
 def get_current_context(params):

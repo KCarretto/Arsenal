@@ -16,9 +16,10 @@ from .api import remove_group_member, add_group_member, blacklist_group_member
 from .api import create_log, list_logs
 from .api import register_agent, get_agent, list_agents, unregister_agent
 from .api import create_user, create_role, create_api_key
-from .api import get_user, get_current_context
+from .api import get_user, get_role, get_current_context
 from .api import update_role_permissions, update_user_password
 from .api import add_role_member, remove_role_member
+#from .api import delete_user, delete_role
 
 from .models import APIKey, User, log
 
@@ -142,6 +143,7 @@ def api_entry(): # pylint: disable=too-many-return-statements
         'CreateRole': create_role,
 
         'GetUser': get_user,
+        'GetRole': get_role,
         'GetCurrentContext': get_current_context,
 
         'UpdateUserPassword': update_user_password,
