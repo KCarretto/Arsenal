@@ -43,6 +43,13 @@ CONFIG = {
                 'CreateGroupAction',
             ]
         },
+        'manage-self': {
+            'users': [],
+            'allowed_api_calls': [
+                'UpdateUserPassword',
+                'CreateAPIKey',
+            ]
+        },
         'spectator': {
             'users': ['guest'],
             'allowed_api_calls': [
