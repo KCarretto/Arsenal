@@ -11,7 +11,7 @@ from passlib.hash import bcrypt
 
 sys.path.insert(0, abspath(dirname(abspath(dirname(__file__)))))
 from teamserver.models import User, Role, APIKey # pylint: disable-all
-from teamserver.config import DB_NAME, DB_HOST, DB_PORT # pylint: disable-all
+from teamserver.config import DB_NAME, DB_HOST, DB_PORT, API_KEY_SALT # pylint: disable-all
 
 CONFIG = {
     'users': {
@@ -22,7 +22,8 @@ CONFIG = {
     'api_keys': {
         'default-c2': [
             'CreateSession',
-            'SessionCheckIn'
+            'SessionCheckIn',
+            'GetCurrentContext',
         ]
     },
     'roles': {
@@ -119,12 +120,12 @@ def create_api_key(username, allowed_api_calls):
             str(uuid4()),
             )
     key = APIKey(
-        key=bcrypt.hash(original_key),
+        key=bcrypt.hash(original_key, salt=API_KEY_SALT),
         owner=username,
         allowed_api_calls=allowed_api_calls
     )
     key.save()
-    return key
+    return original_key
 
 def main():
     """
@@ -148,9 +149,9 @@ def main():
     for owner, allowed_api_calls in CONFIG['api_keys'].items():
         api_key = create_api_key(owner, allowed_api_calls)
         print('[+][Created API Key] {}:{}:{}'.format(
-            api_key.key,
-            api_key.owner,
-            ','.join(api_key.allowed_api_calls)))
+            api_key,
+            owner,
+            ','.join(allowed_api_calls)))
     print('')
 
 if __name__ == '__main__':
