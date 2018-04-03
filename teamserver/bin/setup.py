@@ -33,12 +33,14 @@ CONFIG = {
         'logger': {
             'users': [],
             'allowed_api_calls': [
+                'GetCurrentContext',
                 'CreateLog',
             ]
         },
         'attacker': {
             'users': [],
             'allowed_api_calls': [
+                'GetCurrentContext',
                 'CreateAction',
                 'CreateGroupAction',
             ]
@@ -46,6 +48,7 @@ CONFIG = {
         'manage-self': {
             'users': [],
             'allowed_api_calls': [
+                'GetCurrentContext',
                 'UpdateUserPassword',
                 'CreateAPIKey',
             ]
@@ -69,6 +72,7 @@ CONFIG = {
         'c2': {
             'users': ['default-c2'],
             'allowed_api_calls': [
+                'GetCurrentContext',
                 'CreateSession',
                 'SessionCheckIn',
                 'UpdateSessionConfig',
