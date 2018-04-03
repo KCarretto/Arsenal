@@ -87,4 +87,4 @@ ACTION_TYPES = {
 }
 
 # AUTH SETTINGS
-API_KEY_SALT = 'the_best_salt'
+API_KEY_SALT = 'thebestsaltthebestsalt'
