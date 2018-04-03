@@ -101,7 +101,7 @@ def update_user_password(params):
     current_password (required): The user's current password.
     new_password (required): The user's new password.
 
-    user (optional, requires administrator): An administrator may specify which user password
+    user_context (optional, requires administrator): An administrator may specify which user password
                                              to change.
     """
 
