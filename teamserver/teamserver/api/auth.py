@@ -174,3 +174,11 @@ def get_user(params):
             params.get('include_roles', False),
             params.get('include_api_calls', False)
         ))
+
+@handle_exceptions
+def get_current_context(params):
+    """
+    Return the currently authenticated username.
+    """
+    user, _, _ = _get_context(params)
+    return success_response(username=user.username)
