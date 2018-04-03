@@ -2,6 +2,7 @@
     This module contains all 'Auth' API functions.
 """
 from uuid import uuid4
+from passlib.hash import bcrypt
 
 from ..exceptions import handle_exceptions, PermissionDenied
 from ..models import User, APIKey, Role
@@ -51,20 +52,21 @@ def create_api_key(params):
         raise PermissionDenied('Cannot create API key with more permissions than key owner.')
 
     # Create the key
+    original_key = '{}{}{}{}{}'.format(
+        str(uuid4()),
+        str(uuid4()),
+        str(uuid4()),
+        str(uuid4()),
+        str(uuid4()),
+        )
     key = APIKey(
-        key='{}{}{}{}{}'.format(
-            str(uuid4()),
-            str(uuid4()),
-            str(uuid4()),
-            str(uuid4()),
-            str(uuid4()),
-            ),
+        key=bcrypt.hash(original_key),
         owner=owner,
         allowed_api_calls=params['allowed_api_calls']
     )
     key.save(force_insert=True)
 
-    return success_response(api_key=key.key)
+    return success_response(api_key=original_key)
 
 @handle_exceptions
 def create_role(params):
