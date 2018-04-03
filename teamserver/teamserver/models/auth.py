@@ -41,6 +41,18 @@ class Role(Document):
         """
         return Role.objects.get(name=role_name) # pylint: disable=no-member
 
+    @property
+    def document(self):
+        """
+        This property filters and returns the JSON information for a queried role.
+        """
+        return {
+            'name': self.name,
+            'description': self.description,
+            'allowed_api_calls': self.allowed_api_calls,
+            'users': self.users,
+        }
+
     def add_member(self, username):
         """
         Add a user to this role if it exists.
@@ -139,11 +151,12 @@ class User(Document):
     @property
     def document(self):
         """
-        This property filters and returns the JSON information for a queried agent.
+        This property filters and returns the JSON information for a queried user.
         """
         return {
             'username': self.username,
-            'roles': self.roles,
+            'allowed_api_calls': self.allowed_api_calls,
+            'roles': [role.document for role in self.roles],
         }
 
     @property
