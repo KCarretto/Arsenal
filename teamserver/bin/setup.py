@@ -111,14 +111,15 @@ def create_api_key(username, allowed_api_calls):
     """
     Create an API key for a user with the given permissions.
     """
+    original_key = '{}{}{}{}{}'.format(
+            str(uuid4()),
+            str(uuid4()),
+            str(uuid4()),
+            str(uuid4()),
+            str(uuid4()),
+            )
     key = APIKey(
-        key='{}{}{}{}{}'.format(
-            str(uuid4()),
-            str(uuid4()),
-            str(uuid4()),
-            str(uuid4()),
-            str(uuid4()),
-            ),
+        key=bcrypt.hash(original_key),
         owner=username,
         allowed_api_calls=allowed_api_calls
     )
