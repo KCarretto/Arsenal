@@ -47,10 +47,15 @@ def create_api_key(params):
     # Set the owner of the new API key to be the current user
     owner = user.username
 
+    allowed_api_calls = params.get('allowed_api_calls')
+
     # Verify allowed api calls
-    if any(method not in allowed_methods for method in params['allowed_api_calls']):
-        if '*' not in allowed_methods:
-            raise PermissionDenied('Cannot create API key with more permissions than key owner.')
+    if allowed_api_calls:
+        if any(method not in allowed_methods for method in allowed_api_calls):
+            if '*' not in allowed_methods:
+                raise PermissionDenied('Cannot create API key with more permissions than key owner.')
+    else:
+        allowed_api_calls = allowed_methods
 
     # Create the key
     original_key = '{}{}{}{}{}'.format(
@@ -63,7 +68,7 @@ def create_api_key(params):
     key = APIKey(
         key=bcrypt.hash(original_key, salt=API_KEY_SALT),
         owner=owner,
-        allowed_api_calls=params['allowed_api_calls']
+        allowed_api_calls=allowed_api_calls
     )
     key.save(force_insert=True)
 

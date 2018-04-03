@@ -154,6 +154,9 @@ def handle_exceptions(func):
         except InvalidCredentials as exception:
             msg = 'Provided credentials are invalid.'
             return failed_response(403, msg, exception.name)
+        except PermissionDenied as exception:
+            msg = 'Permission to access method was denied.'
+            return failed_response(401, msg, exception.name)
 
         # Mongoengine Exceptions
         except ValidationError as exception:
