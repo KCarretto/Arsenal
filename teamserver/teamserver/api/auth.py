@@ -49,7 +49,8 @@ def create_api_key(params):
 
     # Verify allowed api calls
     if any(method not in allowed_methods for method in params['allowed_api_calls']):
-        raise PermissionDenied('Cannot create API key with more permissions than key owner.')
+        if '*' not in allowed_methods:
+            raise PermissionDenied('Cannot create API key with more permissions than key owner.')
 
     # Create the key
     original_key = '{}{}{}{}{}'.format(
@@ -103,10 +104,9 @@ def update_user_password(params):
     current_password (required): The user's current password.
     new_password (required): The user's new password.
 
-    user (optional, requires administrator): An administrator may specify which user password
-                                             to change.
+    user_context (optional, requires administrator): An administrator may specify which user
+                                                    password to change.
     """
-
     user, _, administrator = _get_context(params)
 
     # Allow administrator to change (non-admin user) password without current
@@ -158,3 +158,33 @@ def remove_role_member(params):
     role.remove_member(params['username'])
 
     return success_response()
+
+@handle_exceptions
+def get_user(params):
+    """
+    Retrieve a user object.
+
+    username (required): The name of the user object to fetch. <str>
+    include_roles (optional): Optionally include roles.
+                                    default: False. <bool>
+    include_api_calls (optional): Display the set of permitted API calls for the user.
+                                    default: True. <bool>
+    """
+    user = User.get_user(params['username'])
+
+    return success_response(
+        user=user.document(
+            params.get('include_roles', False),
+            params.get('include_api_calls', False)
+        ))
+
+@handle_exceptions
+def get_current_context(params):
+    """
+    Return the currently authenticated username.
+    """
+    user, allowed_methods, _ = _get_context(params)
+    return success_response(
+        username=user.username,
+        allowed_api_calls=allowed_methods
+    )

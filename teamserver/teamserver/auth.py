@@ -42,8 +42,8 @@ def authenticate(request):
             })
 
     # Attempt user based authentication
-    username = data.get('username')
-    password = data.get('password')
+    username = data.get('login_username')
+    password = data.get('login_password')
 
     # Validate user
     if username and password:
@@ -55,12 +55,14 @@ def authenticate(request):
             return (False, {
                 'status': 403,
                 'description': 'Invalid User.',
+                'error_type': 'invalid-user',
                 'error': True
             })
         except InvalidCredentials:
             return (False, {
                 'status': 403,
                 'description': 'Invalid Credentials.',
+                'error_type': 'invalid-credentials',
                 'error': True
             })
 

@@ -9,7 +9,7 @@
 from mongoengine import Document
 from mongoengine.fields import ListField, StringField, BooleanField
 from passlib.hash import bcrypt
-from ..exceptions import InvalidCredentials, PermissionDenied
+from ..exceptions import InvalidCredentials #, PermissionDenied
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN
 from ..config import COLLECTION_USERS, COLLECTION_ROLES, COLLECTION_APIKEYS
 
@@ -40,6 +40,18 @@ class Role(Document):
         Fetch a role by name.
         """
         return Role.objects.get(name=role_name) # pylint: disable=no-member
+
+    @property
+    def document(self):
+        """
+        This property filters and returns the JSON information for a queried role.
+        """
+        return {
+            'name': self.name,
+            'description': self.description,
+            'allowed_api_calls': self.allowed_api_calls,
+            'users': self.users,
+        }
 
     def add_member(self, username):
         """
@@ -79,7 +91,7 @@ class APIKey(Document):
         required=True,
         null=False,
         unique=True,
-        max_length=MAX_STR_LEN)
+        max_length=MAX_BIGSTR_LEN)
     owner = StringField(required=True, null=False, max_length=MAX_STR_LEN)
     allowed_api_calls = ListField(
         StringField(required=True, null=False, max_length=MAX_STR_LEN),
@@ -101,7 +113,8 @@ class APIKey(Document):
             return True
         if '*' in self.allowed_api_calls: # pylint: disable=unsupported-membership-test
             return True
-        raise PermissionDenied('API Key does not have access to this method.')
+        return False
+        #raise PermissionDenied('API Key does not have access to this method.')
 
 class User(Document):
     """
@@ -135,15 +148,19 @@ class User(Document):
         """
         return APIKey.objects(owner=self.username) # pylint: disable=no-member
 
-    @property
-    def document(self):
+    def document(self, include_roles=False, include_api_calls=True):
         """
-        This property filters and returns the JSON information for a queried agent.
+        This property filters and returns the JSON information for a queried user.
         """
-        return {
+        resp = {
             'username': self.username,
-            'roles': self.roles,
         }
+        if include_roles:
+            resp['roles'] = [role.document for role in self.roles]
+        if include_api_calls:
+            resp['allowed_api_calls'] = self.allowed_api_calls
+
+        return resp
 
     @property
     def roles(self):
@@ -181,7 +198,7 @@ class User(Document):
             return True
         if isinstance(allowed_methods, list) and api_method in allowed_methods:
             return True
-        raise PermissionDenied('Permission denied.')
+        return False
 
     def authenticate(self, password):
         """
