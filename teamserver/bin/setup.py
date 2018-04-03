@@ -124,7 +124,7 @@ def create_api_key(username, allowed_api_calls):
         allowed_api_calls=allowed_api_calls
     )
     key.save()
-    return key
+    return original_key
 
 def main():
     """
@@ -148,9 +148,9 @@ def main():
     for owner, allowed_api_calls in CONFIG['api_keys'].items():
         api_key = create_api_key(owner, allowed_api_calls)
         print('[+][Created API Key] {}:{}:{}'.format(
-            api_key['api_key'],
-            api_key.owner,
-            ','.join(api_key.allowed_api_calls)))
+            api_key,
+            owner,
+            ','.join(allowed_api_calls)))
     print('')
 
 if __name__ == '__main__':
