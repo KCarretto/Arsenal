@@ -148,16 +148,19 @@ class User(Document):
         """
         return APIKey.objects(owner=self.username) # pylint: disable=no-member
 
-    @property
-    def document(self):
+    def document(self, include_roles=False, include_api_calls=True):
         """
         This property filters and returns the JSON information for a queried user.
         """
-        return {
+        resp = {
             'username': self.username,
-            'allowed_api_calls': self.allowed_api_calls,
-            'roles': [role.document for role in self.roles],
         }
+        if include_roles:
+            resp['roles'] = [role.document for role in self.roles]
+        if include_api_calls:
+            resp['allowed_api_calls'] = self.allowed_api_calls
+
+        return resp
 
     @property
     def roles(self):
