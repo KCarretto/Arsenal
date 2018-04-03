@@ -7,6 +7,7 @@ import sys
 from uuid import uuid4
 from os.path import abspath, dirname
 from mongoengine import connect
+from passlib.hash import bcrypt
 
 sys.path.insert(0, abspath(dirname(abspath(dirname(__file__)))))
 from teamserver.models import User, Role, APIKey # pylint: disable-all
@@ -85,9 +86,10 @@ def create_user(username, password, administrator=False):
     """
     Create a user with the given password.
     """
+    hashed_password = User.hash_password(password)
     user = User(
         username=username,
-        password=password,
+        password=hashed_password,
         administrator=administrator
     )
     user.save()
