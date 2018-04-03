@@ -44,6 +44,7 @@ CONFIG = {
                 'GetCurrentContext',
                 'CreateAction',
                 'CreateGroupAction',
+                'RenameTarget',
             ]
         },
         'manage-self': {
