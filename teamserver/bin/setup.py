@@ -123,7 +123,7 @@ def main():
     print('Generating authentication schema...')
     for username, password in CONFIG['users'].items():
         user = create_user(username, password, username=='admin')
-        print('[+][Created User] {}:{}'.format(user.username, user.password))
+        print('[+][Created User] {}:{}'.format(user.username, password))
     print('')
     for rolename, roleconfig in CONFIG['roles'].items():
         role = create_role(rolename, roleconfig['allowed_api_calls'], roleconfig['users'])
