@@ -11,7 +11,7 @@ from passlib.hash import bcrypt
 
 sys.path.insert(0, abspath(dirname(abspath(dirname(__file__)))))
 from teamserver.models import User, Role, APIKey # pylint: disable-all
-from teamserver.config import DB_NAME, DB_HOST, DB_PORT # pylint: disable-all
+from teamserver.config import DB_NAME, DB_HOST, DB_PORT, API_KEY_SALT # pylint: disable-all
 
 CONFIG = {
     'users': {
@@ -119,7 +119,7 @@ def create_api_key(username, allowed_api_calls):
             str(uuid4()),
             )
     key = APIKey(
-        key=bcrypt.hash(original_key),
+        key=bcrypt.hash(original_key, salt=API_KEY_SALT),
         owner=username,
         allowed_api_calls=allowed_api_calls
     )

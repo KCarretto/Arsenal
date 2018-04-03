@@ -6,8 +6,8 @@ from passlib.hash import bcrypt
 
 from ..exceptions import handle_exceptions, PermissionDenied
 from ..models import User, APIKey, Role
+from ..config import API_KEY_SALT
 from .utils import success_response, _get_context
-
 @handle_exceptions
 def create_user(params):
     """
@@ -61,7 +61,7 @@ def create_api_key(params):
         str(uuid4()),
         )
     key = APIKey(
-        key=bcrypt.hash(original_key),
+        key=bcrypt.hash(original_key, salt=API_KEY_SALT),
         owner=owner,
         allowed_api_calls=params['allowed_api_calls']
     )

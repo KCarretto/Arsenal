@@ -85,3 +85,6 @@ ACTION_TYPES = {
     'gather': 7,
     'reset': 999
 }
+
+# AUTH SETTINGS
+API_KEY_SALT = 'the_best_salt'
