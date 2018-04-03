@@ -30,7 +30,7 @@ class Agent(Document):
         """
         Query for an Agent by version.
         """
-        return Agent.objects().get(agent_version=agent_version) # pylint: disable=no-member
+        return Agent.objects.get(agent_version=agent_version) # pylint: disable=no-member
 
     @staticmethod
     def list_agents():

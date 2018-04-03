@@ -8,6 +8,7 @@ from flask_mongoengine import MongoEngine
 
 from mongoengine import connect, MongoEngineConnectionError
 from .config import DB_HOST, DB_PORT, DB_NAME
+
 DB = MongoEngine()
 
 def create_app(**config_overrides):

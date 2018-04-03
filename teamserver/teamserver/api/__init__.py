@@ -18,3 +18,7 @@ from .target import rename_target
 from .log import create_log, list_logs
 
 from .agent import register_agent, get_agent, list_agents, unregister_agent
+
+from .auth import create_user, create_api_key, create_role
+from .auth import update_user_password, update_role_permissions
+from .auth import add_role_member, remove_role_member

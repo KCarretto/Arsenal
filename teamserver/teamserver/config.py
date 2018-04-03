@@ -22,6 +22,9 @@ COLLECTION_SESSION_HISTORIES = 'session_histories'
 COLLECTION_TARGETS = 'targets'
 COLLECTION_LOGS = 'logs'
 COLLECTION_AGENTS = 'agents'
+COLLECTION_USERS = 'users'
+COLLECTION_ROLES = 'roles'
+COLLECTION_APIKEYS = 'api_keys'
 
 # LOG SETTINGS
 APPLICATION = 'teamserver-internal'
