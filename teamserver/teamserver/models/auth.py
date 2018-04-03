@@ -35,6 +35,13 @@ class Role(Document):
     users = ListField(StringField(required=True, null=False, max_length=MAX_STR_LEN))
 
     @staticmethod
+    def list_roles():
+        """
+        Return a list of role objects.
+        """
+        return Role.objects() # pylint: disable=no-member
+
+    @staticmethod
     def get_role(role_name):
         """
         Fetch a role by name.
@@ -72,6 +79,12 @@ class Role(Document):
             self.save()
         # TODO: Raise exception if user not in list
 
+    def remove(self):
+        """
+        Remove this document from the database, and perform any related cleanup.
+        """
+        self.delete()
+
 class APIKey(Document):
     """
     This class represents an API key.
@@ -98,11 +111,28 @@ class APIKey(Document):
         null=False)
 
     @staticmethod
+    def list_keys(owner):
+        """
+        List the keys for a user.
+        """
+        return APIKey.objects(owner=owner) # pylint: disable=no-member
+
+    @staticmethod
     def get_key(key):
         """
         Query for a key from the database.
         """
         return APIKey.objects.get(key=bcrypt.hash(key, salt=API_KEY_SALT)) # pylint: disable=no-member
+
+    @property
+    def document(self):
+        """
+        Returns a document for this object. Does not include the API key itself.
+        """
+        return {
+            'owner': self.owner,
+            'allowed_api_calls': self.allowed_api_calls,
+        }
 
     def is_permitted(self, api_method):
         """
@@ -113,7 +143,12 @@ class APIKey(Document):
         if '*' in self.allowed_api_calls: # pylint: disable=unsupported-membership-test
             return True
         return False
-        #raise PermissionDenied('API Key does not have access to this method.')
+
+    def remove(self):
+        """
+        Remove this document from the database, and perform any related cleanup.
+        """
+        self.delete()
 
 class User(Document):
     """
@@ -132,6 +167,13 @@ class User(Document):
     username = StringField(required=True, null=False, unique=True, max_length=MAX_STR_LEN)
     password = StringField(required=True, null=False, unique=True, max_length=MAX_STR_LEN)
     administrator = BooleanField(required=True, null=False, default=False)
+
+    @staticmethod
+    def list_users():
+        """
+        Return a list of user objects.
+        """
+        return User.objects() # pylint: disable=no-member
 
     @staticmethod
     def get_user(username):

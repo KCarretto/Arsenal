@@ -207,3 +207,84 @@ def get_current_context(params):
             'allowed_api_calls': allowed_methods
         }
     )
+
+@handle_exceptions
+def list_users(params):
+    """
+    Return a list of users.
+
+    include_roles (optional): Optionally include roles.
+                                    default: False. <bool>
+    include_api_calls (optional): Display the set of permitted API calls for the user.
+                                    default: True. <bool>
+    """
+
+    return success_response(users=[user.document(
+        params.get('include_roles'),
+        params.get('include_api_calls'),
+    ) for user in User.list_users()])
+
+@handle_exceptions
+def list_api_keys(params):
+    """
+    Lists the permissions of API keys that you own. This will not return the API key itself.
+
+    user_context (optional, requires administrator)
+    """
+    user, _, _ = _get_context(params)
+
+    return success_response(api_keys=[key.document for key in APIKey.list_keys(user.username)])
+
+@handle_exceptions
+def list_roles(params): #pylint: disable=unused-argument
+    """
+    Return a list of roles.
+    """
+    return success_response(roles=[role.document for role in Role.list_roles()])
+
+@handle_exceptions
+def delete_user(params):
+    """
+    Delete a user.
+
+    username (required): The name of the user to delete. <str>
+    """
+    user = User.get_user(params['username'])
+
+    user.remove()
+
+    return success_response()
+
+@handle_exceptions
+def delete_role(params):
+    """
+    Delete a role.
+
+    role_name(required): The name of the role to delete.
+    """
+    role = Role.get_role(params['role_name'])
+
+    role.remove()
+
+    return success_response()
+
+@handle_exceptions
+def revoke_api_key(params):
+    """
+    Revoke a user's API key.
+
+    api_key (required): The API key to revoke.
+
+    user_context (optional, requires administrator)
+    """
+    user, _, administrator = _get_context(params)
+
+    api_key = APIKey.get_key(params['api_key'])
+
+    if api_key.owner != user.username and not administrator:
+        raise PermissionDenied('Cannot revoke an API key you do not own.\
+        Please authenticate as the owner of the key to revoke it.')
+
+    api_key.remove()
+
+    return success_response()
