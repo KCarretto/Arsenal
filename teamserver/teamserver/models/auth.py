@@ -8,7 +8,7 @@
 """
 from mongoengine import Document
 from mongoengine.fields import ListField, StringField, BooleanField
-from passlib.hash import bcrypt
+import bcrypt
 from ..exceptions import InvalidCredentials #, PermissionDenied
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, API_KEY_SALT
 from ..config import COLLECTION_USERS, COLLECTION_ROLES, COLLECTION_APIKEYS
@@ -102,7 +102,7 @@ class APIKey(Document):
         """
         Query for a key from the database.
         """
-        return APIKey.objects.get(key=bcrypt.hash(key, salt=API_KEY_SALT)) # pylint: disable=no-member
+        return APIKey.objects.get(key=bcrypt.hashpw(key, API_KEY_SALT)) # pylint: disable=no-member
 
     def is_permitted(self, api_method):
         """
@@ -173,7 +173,7 @@ class User(Document):
         """
         Returns a hash of a password.
         """
-        return bcrypt.hash(password)
+        return bcrypt.hashpw(password, bcrypt.gensalt())
 
     @property
     def allowed_api_calls(self):
@@ -204,7 +204,7 @@ class User(Document):
         Determines if a user is authenticated given a password.
         Raises an InvalidCredentials exception if the password was incorrect.
         """
-        if not bcrypt.verify(password, self.password):
+        if not bcrypt.checkpw(password, self.password):
             raise InvalidCredentials('Password incorrect.')
         return True
 
