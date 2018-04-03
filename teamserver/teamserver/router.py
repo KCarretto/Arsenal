@@ -19,7 +19,8 @@ from .api import create_user, create_role, create_api_key
 from .api import get_user, get_role, get_current_context
 from .api import update_role_permissions, update_user_password
 from .api import add_role_member, remove_role_member
-#from .api import delete_user, delete_role
+from .api import list_api_keys, list_roles, list_users
+from .api import delete_role, delete_user, revoke_api_key
 
 from .models import APIKey, User, log
 
@@ -152,9 +153,14 @@ def api_entry(): # pylint: disable=too-many-return-statements
         'AddRoleMember': add_role_member,
         'RemoveRoleMember': remove_role_member,
 
-        #'DeleteUser': delete_user,
-        #'DeleteAPIKey': delete_api_key,
-        #'DeleteRole': delete_role,
+        'ListUsers': list_users,
+        'ListRoles': list_roles,
+        'ListAPIKeys': list_api_keys,
+
+        'DeleteUser': delete_user,
+        'RevokeAPIKey': revoke_api_key,
+        'DeleteRole': delete_role,
+
         #'KillSession': kill_session,
         #'KillSessions': kill_sessions,
     }
