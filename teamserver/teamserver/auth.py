@@ -24,7 +24,7 @@ def authenticate(request):
         pass
 
     # Attempt to get an api_key from parameters
-    api_key = data.get('api_key')
+    api_key = data.get('login_api_key')
     if not api_key:
         # Attempt to get from headers
         api_key = request.headers.get('X-Arsenal-API-Key')
