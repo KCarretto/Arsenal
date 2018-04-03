@@ -148,7 +148,7 @@ def main():
     for owner, allowed_api_calls in CONFIG['api_keys'].items():
         api_key = create_api_key(owner, allowed_api_calls)
         print('[+][Created API Key] {}:{}:{}'.format(
-            api_key.key,
+            api_key['api_key'],
             api_key.owner,
             ','.join(api_key.allowed_api_calls)))
     print('')
