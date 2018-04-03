@@ -9,7 +9,7 @@
 from mongoengine import Document
 from mongoengine.fields import ListField, StringField, BooleanField
 from passlib.hash import bcrypt
-from ..exceptions import InvalidCredentials, PermissionDenied
+from ..exceptions import InvalidCredentials #, PermissionDenied
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN
 from ..config import COLLECTION_USERS, COLLECTION_ROLES, COLLECTION_APIKEYS
 
@@ -101,7 +101,8 @@ class APIKey(Document):
             return True
         if '*' in self.allowed_api_calls: # pylint: disable=unsupported-membership-test
             return True
-        raise PermissionDenied('API Key does not have access to this method.')
+        return False
+        #raise PermissionDenied('API Key does not have access to this method.')
 
 class User(Document):
     """
@@ -181,7 +182,7 @@ class User(Document):
             return True
         if isinstance(allowed_methods, list) and api_method in allowed_methods:
             return True
-        raise PermissionDenied('Permission denied.')
+        return False
 
     def authenticate(self, password):
         """
