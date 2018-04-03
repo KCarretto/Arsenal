@@ -42,8 +42,8 @@ def authenticate(request):
             })
 
     # Attempt user based authentication
-    username = data.get('username')
-    password = data.get('password')
+    username = data.get('login_username')
+    password = data.get('login_password')
 
     # Validate user
     if username and password:
