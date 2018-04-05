@@ -23,6 +23,7 @@ from .api import list_api_keys, list_roles, list_users
 from .api import delete_role, delete_user, revoke_api_key
 
 from .models import APIKey, User
+from .events import trigger_event
 from .utils import authenticate, respond, log
 
 API = Blueprint('router', __name__)
@@ -32,6 +33,7 @@ def teamserver_status():
     """
     This endpoint returns the current status of the teamserver.
     """
+    trigger_event('Hello World')
     return jsonify(
         {
             'status': 200,
