@@ -18,12 +18,6 @@ class Webhook(Document):
     """
     meta = {
         'collection': COLLECTION_WEBHOOKS,
-        'indexes': [
-            {
-                'fields': ['key'],
-                'unique': True
-            }
-        ]
     }
     owner = StringField(required=True, null=False, max_length=MAX_STR_LEN)
     post_url = StringField(required=True, null=False, max_length=MAX_STR_LEN)
