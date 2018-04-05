@@ -21,7 +21,7 @@ from .api import update_role_permissions, update_user_password
 from .api import add_role_member, remove_role_member
 from .api import list_api_keys, list_roles, list_users
 from .api import delete_role, delete_user, revoke_api_key
-
+from .event import generate_event
 from .models import APIKey, User, log
 
 API = Blueprint('router', __name__)
@@ -39,6 +39,7 @@ def teamserver_status():
     """
     This endpoint returns the current status of the teamserver.
     """
+    generate_event('Got status')
     return jsonify(
         {
             'status': 200,
