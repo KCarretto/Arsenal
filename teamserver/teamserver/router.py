@@ -33,7 +33,7 @@ def teamserver_status():
     """
     This endpoint returns the current status of the teamserver.
     """
-    trigger_event(event='message', message='Hello World')
+    trigger_event.delay(event='message', message='Hello World')
     return jsonify(
         {
             'status': 200,
@@ -208,7 +208,7 @@ def api_entry(): # pylint: disable=too-many-return-statements
                 data['method']))
 
         # Trigger method pre-hooks
-        trigger_event(
+        trigger_event.delay(
             event='api_call',
             method=data['method'],
             user=username,

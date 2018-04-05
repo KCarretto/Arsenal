@@ -1,6 +1,7 @@
 """
 This module is responsible for event handling and management.
 """
+import time
 import requests
 
 from celery import Celery
@@ -18,6 +19,8 @@ def trigger_event(**kwargs):
     """
     Trigger an event, and notify subscribers.
     """
+    print("Triggering event")
+    time.sleep(15)
     event = kwargs.get('event')
     subscribers = Webhook.get_subscribers(event)
 
