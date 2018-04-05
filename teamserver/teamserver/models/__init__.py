@@ -10,3 +10,4 @@ from .session import Session, SessionHistory
 from .target import Target, Credential
 from .agent import Agent
 from .auth import Role, User, APIKey
+from .webhook import Webhook

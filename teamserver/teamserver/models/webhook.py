@@ -29,6 +29,13 @@ class Webhook(Document):
     post_url = StringField(required=True, null=False, max_length=MAX_STR_LEN)
     event_trigger = StringField(required=True, null=False, max_length=MAX_STR_LEN)
 
+    @staticmethod
+    def get_subscribers(event):
+        """
+        Return a list of webhooks subscribed to a given event_trigger.
+        """
+        return Webhook.objects(event_trigger=event) # pylint: disable=no-member
+
     @property
     def document(self):
         """

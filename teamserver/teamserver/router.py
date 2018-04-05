@@ -33,7 +33,7 @@ def teamserver_status():
     """
     This endpoint returns the current status of the teamserver.
     """
-    trigger_event('Hello World')
+    trigger_event(event='message', message='Hello World')
     return jsonify(
         {
             'status': 200,
@@ -194,16 +194,25 @@ def api_entry(): # pylint: disable=too-many-return-statements
     # Perform authorization check
     # Ensure the response we recieved is a valid auth object
     if isinstance(response, (User, APIKey)) and response.is_permitted(data['method']):
-        # Trigger method pre-hooks
-        # TODO: Trigger method pre-hooks
+
+        username = None
 
         # Generate a DEBUG log message
         if isinstance(response, User):
-            log('DEBUG', '{} calling API method {}'.format(response.username, data['method']))
+            username = response.username
+            log('DEBUG', '{} calling API method {}'.format(username, data['method']))
         else:
+            username = response.owner
             log('DEBUG', '{} calling API method {} using API Key'.format(
-                response.owner,
+                username,
                 data['method']))
+
+        # Trigger method pre-hooks
+        trigger_event(
+            event='api_call',
+            method=data['method'],
+            user=username,
+        )
 
         # Override the reserved 'arsenal_auth_object' field with the given auth object
         data['arsenal_auth_object'] = response
