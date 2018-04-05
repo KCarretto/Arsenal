@@ -263,4 +263,6 @@ class User(Document):
         """
         Remove this document from the database, and perform any related cleanup.
         """
+        for api_key in self.api_keys:
+            api_key.remove()
         self.delete()
