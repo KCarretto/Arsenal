@@ -9,6 +9,9 @@
 from mongoengine import Document
 from mongoengine.fields import ListField, StringField, BooleanField
 from passlib.hash import bcrypt
+
+from .webhook import Webhook
+
 from ..exceptions import InvalidCredentials #, PermissionDenied
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, API_KEY_SALT
 from ..config import COLLECTION_USERS, COLLECTION_ROLES, COLLECTION_APIKEYS
@@ -189,6 +192,13 @@ class User(Document):
         """
         return APIKey.objects(owner=self.username) # pylint: disable=no-member
 
+    @property
+    def webhooks(self):
+        """
+        Return a list of all webhooks owned by this user.
+        """
+        return Webhook.list_hooks(self.username)
+
     def document(self, include_roles=False, include_api_calls=True):
         """
         This property filters and returns the JSON information for a queried user.
@@ -265,4 +275,8 @@ class User(Document):
         """
         for api_key in self.api_keys:
             api_key.remove()
+
+        for webhook in self.webhooks:
+            webhook.remove()
+
         self.delete()
