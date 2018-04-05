@@ -1,9 +1,8 @@
 """
     This module contains all 'Group' API functions.
 """
-from .utils import success_response
+from ..utils import success_response, handle_exceptions
 from ..models import Group, Target
-from ..exceptions import handle_exceptions
 
 @handle_exceptions
 def create_group(params):

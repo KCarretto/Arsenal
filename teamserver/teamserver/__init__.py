@@ -4,33 +4,15 @@
 import sys
 
 from flask import Flask
+
 from flask_mongoengine import MongoEngine
-
-from celery import Celery
-
 from mongoengine import connect, MongoEngineConnectionError
+
 from .config import DB_HOST, DB_PORT, DB_NAME
 from .config import CELERY_BROKER_URL, CELERY_RESULT_BACKEND
+from .utils import log
 
 DB = MongoEngine()
-
-def make_celery(app):
-    """
-    Create celery instance.
-    """
-    celery = Celery(
-        app.import_name,
-        backend=app.config['CELERY_RESULT_BACKEND'],
-        broker=app.config['CELERY_BROKER_URL']
-    )
-    celery.conf.update(app.config)
-    class ContextTask(celery.Task): # pylint: disable-all
-        abstract = True
-        def __call__(self, *args, **kwargs):
-            with app.app_context():
-                return celery.Task.__call__(self, *args, **kwargs)
-    celery.Task = ContextTask
-    return celery
 
 def create_app(**config_overrides):
     """
@@ -56,15 +38,10 @@ def create_app(**config_overrides):
     try:
         DB.init_app(app)
     except MongoEngineConnectionError as conn_err:
-        from .models import log
         log('FATAL', 'Failed to connect to database.')
         log('DEBUG', conn_err)
         print(conn_err)
         sys.exit('Could not connect to database.')
-
-    # Initialize Celery
-    from teamserver.event import CELERY
-    CELERY = make_celery(app)
 
     # Import endpoints
     from teamserver.router import API

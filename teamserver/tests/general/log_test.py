@@ -7,14 +7,16 @@ import unittest
 try:
     from testutils import BaseTest
     from teamserver.config import LOG_LEVEL
-    from teamserver.models import log, Log
+    from teamserver.models import Log
+    from teamserver.utils import log
 except ModuleNotFoundError:
     # Configure path to start at teamserver module
     from os.path import dirname, abspath
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
     from tests.testutils import BaseTest
     from teamserver.config import LOG_LEVEL
-    from teamserver.models import log, Log
+    from teamserver.models import Log
+    from teamserver.utils import log
 
 class LogTest(BaseTest):
     """

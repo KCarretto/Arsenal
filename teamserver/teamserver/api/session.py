@@ -7,9 +7,9 @@ from uuid import uuid4
 from mongoengine.errors import DoesNotExist
 
 from .action import create_action
-from .utils import success_response
-from ..exceptions import handle_exceptions, SessionUnboundTarget
-from ..models import Target, Session, SessionHistory, Action, Response, Agent, log
+from ..utils import success_response, handle_exceptions, log
+from ..exceptions import SessionUnboundTarget
+from ..models import Target, Session, SessionHistory, Action, Response, Agent
 from ..config import DEFAULT_AGENT_SERVERS, DEFAULT_AGENT_INTERVAL
 from ..config import DEFAULT_AGENT_INTERVAL_DELTA, DEFAULT_AGENT_CONFIG_DICT
 

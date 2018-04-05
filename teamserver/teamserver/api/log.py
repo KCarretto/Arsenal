@@ -1,9 +1,8 @@
 """
     This module contains all 'Log' API functions.
 """
-from .utils import success_response
-from ..models import Log, log
-from ..exceptions import handle_exceptions
+from ..utils import success_response, handle_exceptions, log
+from ..models import Log
 
 @handle_exceptions
 def create_log(params):

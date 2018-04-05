@@ -5,7 +5,7 @@
 """
 
 from flask import Blueprint, request, jsonify, current_app
-from .auth import authenticate
+
 from .api import create_target, get_target, rename_target, set_target_facts, list_targets
 from .api import create_session, get_session, session_check_in
 from .api import update_session_config, list_sessions
@@ -21,25 +21,17 @@ from .api import update_role_permissions, update_user_password
 from .api import add_role_member, remove_role_member
 from .api import list_api_keys, list_roles, list_users
 from .api import delete_role, delete_user, revoke_api_key
-from .event import generate_event
-from .models import APIKey, User, log
+
+from .models import APIKey, User
+from .utils import authenticate, respond, log
 
 API = Blueprint('router', __name__)
-
-def respond(response):
-    """
-    This method will return a jsonfied response, with the correct http headers.
-    """
-    resp = jsonify(response)
-    resp.status_code = response.get('status', 500)
-    return resp
 
 @API.route('/status')
 def teamserver_status():
     """
     This endpoint returns the current status of the teamserver.
     """
-    generate_event('Got status')
     return jsonify(
         {
             'status': 200,
