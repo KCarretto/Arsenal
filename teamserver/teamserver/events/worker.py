@@ -5,8 +5,10 @@ import time
 import requests
 
 from celery import Celery
+from mongoengine import connect
 
 from teamserver.config import CELERY_MAIN_NAME, CELERY_RESULT_BACKEND, CELERY_BROKER_URL
+from teamserver.config import DB_NAME, DB_HOST, DB_PORT
 from teamserver.models import Webhook
 
 app = Celery( # pylint: disable=invalid-name
@@ -15,6 +17,8 @@ app = Celery( # pylint: disable=invalid-name
     broker=CELERY_BROKER_URL,
 )
 
+connect(DB_NAME, host=DB_HOST, port=DB_PORT)
+
 @app.task
 def trigger_event(**kwargs):
     """
@@ -22,11 +26,11 @@ def trigger_event(**kwargs):
     """
     print("Triggering event")
     time.sleep(15)
-    #event = kwargs.get('event')
-    #subscribers = Webhook.get_subscribers(event)
+    event = kwargs.get('event')
+    subscribers = Webhook.get_subscribers(event)
 
-    #if subscribers:
-    #    kwargs['subscribers'] = [subscriber.document for subscriber in subscribers]
+    if subscribers:
+        kwargs['subscribers'] = [subscriber.document for subscriber in subscribers]
 
     requests.post('http://129.21.106.18', json=kwargs)
 
