@@ -21,7 +21,7 @@ from .api import update_role_permissions, update_user_password
 from .api import add_role_member, remove_role_member
 from .api import list_api_keys, list_roles, list_users
 from .api import delete_role, delete_user, revoke_api_key
-
+from .api import register_webhook, unregister_webhook, list_webhooks
 from .models import APIKey, User
 from .events import trigger_event
 from .utils import authenticate, respond, log
@@ -76,9 +76,9 @@ def api_entry(): # pylint: disable=too-many-return-statements
     # Available methods
     api_functions = {
         # Web Hooks
-        'RegisterWebhook': None,
-        'RemoveWebhook': None,
-        'ListWebhooks': None,
+        'RegisterWebhook': register_webhook,
+        'UnregisterWebhook': unregister_webhook,
+        'ListWebhooks': list_webhooks,
 
         # Targets
         'CreateTarget': create_target,
