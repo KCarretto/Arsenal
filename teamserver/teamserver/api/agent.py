@@ -54,3 +54,4 @@ def unregister_agent(params):
     """
     agent = Agent.get_by_version(params['agent_version'])
     agent.remove()
+    return success_response()
