@@ -7,6 +7,7 @@ from uuid import uuid4
 from mongoengine.errors import DoesNotExist
 
 from .action import create_action
+from ..events import trigger_event
 from ..utils import success_response, handle_exceptions, log
 from ..exceptions import SessionUnboundTarget
 from ..models import Target, Session, SessionHistory, Action, Response, Agent
@@ -112,13 +113,19 @@ def session_check_in(params): #pylint: disable=too-many-locals
     # Fetch session object, create one if it does not exist
     session = Session.get_by_id(params['session_id'])
 
+    # Find the associated target object
+    target = None
+    try:
+        target = Target.get_by_name(session.target_name)
+    except DoesNotExist:
+        raise SessionUnboundTarget("Target for session does not exist.")
+
     # Attempt to find an associated agent
     agent = None
     try:
         agent = Agent.get_by_version(session.agent_version)
     except DoesNotExist:
         pass
-
 
     log(
         'INFO',
@@ -180,11 +187,14 @@ def session_check_in(params): #pylint: disable=too-many-locals
     # Update facts if they were included
     facts = params.get('facts')
     if facts and isinstance(facts, dict):
-        try:
-            target = Target.get_by_name(session.target_name)
-            target.set_facts(facts)
-        except DoesNotExist:
-            raise SessionUnboundTarget("Target for session does not exist.")
+        target.set_facts(facts)
+
+    # Generate Event
+    trigger_event.delay(
+        event='session_checkin',
+        session=session.document,
+        target=target.document(False, True)
+    )
 
     # Respond
     return success_response(session_id=session.session_id, actions=actions)
