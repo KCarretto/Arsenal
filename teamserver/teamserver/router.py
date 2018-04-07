@@ -169,6 +169,7 @@ def api_entry(): # pylint: disable=too-many-return-statements
         return respond({
             'status': 404,
             'description': 'Method not found.',
+            'error_type': 'method-not-found',
             'error': True
         })
 
@@ -177,6 +178,7 @@ def api_entry(): # pylint: disable=too-many-return-statements
         return respond({
             'status': 501,
             'description': 'Method not implemented.',
+            'error_type': 'method-not-implemented',
             'error': True
         })
 
@@ -223,6 +225,7 @@ def api_entry(): # pylint: disable=too-many-return-statements
         return respond({
             'status': 403,
             'error': True,
+            'error_type': 'permission-denied',
             'description': 'Permission Denied.',
         })
 
@@ -230,4 +233,5 @@ def api_entry(): # pylint: disable=too-many-return-statements
         'status': 500,
         'error': True,
         'description': 'An unknown error occurred.',
+        'error_type': 'unknown-error',
     })
