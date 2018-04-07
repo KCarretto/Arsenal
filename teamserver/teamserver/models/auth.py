@@ -71,7 +71,8 @@ class Role(Document):
         if user.username not in self.users: #pylint: disable=unsupported-membership-test
             self.users.append(user.username) # pylint: disable=no-member
             self.save()
-        raise RoleException('User is already a member of this role.')
+        else:
+            raise RoleException('User is already a member of this role.')
 
     def remove_member(self, username):
         """
@@ -80,7 +81,8 @@ class Role(Document):
         if username in self.users: #pylint: disable=unsupported-membership-test
             self.users.remove(username) #pylint: disable=no-member
             self.save()
-        raise RoleException('User is not a member of this role.')
+        else:
+            raise RoleException('User is not a member of this role.')
 
     def remove(self):
         """
