@@ -2,6 +2,11 @@
     This file describes the various configuration options available for tweaking.
 """
 
+# CELERY SETTINGS
+CELERY_MAIN_NAME = 'arsenal'
+CELERY_BROKER_URL = 'amqp://localhost:5672'
+CELERY_RESULT_BACKEND = 'amqp://localhost:5672'
+
 # DATABASE CONNECTION SETTINGS
 DB_NAME = 'arsenal_sample'
 DB_HOST = 'localhost'
@@ -25,6 +30,7 @@ COLLECTION_AGENTS = 'agents'
 COLLECTION_USERS = 'users'
 COLLECTION_ROLES = 'roles'
 COLLECTION_APIKEYS = 'api_keys'
+COLLECTION_WEBHOOKS = 'webhooks'
 
 # LOG SETTINGS
 APPLICATION = 'teamserver-internal'
@@ -88,3 +94,7 @@ ACTION_TYPES = {
 
 # AUTH SETTINGS
 API_KEY_SALT = 'thebestsaltthebestsalt'
+
+# WEBHOOK SETTINGS
+CONNECT_TIMEOUT = 10.0
+READ_TIMEOUT = 30.0

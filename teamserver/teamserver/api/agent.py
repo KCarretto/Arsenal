@@ -1,9 +1,8 @@
 """
     This module contains all 'Agent' API functions.
 """
-from .utils import success_response
+from ..utils import success_response, handle_exceptions
 from ..models import Agent
-from ..exceptions import handle_exceptions
 
 @handle_exceptions
 def register_agent(params):
@@ -55,3 +54,4 @@ def unregister_agent(params):
     """
     agent = Agent.get_by_version(params['agent_version'])
     agent.remove()
+    return success_response()

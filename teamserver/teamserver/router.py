@@ -5,7 +5,9 @@
 """
 
 from flask import Blueprint, request, jsonify, current_app
-from .auth import authenticate
+
+import teamserver.events as events
+
 from .api import create_target, get_target, rename_target, set_target_facts, list_targets
 from .api import create_session, get_session, session_check_in
 from .api import update_session_config, list_sessions
@@ -21,18 +23,11 @@ from .api import update_role_permissions, update_user_password
 from .api import add_role_member, remove_role_member
 from .api import list_api_keys, list_roles, list_users
 from .api import delete_role, delete_user, revoke_api_key
-
-from .models import APIKey, User, log
+from .api import register_webhook, unregister_webhook, list_webhooks
+from .models import APIKey, User
+from .utils import authenticate, respond, log
 
 API = Blueprint('router', __name__)
-
-def respond(response):
-    """
-    This method will return a jsonfied response, with the correct http headers.
-    """
-    resp = jsonify(response)
-    resp.status_code = response.get('status', 500)
-    return resp
 
 @API.route('/status')
 def teamserver_status():
@@ -81,9 +76,9 @@ def api_entry(): # pylint: disable=too-many-return-statements
     # Available methods
     api_functions = {
         # Web Hooks
-        'RegisterWebhook': None,
-        'RemoveWebhook': None,
-        'ListWebhooks': None,
+        'RegisterWebhook': register_webhook,
+        'UnregisterWebhook': unregister_webhook,
+        'ListWebhooks': list_webhooks,
 
         # Targets
         'CreateTarget': create_target,
@@ -174,6 +169,7 @@ def api_entry(): # pylint: disable=too-many-return-statements
         return respond({
             'status': 404,
             'description': 'Method not found.',
+            'error_type': 'method-not-found',
             'error': True
         })
 
@@ -182,6 +178,7 @@ def api_entry(): # pylint: disable=too-many-return-statements
         return respond({
             'status': 501,
             'description': 'Method not implemented.',
+            'error_type': 'method-not-implemented',
             'error': True
         })
 
@@ -199,16 +196,26 @@ def api_entry(): # pylint: disable=too-many-return-statements
     # Perform authorization check
     # Ensure the response we recieved is a valid auth object
     if isinstance(response, (User, APIKey)) and response.is_permitted(data['method']):
-        # Trigger method pre-hooks
-        # TODO: Trigger method pre-hooks
+
+        username = None
 
         # Generate a DEBUG log message
         if isinstance(response, User):
-            log('DEBUG', '{} calling API method {}'.format(response.username, data['method']))
+            username = response.username
+            log('DEBUG', '{} calling API method {}'.format(username, data['method']))
         else:
+            username = response.owner
             log('DEBUG', '{} calling API method {} using API Key'.format(
-                response.owner,
+                username,
                 data['method']))
+
+        # Trigger method pre-hooks
+        if not current_app.config.get('DISABLE_EVENTS', False):
+            events.trigger_event.delay(
+                event='api_call',
+                method=data['method'],
+                user=username,
+            )
 
         # Override the reserved 'arsenal_auth_object' field with the given auth object
         data['arsenal_auth_object'] = response
@@ -219,6 +226,7 @@ def api_entry(): # pylint: disable=too-many-return-statements
         return respond({
             'status': 403,
             'error': True,
+            'error_type': 'permission-denied',
             'description': 'Permission Denied.',
         })
 
@@ -226,4 +234,5 @@ def api_entry(): # pylint: disable=too-many-return-statements
         'status': 500,
         'error': True,
         'description': 'An unknown error occurred.',
+        'error_type': 'unknown-error',
     })

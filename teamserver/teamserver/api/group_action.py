@@ -2,10 +2,10 @@
     This module contains all 'GroupAction' API functions.
 """
 from uuid import uuid4
-from .utils import success_response
+
+from ..utils import success_response, handle_exceptions, log
 from .action import create_action
-from ..models import GroupAction, Group, log
-from ..exceptions import handle_exceptions
+from ..models import GroupAction, Group
 
 @handle_exceptions
 def create_group_action(params):

@@ -2,26 +2,11 @@
     This module defines a python object model for the Log document
     in the backend MongoDB database.
 """
-import time
-
 from mongoengine import Document
 from mongoengine.fields import BooleanField, StringField, FloatField
 
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, COLLECTION_LOGS
-from ..config import LOG_LEVELS, LOG_LEVEL, APPLICATION
-
-def log(level, message, application=APPLICATION):
-    """
-    Log a message for the application at the given level.
-    """
-    if LOG_LEVELS.get(level.upper(), 0) >= LOG_LEVELS.get(LOG_LEVEL, 0):
-        entry = Log(
-            timestamp=time.time(),
-            application=application,
-            level=level.upper(),
-            message=message
-        )
-        entry.save(force_insert=True)
+from ..config import LOG_LEVELS
 
 class Log(Document):
     """

@@ -436,8 +436,6 @@ class Action(DynamicDocument):
         This function will assign the action to the given session_id.
         It does not attempt to lookup the session.
         """
-        # TODO: Generate Event
-
         if self.bound_session_id and session_id != self.bound_session_id:
             raise CannotAssignAction(
                 'Action cannot be assigned to session, because it is bound to another')
@@ -451,7 +449,6 @@ class Action(DynamicDocument):
         This function will update the action object with a response object,
         and set appropriate timestamps.
         """
-        # TODO: Generate Event
         self.response = response
         self.complete_time = time.time()
         self.save()

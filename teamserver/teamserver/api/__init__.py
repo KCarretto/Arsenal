@@ -25,3 +25,5 @@ from .auth import update_user_password, update_role_permissions
 from .auth import add_role_member, remove_role_member
 from .auth import list_api_keys, list_users, list_roles
 from .auth import delete_role, revoke_api_key, delete_user
+
+from .webhook import register_webhook, unregister_webhook, list_webhooks

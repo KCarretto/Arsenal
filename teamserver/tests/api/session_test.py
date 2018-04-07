@@ -27,7 +27,6 @@ class SessionAPITest(BaseTest):
         """
         target = Database.create_target()
         data = APIClient.create_session(self.client, target.mac_addrs)
-        #TODO: Add other vars and check
 
         session_id = data['session_id']
         self.assertEqual(False, data['error'])

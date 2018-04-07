@@ -4,12 +4,15 @@
 import time
 
 from uuid import uuid4
+from flask import current_app
 from mongoengine.errors import DoesNotExist
 
+import teamserver.events as events
+
 from .action import create_action
-from .utils import success_response
-from ..exceptions import handle_exceptions, SessionUnboundTarget
-from ..models import Target, Session, SessionHistory, Action, Response, Agent, log
+from ..utils import success_response, handle_exceptions, log
+from ..exceptions import SessionUnboundTarget
+from ..models import Target, Session, SessionHistory, Action, Response, Agent
 from ..config import DEFAULT_AGENT_SERVERS, DEFAULT_AGENT_INTERVAL
 from ..config import DEFAULT_AGENT_INTERVAL_DELTA, DEFAULT_AGENT_CONFIG_DICT
 
@@ -112,13 +115,19 @@ def session_check_in(params): #pylint: disable=too-many-locals
     # Fetch session object, create one if it does not exist
     session = Session.get_by_id(params['session_id'])
 
+    # Find the associated target object
+    target = None
+    try:
+        target = Target.get_by_name(session.target_name)
+    except DoesNotExist:
+        raise SessionUnboundTarget("Target for session does not exist.")
+
     # Attempt to find an associated agent
     agent = None
     try:
         agent = Agent.get_by_version(session.agent_version)
     except DoesNotExist:
         pass
-
 
     log(
         'INFO',
@@ -147,6 +156,12 @@ def session_check_in(params): #pylint: disable=too-many-locals
         )
 
         action.submit_response(resp)
+
+        if not current_app.config.get('DISABLE_EVENTS', False):
+            events.trigger_event.delay(
+                event='action_complete',
+                action=action.document
+            )
 
     # TODO: Implement locking to avoid duplication
 
@@ -180,11 +195,15 @@ def session_check_in(params): #pylint: disable=too-many-locals
     # Update facts if they were included
     facts = params.get('facts')
     if facts and isinstance(facts, dict):
-        try:
-            target = Target.get_by_name(session.target_name)
-            target.set_facts(facts)
-        except DoesNotExist:
-            raise SessionUnboundTarget("Target for session does not exist.")
+        target.set_facts(facts)
+
+    # Generate Event
+    if not current_app.config.get('DISABLE_EVENTS', False):
+        events.trigger_event.delay(
+            event='session_checkin',
+            session=session.document,
+            target=target.document(False, True)
+        )
 
     # Respond
     return success_response(session_id=session.session_id, actions=actions)

@@ -3,9 +3,9 @@
 """
 from mongoengine.errors import DoesNotExist
 
-from .utils import success_response, _get_filtered_target
+from ..utils import success_response, get_filtered_target, handle_exceptions
 from ..models import Target, Action, Group
-from ..exceptions import handle_exceptions, CannotRenameTarget
+from ..exceptions import CannotRenameTarget
 
 @handle_exceptions
 def create_target(params):
@@ -43,7 +43,7 @@ def get_target(params):
     include_groups (optional): Should groups be included, default: False. <bool>
     """
     target = Target.get_by_name(params['name'])
-    return success_response(target=_get_filtered_target(target, params))
+    return success_response(target=get_filtered_target(target, params))
 
 @handle_exceptions
 def rename_target(params):
@@ -110,5 +110,5 @@ def list_targets(params): #pylint: disable=unused-argument
     include_groups (optional): Should groups be included, default: False. <bool>
     """
     return success_response(targets={
-        target.name: _get_filtered_target(target, params) for target in Target.list_targets()
+        target.name: get_filtered_target(target, params) for target in Target.list_targets()
     })
