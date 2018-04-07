@@ -12,6 +12,7 @@ from mongoengine.fields import BooleanField, EmbeddedDocumentField
 
 from .session import Session
 
+from ..events import trigger_event
 from ..exceptions import CannotCancelAction, CannotAssignAction
 from ..exceptions import ActionSyntaxError, ActionUnboundSession
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, ACTION_STATUSES, SESSION_STATUSES
@@ -452,6 +453,10 @@ class Action(DynamicDocument):
         self.response = response
         self.complete_time = time.time()
         self.save()
+        trigger_event.delay(
+            event='action_complete',
+            action=self.document
+        )
 
     def cancel(self):
         """

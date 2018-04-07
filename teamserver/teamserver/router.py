@@ -33,7 +33,7 @@ def teamserver_status():
     """
     This endpoint returns the current status of the teamserver.
     """
-    trigger_event.delay(event='message', message='Hello World')
+    trigger_event.delay(event='status', message='Status was requested.')
     return jsonify(
         {
             'status': 200,
