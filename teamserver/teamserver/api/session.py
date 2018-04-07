@@ -155,6 +155,11 @@ def session_check_in(params): #pylint: disable=too-many-locals
 
         action.submit_response(resp)
 
+        trigger_event.delay(
+            event='action_complete',
+            action=action.document
+        )
+
     # TODO: Implement locking to avoid duplication
 
     # Gather new actions
