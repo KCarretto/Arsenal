@@ -73,3 +73,9 @@ class PermissionDenied(ArsenalException):
     an action that they do not have access to.
     """
     name = 'permission-denied'
+
+class RoleException(ArsenalException):
+    """
+    This exception is raised when an invalid operation is attempted to be applied to a role.
+    """
+    name = 'role-exception'

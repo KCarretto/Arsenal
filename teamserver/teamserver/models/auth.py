@@ -12,7 +12,7 @@ from passlib.hash import bcrypt
 
 from .webhook import Webhook
 
-from ..exceptions import InvalidCredentials #, PermissionDenied
+from ..exceptions import InvalidCredentials, RoleException
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, API_KEY_SALT
 from ..config import COLLECTION_USERS, COLLECTION_ROLES, COLLECTION_APIKEYS
 
@@ -71,7 +71,7 @@ class Role(Document):
         if user.username not in self.users: #pylint: disable=unsupported-membership-test
             self.users.append(user.username) # pylint: disable=no-member
             self.save()
-        # TODO: Raise exception
+        raise RoleException('User is already a member of this role.')
 
     def remove_member(self, username):
         """
@@ -80,7 +80,7 @@ class Role(Document):
         if username in self.users: #pylint: disable=unsupported-membership-test
             self.users.remove(username) #pylint: disable=no-member
             self.save()
-        # TODO: Raise exception if user not in list
+        raise RoleException('User is not a member of this role.')
 
     def remove(self):
         """

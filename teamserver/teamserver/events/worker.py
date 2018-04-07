@@ -10,6 +10,7 @@ from teamserver.config import CELERY_MAIN_NAME, CELERY_RESULT_BACKEND, CELERY_BR
 from teamserver.config import DB_NAME, DB_HOST, DB_PORT
 from teamserver.config import CONNECT_TIMEOUT, READ_TIMEOUT
 from teamserver.models import Webhook
+from teamserver.utils import log
 
 app = Celery( # pylint: disable=invalid-name
     CELERY_MAIN_NAME,
@@ -27,9 +28,9 @@ def trigger_event(**kwargs):
     event = kwargs.get('event')
     subscribers = Webhook.get_subscribers(event)
 
-    if subscribers:
-        kwargs['subscribers'] = [subscriber.document for subscriber in subscribers]
-
-    for subscriber in subscribers:
-        requests.post(subscriber.post_url, json=kwargs, timeout=(CONNECT_TIMEOUT, READ_TIMEOUT))
-
+    if subscribers and event:
+        log('INFO', 'Triggering event ({}).'.format(event))
+        for subscriber in subscribers:
+            requests.post(subscriber.post_url, json=kwargs, timeout=(CONNECT_TIMEOUT, READ_TIMEOUT))
+    elif event:
+        log('INFO', 'Triggered event ({}) had no subscribers.'.format(event))
