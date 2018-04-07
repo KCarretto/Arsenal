@@ -3,7 +3,7 @@ This module is used to determine if a request is properly authenticated.
 """
 from mongoengine import DoesNotExist
 from ..models import User, APIKey
-from ..exceptions import InvalidCredentials, PermissionMismatch
+from ..exceptions import InvalidCredentials
 
 def _get_user(params):
     """
@@ -16,10 +16,6 @@ def _get_user(params):
     user = params['arsenal_auth_object']
     if isinstance(auth_obj, APIKey):
         user = User.get_user(auth_obj.owner)
-
-        # Ensure API Key has subset of User permissions
-        if any([method not in user.allowed_api_calls for method in auth_obj.allowed_api_calls]):
-            raise PermissionMismatch('API Key has more privileges than user.')
 
     # Return allowed_api_calls to prevent API keys from assuming user permissions
     return (user, auth_obj.allowed_api_calls)

@@ -74,13 +74,6 @@ class PermissionDenied(ArsenalException):
     """
     name = 'permission-denied'
 
-class PermissionMismatch(ArsenalException):
-    """
-    This exception is raised when an API key is used to authenticate, but the API key
-    has more permissions than the user that owns it.
-    """
-    name = 'permission-mismatch'
-
 class RoleException(ArsenalException):
     """
     This exception is raised when an invalid operation is attempted to be applied to a role.
