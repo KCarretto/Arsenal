@@ -4,10 +4,12 @@
 import time
 
 from uuid import uuid4
+from flask import current_app
 from mongoengine.errors import DoesNotExist
 
+import teamserver.events as events
+
 from .action import create_action
-from ..events import trigger_event
 from ..utils import success_response, handle_exceptions, log
 from ..exceptions import SessionUnboundTarget
 from ..models import Target, Session, SessionHistory, Action, Response, Agent
@@ -155,10 +157,11 @@ def session_check_in(params): #pylint: disable=too-many-locals
 
         action.submit_response(resp)
 
-        trigger_event.delay(
-            event='action_complete',
-            action=action.document
-        )
+        if not current_app.config.get('DISABLE_EVENTS', False):
+            events.trigger_event.delay(
+                event='action_complete',
+                action=action.document
+            )
 
     # TODO: Implement locking to avoid duplication
 
@@ -195,11 +198,12 @@ def session_check_in(params): #pylint: disable=too-many-locals
         target.set_facts(facts)
 
     # Generate Event
-    trigger_event.delay(
-        event='session_checkin',
-        session=session.document,
-        target=target.document(False, True)
-    )
+    if not current_app.config.get('DISABLE_EVENTS', False):
+        events.trigger_event.delay(
+            event='session_checkin',
+            session=session.document,
+            target=target.document(False, True)
+        )
 
     # Respond
     return success_response(session_id=session.session_id, actions=actions)

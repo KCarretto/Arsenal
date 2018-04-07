@@ -6,6 +6,8 @@
 
 from flask import Blueprint, request, jsonify, current_app
 
+import teamserver.events as events
+
 from .api import create_target, get_target, rename_target, set_target_facts, list_targets
 from .api import create_session, get_session, session_check_in
 from .api import update_session_config, list_sessions
@@ -23,7 +25,6 @@ from .api import list_api_keys, list_roles, list_users
 from .api import delete_role, delete_user, revoke_api_key
 from .api import register_webhook, unregister_webhook, list_webhooks
 from .models import APIKey, User
-from .events import trigger_event
 from .utils import authenticate, respond, log
 
 API = Blueprint('router', __name__)
@@ -33,7 +34,6 @@ def teamserver_status():
     """
     This endpoint returns the current status of the teamserver.
     """
-    trigger_event.delay(event='status', message='Status was requested.')
     return jsonify(
         {
             'status': 200,
@@ -210,11 +210,12 @@ def api_entry(): # pylint: disable=too-many-return-statements
                 data['method']))
 
         # Trigger method pre-hooks
-        trigger_event.delay(
-            event='api_call',
-            method=data['method'],
-            user=username,
-        )
+        if not current_app.config.get('DISABLE_EVENTS', False):
+            events.trigger_event.delay(
+                event='api_call',
+                method=data['method'],
+                user=username,
+            )
 
         # Override the reserved 'arsenal_auth_object' field with the given auth object
         data['arsenal_auth_object'] = response

@@ -37,6 +37,7 @@ def create_test_app():
     return create_app(
         TESTING=True,
         DISABLE_AUTH=True,
+        DISABLE_EVENTS=True,
         MONGODB_SETTINGS=
         {
             'db': 'arsenal_testing',
