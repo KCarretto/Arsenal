@@ -23,10 +23,11 @@ An Agent is a program that will be run on a target system, and will callback to 
 
 ## Agent Requirements
 ### Target Identification Information
-When an Agent calls back to a C2, it is important that the Teamserver is able to identify what machine / target the Agent is running on. IP Addresses alone cannot accurately identify a system, because NAT would cause many systems to appear the same from the C2's perspective. To solve this asset management problem, Arsenal utilizes a combination of the following information:
-  - All MAC Addresses
-  - External IP Address (Collected by the C2)
-When a Session calls back with that criteria, identical to an already existing Target, the Session is associated with the already existing Target. If no Target with the given criteria exists, a new Target is created and is given an automatically generated name. Target naming rules may be created to assign Target names in an automated fashion. The order of the array of MAC Addresses does not matter.
+When an Agent calls back to a C2, it is important that the Teamserver is able to identify what machine / target the Agent is running on. IP Addresses alone cannot accurately identify a system, because NAT would cause many systems to appear the same from the C2's perspective. To solve this asset management problem, Arsenal allows the session to specify a `uuid` field, which is a string that can be set based on your environment that should be unique between targets. Our recommendation is to concatenate the machine-uuid and the mac address of the primary interface. It does not matter what value you use, as long as it is consistent across all agents, and is different between targets. If this criteria changes, a new target will be created on the teamserver automatically. The `MigrateSessions` API endpoint was created in order to attach all session objects from the old target object onto the newly created target object.
+
+When a Session calls back with that criteria, identical to an already existing Target, the Session is associated with the already existing Target. If no Target with the given criteria exists, a new Target is created and is given an automatically generated name. 
+
+_Upcoming Feature_: Target naming rules may be created to assign Target names in an automated fashion.
 
 ### Session ID Tracking
 When an Agent calls back to the C2 for the first time, the C2 must register the newly created Session with the Arsenal Teamserver (If you are unfamiliar, we define a Session as a running instance of an Agent). It uses the Arsenal Teamserver API to do this. Once registered, the C2 is then provided with a Session ID that the Agent must keep track of, and send in every callback request. Without this, the Teamserver will be unable to track which Target a Session belongs to.
