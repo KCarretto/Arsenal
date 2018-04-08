@@ -14,7 +14,7 @@ COPY config.py /opt/arsenal/teamserver/teamserver/config.py
 
 # Install requirements
 RUN pip3 install --upgrade pip
-RUN pip3 install -r /opt/arsenal/teamserver/teamserver/requirements/prod.txt
+RUN pip3 install -r /opt/arsenal/teamserver/requirements/prod.txt
 
 # Configure ENTRYPOINT
 COPY entrypoint.sh /opt/arsenal/entrypoint.sh
