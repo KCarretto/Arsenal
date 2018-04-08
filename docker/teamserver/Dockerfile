@@ -10,11 +10,11 @@ COPY nginx.conf /etc/nginx/nginx.conf
 RUN git clone https://github.com/kcarretto/arsenal /opt/arsenal
 
 # Configure teamserver
-COPY config.py /opt/arsenal/teamserver/config.py
+COPY config.py /opt/arsenal/teamserver/teamserver/config.py
 
 # Install requirements
 RUN pip3 install --upgrade pip
-RUN pip3 install -r /opt/arsenal/teamserver/requirements/prod.txt
+RUN pip3 install -r /opt/arsenal/teamserver/teamserver/requirements/prod.txt
 
 # Configure ENTRYPOINT
 COPY entrypoint.sh /opt/arsenal/entrypoint.sh
