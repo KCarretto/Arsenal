@@ -85,6 +85,8 @@ class Action(DynamicDocument):
     response = EmbeddedDocumentField(Response)
     cancelled = BooleanField(default=False)
 
+    owner = StringField(max_length=MAX_STR_LEN)
+
     @staticmethod
     def get_by_id(action_id):
         """
@@ -427,6 +429,7 @@ class Action(DynamicDocument):
         doc['queue_time'] = self.queue_time
         doc['sent_time'] = self.sent_time
         doc['complete_time'] = self.complete_time
+        doc['owner'] = self.owner
         if self.response:
             doc['response'] = self.response.document
         return doc

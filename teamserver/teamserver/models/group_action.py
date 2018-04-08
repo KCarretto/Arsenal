@@ -30,6 +30,8 @@ class GroupAction(Document):
         StringField(required=True, null=False, max_length=MAX_STR_LEN), required=True, null=False)
     cancelled = BooleanField(default=False)
 
+    owner = StringField(max_length=MAX_STR_LEN)
+
     @staticmethod
     def list_group_actions():
         """
@@ -64,10 +66,11 @@ class GroupAction(Document):
             'action_string': self.action_string,
             'status': self.get_status(actions),
             'action_ids': self.action_ids,
-            'actions': [action.document for action in actions]
+            'actions': [action.document for action in actions],
+            'owner': self.owner,
         }
 
-    def get_status(self, actions=None):
+    def get_status(self, actions=None): # pylint: disable=too-many-return-statements
         """
         This property determines the status of the group action, based on all of
         it's included actions. If no included action list is passed to this function,

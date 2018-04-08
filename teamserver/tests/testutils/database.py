@@ -28,12 +28,13 @@ class Database(object):
     #           Create Methods          #
     #####################################
     @staticmethod
-    def create_action(
+    def create_action( # pylint: disable=too-many-arguments
             target_name=None,
             action_string=None,
             action_type=None,
             response=None,
-            bound_session_id=None):
+            bound_session_id=None,
+            owner=None):
         """
         Create an action object in the database.
         """
@@ -50,7 +51,8 @@ class Database(object):
             target_name=target_name,
             bound_session_id=bound_session_id if bound_session_id is not None else '',
             queue_time=time.time(),
-            response=response
+            response=response,
+            owner=owner if owner else str(uuid4()),
         )
         parsed_action = Action.parse_action_string(action_string)
         action.update_fields(parsed_action)
@@ -60,7 +62,8 @@ class Database(object):
     @staticmethod
     def create_group_action(
             group_name=None,
-            action_string=None):
+            action_string=None,
+            owner=None):
         """
         Create a group action object in the database.
         """
@@ -86,7 +89,8 @@ class Database(object):
         group_action = GroupAction(
             group_action_id=str(uuid4()),
             action_string=action_string,
-            action_ids=actions
+            action_ids=actions,
+            owner=owner if owner else str(uuid4()),
         )
         group_action.save(force_insert=True)
         return group_action

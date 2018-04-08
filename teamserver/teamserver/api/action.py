@@ -5,7 +5,7 @@ from uuid import uuid4
 
 import time
 
-from ..utils import success_response, handle_exceptions, log
+from ..utils import get_context, success_response, handle_exceptions, log
 from ..models import Action, Target
 from ..exceptions import CannotBindAction
 
@@ -19,6 +19,15 @@ def create_action(params, commit=True):
     bound_session_id (optional): This will restrict the action to only be retrieved
                                  by a specific session. <str>
     """
+    username = 'No owner'
+
+    try:
+        user, _, _ = get_context(params)
+        if user:
+            username = user.username
+    except KeyError:
+        pass
+
     target_name = params['target_name']
     action_string = params['action_string']
     bound_session_id = params.get('bound_session_id')
@@ -36,7 +45,8 @@ def create_action(params, commit=True):
         action_string=action_string,
         action_type=parsed_action['action_type'],
         bound_session_id=bound_session_id,
-        queue_time=time.time()
+        queue_time=time.time(),
+        owner=username,
     )
 
     action.update_fields(parsed_action)
@@ -96,6 +106,7 @@ def duplicate_action(params):
     action = Action.get_by_id(params['action_id'])
 
     local_params = {
+        'arsenal_auth_object': params['arsenal_auth_object'],
         'target_name': action.target_name,
         'action_string': action.action_string,
     }
