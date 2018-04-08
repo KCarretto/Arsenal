@@ -146,6 +146,23 @@ class APIClient(object): # pylint: disable=too-many-public-methods
             )
         return json.loads(resp.data)
 
+    @staticmethod
+    def migrate_target(client, old_target, new_target):
+        """
+        Invoke the MigrateTarget API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='MigrateTarget',
+                old_target=old_target,
+                new_target=new_target,
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
+
     #####################################
     #          Session Methods          #
     #####################################

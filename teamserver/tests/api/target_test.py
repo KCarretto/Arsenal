@@ -168,5 +168,43 @@ class TargetAPITest(BaseTest):
         group = Database.get_group(orig_group.name)
         self.assertIn(target.name, group.member_names)
 
+    def test_migrate_target(self):
+        """
+        Tests the MigrateTarget API function.
+        """
+        old_target = Database.create_target()
+        old_sessions = [
+            Database.create_session(old_target.name),
+            Database.create_session(old_target.name),
+            Database.create_session(old_target.name),
+            Database.create_session(old_target.name),
+            Database.create_session(old_target.name),
+        ]
+        new_target = Database.create_target(None, None, {'updated': True})
+
+        new_sessions = [
+            Database.create_session(new_target.name),
+            Database.create_session(new_target.name),
+            Database.create_session(new_target.name),
+            Database.create_session(new_target.name),
+            Database.create_session(new_target.name),
+        ]
+        data = APIClient.migrate_target(self.client, old_target.name, new_target.name)
+        self.assertEqual(data['error'], False)
+
+        # Ensure new_target has old name, and still has facts
+        target = Database.get_target(old_target.name)
+        self.assertIsNotNone(target)
+        self.assertEqual(target.facts['updated'], True)
+
+        # Ensure new target name is gone
+        with self.assertRaises(DoesNotExist):
+            Database.get_target(new_target.name)
+
+        # Ensure all sessions exist on new_target
+        self.assertListEqual(
+            sorted([session.session_id for session in old_sessions+new_sessions]),
+            sorted([session.session_id for session in target.sessions]))
+
 if __name__ == '__main__':
     unittest.main()
