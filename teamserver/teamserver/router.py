@@ -16,6 +16,7 @@ from .api import create_action, get_action, cancel_action, list_actions, duplica
 from .api import create_group_action, get_group_action, cancel_group_action, list_group_actions
 from .api import get_group, create_group, delete_group, list_groups
 from .api import remove_group_member, add_group_member, blacklist_group_member
+from .api import add_group_rule, remove_group_rule, rebuild_group_members
 from .api import create_log, list_logs
 from .api import register_agent, get_agent, list_agents, unregister_agent
 from .api import create_user, create_role, create_api_key
@@ -118,6 +119,9 @@ def api_entry(): # pylint: disable=too-many-return-statements
         'BlacklistGroupMember': blacklist_group_member,
         'DeleteGroup': delete_group,
         'ListGroups': list_groups,
+        'AddGroupRule': add_group_rule,
+        'RemoveGroupRule': remove_group_rule,
+        'RebuildGroupMembers': rebuild_group_members,
 
         # Credentials
         'CreateCredentials': None,

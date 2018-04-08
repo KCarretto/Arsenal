@@ -11,13 +11,13 @@ from mongoengine import DoesNotExist
 # pylint: disable=duplicate-code
 try:
     from testutils import BaseTest, Database
-    from teamserver.models import Group, GroupAutomemberRule
+    from teamserver.models import Group
 except ModuleNotFoundError:
     # Configure path to start at teamserver module
     from os.path import dirname, abspath
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
     from tests.testutils import BaseTest, Database
-    from teamserver.models import Group, GroupAutomemberRule
+    from teamserver.models import Group
 
 class GroupModelTest(BaseTest):
     """

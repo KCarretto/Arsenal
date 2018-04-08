@@ -8,6 +8,7 @@ from .group_action import cancel_group_action, list_group_actions
 
 from .group import create_group, get_group, delete_group, list_groups
 from .group import add_group_member, remove_group_member, blacklist_group_member
+from .group import add_group_rule, remove_group_rule, rebuild_group_members
 
 from .session import create_session, get_session
 from .session import session_check_in, update_session_config, list_sessions
