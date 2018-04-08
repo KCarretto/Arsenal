@@ -180,7 +180,7 @@ class Database(object):
     @staticmethod
     def create_target(
             name=None,
-            mac_addrs=None,
+            uuid=None,
             facts=None,
             credentials=None):
         """
@@ -203,10 +203,7 @@ class Database(object):
                     }
                 ]
             },
-            mac_addrs=mac_addrs if mac_addrs is not None else [
-                'AA:BB:CC:DD:EE:FF',
-                str(uuid4())[0:17]
-                ],
+            uuid=uuid if uuid else str(uuid4()),
             credentials=credentials
         )
         target.save(force_insert=True)

@@ -29,7 +29,7 @@ class TargetAPITest(BaseTest):
         data = APIClient.create_target(
             self.client,
             'TEST Target',
-            ['AA:BB:CC:DD:EE:FF'],
+            'AA:BB:CC:DD:EE:FF',
             {'test_fact': 'hello'})
 
         self.assertEqual(False, data['error'])
@@ -37,7 +37,7 @@ class TargetAPITest(BaseTest):
         target = Database.get_target('TEST Target')
         self.assertIsNotNone(target)
         self.assertEqual(target.name, 'TEST Target')
-        self.assertListEqual(['AA:BB:CC:DD:EE:FF'], target.mac_addrs)
+        self.assertEqual('AA:BB:CC:DD:EE:FF', target.uuid)
         self.assertDictEqual({'test_fact': 'hello'}, target.facts)
 
     def test_get(self):
@@ -49,8 +49,8 @@ class TargetAPITest(BaseTest):
         self.assertEqual(data['error'], False)
         self.assertIsInstance(data['target'], dict)
         self.assertEqual(data['target']['name'], 'GET TEST')
-        self.assertIsInstance(data['target']['mac_addrs'], list)
-        self.assertListEqual(data['target']['mac_addrs'], target.mac_addrs)
+        self.assertIsInstance(data['target']['uuid'], str)
+        self.assertEqual(data['target']['uuid'], target.uuid)
 
     def test_get_params(self):
         """
@@ -62,8 +62,8 @@ class TargetAPITest(BaseTest):
         self.assertEqual(data['error'], False)
         self.assertIsInstance(data['target'], dict)
         self.assertEqual(data['target']['name'], 'PARAMS TEST')
-        self.assertIsInstance(data['target']['mac_addrs'], list)
-        self.assertListEqual(data['target']['mac_addrs'], target.mac_addrs)
+        self.assertIsInstance(data['target']['uuid'], str)
+        self.assertEqual(data['target']['uuid'], target.uuid)
         self.assertIsNotNone(data['target']['actions'])
         self.assertEqual(data['target']['actions'][0]['action_id'], action.action_id)
         with self.assertRaises(KeyError):
@@ -92,7 +92,7 @@ class TargetAPITest(BaseTest):
             'some fact': 55
         }
 
-        target = Database.create_target('FACT TEST', ['AA:BB:CC:DD:EE:FF'], initial_facts)
+        target = Database.create_target('FACT TEST', 'AA:BB:CC:DD:EE:FF', initial_facts)
 
         data = APIClient.set_target_facts(self.client, 'FACT TEST', fact_update)
         self.assertEqual(data['error'], False)

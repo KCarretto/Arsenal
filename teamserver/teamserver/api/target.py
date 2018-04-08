@@ -13,16 +13,16 @@ def create_target(params):
     This API function creates a new target object in the database.
 
     name (required, unique): The name given to the target. <str>
-    mac_addrs (required, unique): The MAC addresses used to identify the target. <[str, str]>
+    uuid (required, unique): The unique identifier of the target. <str>
     facts (optional): A dictionary of key,value pairs to store for the target. <dict>
     """
     name = params['name']
-    mac_addrs = params['mac_addrs']
+    uuid = params['uuid']
     facts = params.get('facts', {})
 
     target = Target(
         name=name,
-        mac_addrs=mac_addrs,
+        uuid=uuid,
         facts=facts
     )
     target.save(force_insert=True)
