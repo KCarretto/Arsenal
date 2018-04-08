@@ -76,7 +76,7 @@ class GroupAPITest(BaseTest):
 
         group = Database.get_group('REMOVE GROUP')
 
-        self.assertListEqual(sorted(targets[1:]), sorted(group.member_names))
+        self.assertListEqual(sorted(targets[1:]), sorted(group.members))
 
     def test_blacklist_member(self):
         """
@@ -95,7 +95,7 @@ class GroupAPITest(BaseTest):
 
         group = Database.get_group('BLACKLIST GROUP')
 
-        self.assertListEqual(sorted(targets[1:]), sorted(group.member_names))
+        self.assertListEqual(sorted(targets[1:]), sorted(group.members))
         self.assertListEqual([targets[0]], group.blacklist_members)
 
     def test_delete(self):

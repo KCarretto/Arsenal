@@ -17,6 +17,7 @@ DB_PASS = None
 # DATABASE DOCUMENT SETTINGS
 MAX_STR_LEN = 100
 MAX_BIGSTR_LEN = 10000
+MAX_RESULTS = 500
 
 # DATABASE COLLECTION SETTINGS
 COLLECTION_ACTIONS = 'actions'
@@ -53,6 +54,7 @@ DEFAULT_SUBSET = 'all'
 # SESSION SETTINGS
 SESSION_CHECK_THRESHOLD = 5
 SESSION_CHECK_MODIFIER = 1.5
+SESSION_ARCHIVE_MODIFIER = 2
 SESSION_STATUSES = {
     'active': 'active',
     'missing': 'missing',
@@ -77,6 +79,7 @@ GROUP_ACTION_STATUSES = {
     'in progress': 'in progress',
     'mixed success': 'mixed success',
     'success': 'success',
+    'stale': 'stale',
     'failed': 'failed',
 }
 

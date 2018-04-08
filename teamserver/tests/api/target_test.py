@@ -166,7 +166,7 @@ class TargetAPITest(BaseTest):
         self.assertEqual(action.target_name, 'TEST')
 
         group = Database.get_group(orig_group.name)
-        self.assertIn(target.name, group.member_names)
+        self.assertIn(target.name, group.members)
 
     def test_migrate_target(self):
         """

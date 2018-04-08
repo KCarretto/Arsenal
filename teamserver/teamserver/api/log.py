@@ -24,10 +24,12 @@ def list_logs(params):
     application (optional): The application to filter for. <str>
     since (optional): The timestamp that logs must be newer than. <float>
     include_archived (optional): Should archived messages be included (default=False). <boolean>
+    levels (optional): The level to filter for. <list[<str>]>
     """
     logs = Log.list_logs(
         params.get('include_archived', False),
         params.get('application'),
-        params.get('since', 0))
+        params.get('since', 0),
+        params.get('levels'))
 
     return success_response(logs=[entry.document for entry in logs])
