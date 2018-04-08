@@ -96,7 +96,7 @@ class Target(Document):
         associated with this target. Archive any sessions that have
         not been seen in a long period of time.
         """
-        sessions = Session.objects(target_name=self.name, archived=False) #pylint: disable=no-member
+        sessions = list(Session.objects(target_name=self.name, archived=False)) #pylint: disable=no-member
         for session in sessions:
             threshold = session.timestamp + (session.interval + session.interval_delta)
             threshold *= SESSION_ARCHIVE_MODIFIER
