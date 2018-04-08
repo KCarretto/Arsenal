@@ -16,7 +16,7 @@ from ..exceptions import CannotCancelAction, CannotAssignAction
 from ..exceptions import ActionSyntaxError, ActionUnboundSession
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, ACTION_STATUSES, SESSION_STATUSES
 from ..config import COLLECTION_ACTIONS, ACTION_STALE_THRESHOLD
-from ..config import ACTION_TYPES, DEFAULT_SUBSET
+from ..config import ACTION_TYPES, DEFAULT_SUBSET, MAX_RESULTS
 
 class Response(EmbeddedDocument):
     """
@@ -116,11 +116,17 @@ class Action(DynamicDocument):
         return actions
 
     @staticmethod
-    def list_actions():
+    def list_actions(**kwargs):
         """
         This method queries for all action objects.
         """
-        return Action.objects() #pylint: disable=no-member
+        target_name = kwargs.get('target_name')
+        owner = kwargs.get('owner')
+        limit = kwargs.get('limit', MAX_RESULTS)
+        offset = kwargs.get('offset', 0)
+        return Action.objects( #pylint: disable=no-member
+            owner=owner,
+            target_name=target_name).limit[offset:limit]
 
     @staticmethod
     def parse_action_string(action_string):

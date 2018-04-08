@@ -91,8 +91,20 @@ def list_actions(params): #pylint: disable=unused-argument
     This API function will return a list of action documents.
     It is highly recommended to avoid using this function, as it
     can be very expensive.
+
+    Optionally filter by owner and target.
+
+    owner (optional): Only display actions owned by this user.
+    target_name (optional): Only display actions for given target.
+    limit (optional): Optionally limit how many values may be returned.
+    offset (optional): The position to start listing from.
     """
-    actions = Action.list_actions()
+    actions = Action.list_actions(
+        owner=params.get('owner'),
+        target_name=params.get('target_name'),
+        limit=params.get('limit'),
+        offset=params.get('offset', 0))
+
     return success_response(actions={action.action_id: action.document for action in actions})
 
 @handle_exceptions
