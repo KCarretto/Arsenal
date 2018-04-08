@@ -81,12 +81,12 @@ class GroupActionModelTest(BaseTest):
             action.submit_response(response)
         self.assertEqual(group_action.get_status(), GROUP_ACTION_STATUSES.get('success', 'success'))
 
-        # Create a new group action, make all actions stale. Status should be failed
+        # Create a new group action, make all actions stale. Status should be stale
         group_action = Database.create_group_action()
         for action in group_action.actions:
             action.queue_time = 0
             action.save()
-        self.assertEqual(group_action.get_status(), GROUP_ACTION_STATUSES.get('failed', 'failed'))
+        self.assertEqual(group_action.get_status(), GROUP_ACTION_STATUSES.get('stale', 'stale'))
 
         # Have a session check in, status should update to in progress
         group_action.actions[0].assign_to(session.session_id)
@@ -100,6 +100,13 @@ class GroupActionModelTest(BaseTest):
         self.assertEqual(
             group_action.get_status(),
             GROUP_ACTION_STATUSES.get('mixed success', 'mixed success'))
+
+        # Set all actions to failed. Status should be failed.
+        group_action = Database.create_group_action()
+        session = Database.create_session(None, 0)
+        for action in group_action.actions:
+            action.assign_to(session.session_id)
+        self.assertEqual(group_action.get_status(), GROUP_ACTION_STATUSES.get('failed', 'failed'))
 
         # Create a new group action, and cancel it. Status should be cancelled
         group_action = Database.create_group_action()

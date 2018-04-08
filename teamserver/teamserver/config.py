@@ -78,6 +78,7 @@ GROUP_ACTION_STATUSES = {
     'in progress': 'in progress',
     'mixed success': 'mixed success',
     'success': 'success',
+    'stale': 'stale',
     'failed': 'failed',
 }
 

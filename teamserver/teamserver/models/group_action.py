@@ -81,6 +81,7 @@ class GroupAction(Document):
         queued = 0
         sent = 0
         complete = 0
+        stale = 0
 
         for action in actions:
             status = action.status
@@ -90,6 +91,8 @@ class GroupAction(Document):
                 sent += 1
             if status == ACTION_STATUSES.get('complete', 'complete'):
                 complete += 1
+            if status == ACTION_STATUSES.get('stale', 'stale'):
+                stale += 1
 
         if complete == len(actions):
             return GROUP_ACTION_STATUSES.get('success', 'success')
@@ -97,11 +100,14 @@ class GroupAction(Document):
         if sent > 0:
             return GROUP_ACTION_STATUSES.get('in progress', 'in progress')
 
-        if queued > 0:
-            return GROUP_ACTION_STATUSES.get('queued', 'queued')
-
         if complete > 0:
             return GROUP_ACTION_STATUSES.get('mixed success', 'mixed success')
+
+        if stale > 0:
+            return GROUP_ACTION_STATUSES.get('stale', 'stale')
+
+        if queued > 0:
+            return GROUP_ACTION_STATUSES.get('queued', 'queued')
 
         return GROUP_ACTION_STATUSES.get('failed', 'failed')
 
