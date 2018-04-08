@@ -134,7 +134,7 @@ class Action(DynamicDocument):
         elif target_name:
             return Action.objects( #pylint: disable=no-member
                 target_name=target_name)[offset:limit]
-        return Action.objects[offset:limit]
+        return Action.objects[offset:limit] # pylint: disable=no-member
 
     @staticmethod
     def parse_action_string(action_string):
