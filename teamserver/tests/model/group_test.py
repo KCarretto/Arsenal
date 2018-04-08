@@ -107,9 +107,12 @@ class GroupModelTest(BaseTest):
                 'something': {'cool': False}}),
         ]
         group.membership_rules = [
-            GroupAutomemberRule(attribute='facts.include', regex='.*yes.*'),
-            GroupAutomemberRule(attribute='facts.something.cool', regex='True'),
-            GroupAutomemberRule(attribute='facts.interfaces', regex='.*192.168.1.*')
+            Database.create_group_rule(
+                attribute='facts.include', regex='.*yes.*'),
+            Database.create_group_rule(
+                attribute='facts.something.cool', regex='True'),
+            Database.create_group_rule(
+                attribute='facts.interfaces', regex='.*192.168.1.*'),
         ]
         group.save()
 

@@ -9,14 +9,14 @@ import time
 
 try:
     from teamserver.models import Action, Response, GroupAction, Log
-    from teamserver.models import Session, SessionHistory, Target, Group
+    from teamserver.models import Session, SessionHistory, Target, Group, GroupAutomemberRule
     from teamserver.config import SESSION_CHECK_THRESHOLD
 except ModuleNotFoundError:
     from os.path import abspath, dirname
     # Configure path to start at teamserver module
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
     from teamserver.models import Action, Response, GroupAction, Log
-    from teamserver.models import Session, SessionHistory, Target, Group
+    from teamserver.models import Session, SessionHistory, Target, Group, GroupAutomemberRule
     from teamserver.config import SESSION_CHECK_THRESHOLD
 
 class Database(object):
@@ -130,6 +130,20 @@ class Database(object):
         group.save(force_insert=True)
 
         return group
+
+    @staticmethod
+    def create_group_rule(
+            attribute,
+            regex,
+            rule_id=None):
+        """
+        Create an automember rule.
+        """
+        return GroupAutomemberRule(
+            attribute=attribute,
+            regex=regex,
+            rule_id=rule_id if rule_id else str(uuid4()),
+        )
 
     @staticmethod
     def create_session( # pylint: disable=too-many-arguments

@@ -20,8 +20,20 @@ class GroupAutomemberRule(EmbeddedDocument):
     This class represents an embedded document into the group document,
     which will be used to calculate members of a group.
     """
+    rule_id = StringField(required=True, null=False, unique=True, max_length=MAX_STR_LEN)
     attribute = StringField(required=True, null=False, max_length=MAX_STR_LEN)
     regex = StringField(required=True, null=False, max_length=MAX_STR_LEN)
+
+    @property
+    def document(self):
+        """
+        Return formatted json for the object.
+        """
+        return {
+            'rule_id': self.rule_id,
+            'attribute': self.attribute,
+            'regex': self.regex,
+        }
 
 class Group(Document):
     """
@@ -91,7 +103,8 @@ class Group(Document):
         return {
             'name': self.name,
             'whitelist_members': self.whitelist_members,
-            'blacklist_members': self.blacklist_members
+            'blacklist_members': self.blacklist_members,
+            'rules': [rule.document for rule in self.membership_rules], # pylint: disable=not-an-iterable
         }
 
     def whitelist_member(self, target_name):
@@ -158,12 +171,12 @@ class Group(Document):
         # Filter through objects and compute regexes
         if self.membership_rules:
             for target in Target.objects: # pylint: disable=no-member
-                for rule in self.membership_rules:
+                for rule in self.membership_rules: # pylint: disable=not-an-iterable
                     pattern = re.compile(rule.regex)
                     value = get_value(target, rule.attribute.split('.')) # pylint: disable=no-member
                     if pattern.match(str(value)):
                         targets.append(target.name)
-                        break # Don't bother applying any other rules
+                        break
 
         # Add whitelisted members
         targets += self.whitelist_members
