@@ -71,14 +71,14 @@ class Target(Document):
         """
         This method queries for the target object matching the name provided.
         """
-        return Target.objects.get(name=name) #pylint: disable=no-member
+        return Target.objects.get(name__iexact=name) #pylint: disable=no-member
 
     @staticmethod
     def get_by_uuid(uuid):
         """
         This method queries for the target object matching the mac_addrs provided.
         """
-        return Target.objects.get(uuid=uuid) #pylint: disable=no-member
+        return Target.objects.get(uuid__iexact=uuid) #pylint: disable=no-member
 
     @staticmethod
     def list_targets():
