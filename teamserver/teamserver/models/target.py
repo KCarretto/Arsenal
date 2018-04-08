@@ -159,3 +159,8 @@ class Target(Document):
             self.facts[key] = value #pylint: disable=unsupported-assignment-operation
         self.save()
 
+    def remove(self):
+        """
+        Remove this document from the database, and perform any related cleanup.
+        """
+        self.delete()
