@@ -21,7 +21,7 @@ def create_session(params):
     """
     This API function creates a new session object in the database.
 
-    mac_addrs (required): The list of MAC addresses that the agent gathered from the target <str>
+    target_uuid (required): The unique identifier of the target. <str>
     servers (optional): Which servers the agent will initially be configured with. <[str, str]>
     interval (optional): The interval the agent will initially be configured with. <float>
     interval_delta (optional): The interval delta the agent will initially be
@@ -33,11 +33,11 @@ def create_session(params):
     """
     # Fetch Target, create it automatically if it does not exist
     try:
-        target = Target.get_by_macs(params['mac_addrs'])
+        target = Target.get_by_uuid(params['target_uuid'])
     except DoesNotExist:
         target = Target(
             name=str(uuid4()),
-            mac_addrs=params['mac_addrs'],
+            uuid=params['target_uuid'],
         )
         target.save(force_insert=True)
 

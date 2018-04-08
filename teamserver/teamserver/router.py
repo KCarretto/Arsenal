@@ -8,7 +8,8 @@ from flask import Blueprint, request, jsonify, current_app
 
 import teamserver.events as events
 
-from .api import create_target, get_target, rename_target, set_target_facts, list_targets
+from .api import create_target, get_target, rename_target
+from .api import set_target_facts, list_targets, migrate_target
 from .api import create_session, get_session, session_check_in
 from .api import update_session_config, list_sessions
 from .api import create_action, get_action, cancel_action, list_actions
@@ -83,16 +84,16 @@ def api_entry(): # pylint: disable=too-many-return-statements
         # Targets
         'CreateTarget': create_target,
         'GetTarget': get_target,
-        'SetTargetFacts': set_target_facts, # TODO: Deprecate
+        'SetTargetFacts': set_target_facts,
         'RenameTarget': rename_target,
-        'ArchiveTarget': None,
         'ListTargets': list_targets,
+        'MigrateTarget': migrate_target,
 
         # Sessions
         'CreateSession': create_session,
         'GetSession': get_session,
         'SessionCheckIn': session_check_in,
-        'UpdateSessionConfig': update_session_config, # TODO: Deprecate
+        'UpdateSessionConfig': update_session_config,
         'ArchiveSession': None,
         'ListSessions': list_sessions,
 

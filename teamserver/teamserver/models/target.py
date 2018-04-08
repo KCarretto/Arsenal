@@ -4,7 +4,7 @@
 """
 
 from mongoengine import Document, DynamicEmbeddedDocument
-from mongoengine.fields import StringField, DictField, ListField
+from mongoengine.fields import StringField, DictField
 from mongoengine.fields import EmbeddedDocumentListField
 
 from .session import Session
@@ -40,7 +40,7 @@ class Target(Document):
                 'unique': True
             },
             {
-                'fields': ['mac_addrs'],
+                'fields': ['uuid'],
                 'unique': True
             }
         ]
@@ -52,11 +52,13 @@ class Target(Document):
         max_length=MAX_STR_LEN,
         unique=True)
 
-    mac_addrs = ListField(
-        StringField(required=True, null=False, max_length=20),
-        required=True,
-        null=False,
-        unique=True)
+    #mac_addrs = ListField(
+    #    StringField(required=True, null=False, max_length=20),
+    #    required=True,
+    #    null=False,
+    #    unique=True)
+
+    uuid = StringField(required=True, null=False, max_length=MAX_BIGSTR_LEN, unique=True)
 
     facts = DictField(null=False)
 
@@ -72,11 +74,11 @@ class Target(Document):
         return Target.objects.get(name=name) #pylint: disable=no-member
 
     @staticmethod
-    def get_by_macs(mac_addrs):
+    def get_by_uuid(uuid):
         """
         This method queries for the target object matching the mac_addrs provided.
         """
-        return Target.objects.get(mac_addrs=mac_addrs) #pylint: disable=no-member
+        return Target.objects.get(uuid=uuid) #pylint: disable=no-member
 
     @staticmethod
     def list_targets():
@@ -135,7 +137,7 @@ class Target(Document):
         """
         doc = {
             'name': self.name,
-            'mac_addrs': self.mac_addrs,
+            'uuid': self.uuid,
         }
         if include_status:
             doc['status'] = self.status
@@ -157,3 +159,8 @@ class Target(Document):
             self.facts[key] = value #pylint: disable=unsupported-assignment-operation
         self.save()
 
+    def remove(self):
+        """
+        Remove this document from the database, and perform any related cleanup.
+        """
+        self.delete()

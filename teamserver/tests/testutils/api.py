@@ -2,6 +2,7 @@
     This module is used to invoke API functions.
 """
 
+from uuid import uuid4
 from flask import json
 
 class APIClient(object): # pylint: disable=too-many-public-methods
@@ -42,7 +43,7 @@ class APIClient(object): # pylint: disable=too-many-public-methods
     def create_target(
             client,
             name=None,
-            mac_addrs=None,
+            uuid=None,
             facts=None):
         """
         Invoke the CreateTarget API function using the provided client.
@@ -52,7 +53,7 @@ class APIClient(object): # pylint: disable=too-many-public-methods
             data=json.dumps(dict(
                 method='CreateTarget',
                 name=name if name is not None else 'TEST Target',
-                mac_addrs=mac_addrs if mac_addrs else ['AA:BB:CC:DD:EE:FF'],
+                uuid=uuid if uuid else str(uuid4()),
                 facts=facts if facts is not None else {}
             )),
             content_type='application/json',
@@ -145,13 +146,30 @@ class APIClient(object): # pylint: disable=too-many-public-methods
             )
         return json.loads(resp.data)
 
+    @staticmethod
+    def migrate_target(client, old_target, new_target):
+        """
+        Invoke the MigrateTarget API function using the provided client.
+        """
+        resp = client.post(
+            '/api',
+            data=json.dumps(dict(
+                method='MigrateTarget',
+                old_target=old_target,
+                new_target=new_target,
+            )),
+            content_type='application/json',
+            follow_redirects=True
+        )
+        return json.loads(resp.data)
+
     #####################################
     #          Session Methods          #
     #####################################
     @staticmethod
     def create_session( # pylint: disable=too-many-arguments
             client,
-            mac_addrs,
+            target_uuid,
             interval=120,
             interval_delta=20,
             servers=None,
@@ -163,7 +181,7 @@ class APIClient(object): # pylint: disable=too-many-public-methods
             '/api',
             data=json.dumps(dict(
                 method='CreateSession',
-                mac_addrs=mac_addrs,
+                target_uuid=target_uuid,
                 servers=servers if servers else ['10.10.10.10', 'https://google.com'],
                 interval=interval,
                 interval_delta=interval_delta,
