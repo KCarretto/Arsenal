@@ -31,7 +31,7 @@ def create_group_action(params):
     actions = []
 
     # Iterate through all desired targets
-    for target_name in Group.get_by_name(group_name).member_names:
+    for target_name in Group.get_by_name(group_name).members:
         # Invoke the API to create action objects without commiting to the database.
         action = create_action({
             'target_name': target_name,

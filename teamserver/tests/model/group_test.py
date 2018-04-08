@@ -11,13 +11,13 @@ from mongoengine import DoesNotExist
 # pylint: disable=duplicate-code
 try:
     from testutils import BaseTest, Database
-    from teamserver.models import Group
+    from teamserver.models import Group, GroupAutomemberRule
 except ModuleNotFoundError:
     # Configure path to start at teamserver module
     from os.path import dirname, abspath
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
     from tests.testutils import BaseTest, Database
-    from teamserver.models import Group
+    from teamserver.models import Group, GroupAutomemberRule
 
 class GroupModelTest(BaseTest):
     """
@@ -63,28 +63,11 @@ class GroupModelTest(BaseTest):
         group.whitelist_member(target1.name)
         group.whitelist_member(target2.name)
 
-        member_names = [member.name for member in group.members]
+        member_names = group.members
 
         self.assertIn(target1.name, member_names)
         self.assertIn(target2.name, member_names)
         self.assertNotIn(target3.name, member_names)
-
-    def test_member_names(self):
-        """
-        Test the member_names function.
-        """
-        target1 = Database.create_target()
-        target2 = Database.create_target()
-        target3 = Database.create_target()
-        group = Database.create_group('test_group')
-        group.whitelist_member(target1.name)
-        group.whitelist_member(target3.name)
-
-        member_names = group.member_names
-
-        self.assertIn(target1.name, member_names)
-        self.assertIn(target3.name, member_names)
-        self.assertNotIn(target2.name, member_names)
 
     def test_remove_member(self):
         """
@@ -97,9 +80,7 @@ class GroupModelTest(BaseTest):
         group.whitelist_member(target2.name)
         group.remove_member(target2.name)
 
-        member_names = group.member_names
-
-        self.assertNotIn(target2.name, member_names)
+        self.assertNotIn(target2.name, group.members)
 
     def test_whitelist_member(self):
         """
@@ -110,6 +91,30 @@ class GroupModelTest(BaseTest):
         group.whitelist_member(target.name)
         group = Database.get_group('SOME GROUP')
         self.assertListEqual([target.name], group.whitelist_members)
+
+    def test_group_rules(self):
+        """
+        Test if group Automember rules are functioning as expected.
+        """
+        group = Database.create_group()
+        targets = [
+            Database.create_target(None, None, {'include': 'yes'}),
+            Database.create_target(None, None, {'something': {'cool': True}}),
+            Database.create_target(None, None, {'interfaces': [
+                {'name': 'eth0', 'ip_addrs': ['192.168.1.1', '127.0.0.1']}]}),
+            Database.create_target(None, None, {
+                'include': 'sureyessure',
+                'something': {'cool': False}}),
+        ]
+        group.membership_rules = [
+            GroupAutomemberRule(attribute='facts.include', regex='.*yes.*'),
+            GroupAutomemberRule(attribute='facts.something.cool', regex='True'),
+            GroupAutomemberRule(attribute='facts.interfaces', regex='.*192.168.1.*')
+        ]
+        group.save()
+
+        for target in targets:
+            self.assertIn(target.name, group.members)
 
     def test_create(self):
         """

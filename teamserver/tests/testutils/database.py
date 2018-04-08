@@ -81,7 +81,7 @@ class Database(object):
         group = Database.get_group(group_name)
         actions = [
             Database.create_action(target, action_string).action_id
-            for target in group.member_names
+            for target in group.members
         ]
 
         action_string = action_string if action_string is not None else 'exec echo test'

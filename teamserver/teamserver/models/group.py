@@ -54,7 +54,7 @@ class Group(Document):
         """
         groups = []
         for group in Group.objects(): #pylint: disable=no-member
-            if target_name in group.member_names:
+            if target_name in group.members:
                 groups.append(group)
 
         return list(set(groups))
@@ -79,20 +79,9 @@ class Group(Document):
         This property returns member objects of all group members.
         """
         if not self.built_members:
-            self.built_members = self.build_members()
-            self.save()
+            self.build_members()
 
         return self.built_members
-
-        #return Target.objects(name__in=self.whitelist_members) #pylint: disable=no-member
-
-    # @property
-    # def member_names(self):
-    #     """
-    #     This property returns member object names for all group members.
-    #     """
-    #     # TODO: Implement membership rules and blacklist
-    #     return self.whitelist_members
 
     @property
     def document(self):
@@ -115,7 +104,7 @@ class Group(Document):
             raise MembershipError('Cannot whitelist a member that is on the blacklist.')
 
         self.whitelist_members.append(target_name) #pylint: disable=no-member
-        self.save()
+        self.build_members()
 
     def remove_member(self, target_name):
         """
@@ -124,7 +113,7 @@ class Group(Document):
         if not target_name in self.whitelist_members: #pylint: disable=unsupported-membership-test
             raise MembershipError('Cannot remove member, member is not whitelisted.')
         self.whitelist_members.remove(target_name) #pylint: disable=no-member
-        self.save()
+        self.build_members()
 
     def blacklist_member(self, target_name):
         """
@@ -139,7 +128,7 @@ class Group(Document):
         if target_name in self.blacklist_members: #pylint: disable=unsupported-membership-test
             raise MembershipError('Member is already blacklisted.')
         self.blacklist_members.append(target_name) #pylint: disable=no-member
-        self.save()
+        self.build_members()
 
     def remove(self):
         """
@@ -153,11 +142,11 @@ class Group(Document):
         """
         targets = []
 
-        def get_value(value, attribute):
+        def get_value(value, attributes):
             """
             Recursively look up values based on tokens.
             """
-            if attributes[0]:
+            if attributes:
                 if hasattr(value, attributes[0]):
                     value = getattr(value, attributes[0])
                     return get_value(value, attributes[1:])
@@ -167,14 +156,18 @@ class Group(Document):
             return value
 
         # Filter through objects and compute regexes
-        for target in Target.objects():
-            for rule in self.membership_rules:
-                pattern = re.compile(rule.regex)
-                value = get_value(target, rule.attribute.split('.'))
-                if pattern.match(value):
-                    targets.append(target.name)
+        if self.membership_rules:
+            for target in Target.objects: # pylint: disable=no-member
+                for rule in self.membership_rules:
+                    pattern = re.compile(rule.regex)
+                    value = get_value(target, rule.attribute.split('.')) # pylint: disable=no-member
+                    if pattern.match(str(value)):
+                        targets.append(target.name)
+                        break # Don't bother applying any other rules
 
         # Add whitelisted members
         targets += self.whitelist_members
 
-        return list(filter(lambda x: x not in self.blacklist_members, targets))
+        # Set compiled list of members
+        self.built_members = list(filter(lambda x: x not in self.blacklist_members, set(targets))) #pylint: disable=unsupported-membership-test
+        self.save()
