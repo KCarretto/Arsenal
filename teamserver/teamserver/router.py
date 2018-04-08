@@ -12,7 +12,7 @@ from .api import create_target, get_target, rename_target
 from .api import set_target_facts, list_targets, migrate_target
 from .api import create_session, get_session, session_check_in
 from .api import update_session_config, list_sessions
-from .api import create_action, get_action, cancel_action, list_actions
+from .api import create_action, get_action, cancel_action, list_actions, duplicate_action
 from .api import create_group_action, get_group_action, cancel_group_action, list_group_actions
 from .api import get_group, create_group, delete_group, list_groups
 from .api import remove_group_member, add_group_member, blacklist_group_member
@@ -102,6 +102,7 @@ def api_entry(): # pylint: disable=too-many-return-statements
         'GetAction': get_action,
         'CancelAction': cancel_action,
         'ListActions': list_actions,
+        'DuplicateAction': duplicate_action,
 
         # Group Actions
         'CreateGroupAction': create_group_action,

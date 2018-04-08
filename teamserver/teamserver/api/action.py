@@ -84,3 +84,23 @@ def list_actions(params): #pylint: disable=unused-argument
     """
     actions = Action.list_actions()
     return success_response(actions={action.action_id: action.document for action in actions})
+
+@handle_exceptions
+def duplicate_action(params):
+    """
+    This API function is used to queue an identical action to the given action_id.
+
+    Args:
+        action_id: The unique identifier of the action to clone.
+    """
+    action = Action.get_by_id(params['action_id'])
+
+    local_params = {
+        'target_name': action.target_name,
+        'action_string': action.action_string,
+    }
+
+    if action.bound_session_id:
+        local_params['bound_session_id'] = action.bound_session_id
+
+    return create_action(local_params)

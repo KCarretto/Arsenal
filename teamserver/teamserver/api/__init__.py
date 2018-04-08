@@ -2,7 +2,7 @@
 This module contains all API functions.
 """
 
-from .action import create_action, get_action, cancel_action, list_actions
+from .action import create_action, get_action, cancel_action, list_actions, duplicate_action
 from .group_action import create_group_action, get_group_action
 from .group_action import cancel_group_action, list_group_actions
 
