@@ -65,7 +65,7 @@ It is required that Agents support the following action types, or return a speci
 More information on Actions can be found in the database.md documentation file.
 
 ### Fact Collection
-It is recommended that the Agent be capable of collecting facts about a Target system for ease of use. While the only two required facts are the Target's hostname and MAC addresses, many other facts are useful for collection. Please see the database.md documentation's Target section for more information on the default factsets.
+It is recommended that the Agent be capable of collecting facts about a Target system for ease of use.
 
 ## Working with the Arsenal HTTP C2
 
@@ -75,6 +75,7 @@ The existing Arsenal HTTP C2 utilizes JSON as a communication Format. The JSON t
 ```json
 {
   "session_id": "",
+  "uuid": "A target-unique identifier.",
   "config": {
     "interval": 60,
     "interval_delta": 120,
@@ -98,6 +99,7 @@ The existing Arsenal HTTP C2 utilizes JSON as a communication Format. The JSON t
 }
 ```
 * **session_id** - Must be empty string or not present in the initial beacon. The C2 will respond with a session_id that the Agent should keep track of, and send with all future call backs.<br>
+* **uuid** - A unique identifier string that is used to associate the session with a target. It is recommended to concatenate the machine-uuid and the mac address of the machines primary interface, however you may use any identifying criteria that works best for your environment so long as it is consistent across agents, and distinct amongst targets.
 * **config** - This is a dictionary that represents the agent's initial configuration.
 * **facts** - A dictionary containing facts about the target system. The only required fact is "interfaces", which should be provided in the format shown above, however it is recommended that you collect at least the "min" subset on initial beacon (Which can be found under the target section of database.md Documentation). It is also likely that the "hostname" fact will be used for target auto-naming, so it is highly recommended that you collect this fact as well.<br>
 
