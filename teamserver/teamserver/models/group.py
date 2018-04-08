@@ -2,9 +2,10 @@
     This module defines a python object model for the Group document
     in the backend MongoDB database.
 """
+import re
 
 from mongoengine import Document, EmbeddedDocument
-from mongoengine.fields import BooleanField, StringField
+from mongoengine.fields import StringField
 from mongoengine.fields import ListField, EmbeddedDocumentListField
 
 from .target import Target
@@ -21,7 +22,6 @@ class GroupAutomemberRule(EmbeddedDocument):
     """
     attribute = StringField(required=True, null=False, max_length=MAX_STR_LEN)
     regex = StringField(required=True, null=False, max_length=MAX_STR_LEN)
-    include = BooleanField(required=True, null=False, default=True)
 
 class Group(Document):
     """
@@ -40,6 +40,7 @@ class Group(Document):
     }
     name = StringField(required=True, null=False, unique=True)
 
+    built_members = ListField(StringField(required=True, null=False))
     whitelist_members = ListField(StringField(required=True, null=False))
     blacklist_members = ListField(StringField(required=True, null=False))
 
@@ -77,16 +78,21 @@ class Group(Document):
         """
         This property returns member objects of all group members.
         """
-        # TODO: Implement membership rules and blacklist
-        return Target.objects(name__in=self.whitelist_members) #pylint: disable=no-member
+        if not self.built_members:
+            self.built_members = self.build_members()
+            self.save()
 
-    @property
-    def member_names(self):
-        """
-        This property returns member object names for all group members.
-        """
-        # TODO: Implement membership rules and blacklist
-        return self.whitelist_members
+        return self.built_members
+
+        #return Target.objects(name__in=self.whitelist_members) #pylint: disable=no-member
+
+    # @property
+    # def member_names(self):
+    #     """
+    #     This property returns member object names for all group members.
+    #     """
+    #     # TODO: Implement membership rules and blacklist
+    #     return self.whitelist_members
 
     @property
     def document(self):
@@ -140,3 +146,35 @@ class Group(Document):
         Remove this document from the database, and perform any related cleanup.
         """
         self.delete()
+
+    def build_members(self):
+        """
+        Determine group members.
+        """
+        targets = []
+
+        def get_value(value, attribute):
+            """
+            Recursively look up values based on tokens.
+            """
+            if attributes[0]:
+                if hasattr(value, attributes[0]):
+                    value = getattr(value, attributes[0])
+                    return get_value(value, attributes[1:])
+                elif isinstance(value, dict) and value.get(attributes[0]):
+                    value = value[attributes[0]]
+                    return get_value(value, attributes[1:])
+            return value
+
+        # Filter through objects and compute regexes
+        for target in Target.objects():
+            for rule in self.membership_rules:
+                pattern = re.compile(rule.regex)
+                value = get_value(target, rule.attribute.split('.'))
+                if pattern.match(value):
+                    targets.append(target.name)
+
+        # Add whitelisted members
+        targets += self.whitelist_members
+
+        return list(filter(lambda x: x not in self.blacklist_members, targets))
