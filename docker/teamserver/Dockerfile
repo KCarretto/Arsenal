@@ -1,16 +1,20 @@
-FROM nginx:ubuntu
-
-# Update
-RUN apt-get update
+FROM nginx:alpine
 
 # Configure nginx
 COPY nginx.conf /etc/nginx/nginx.conf
-RUN mkdir -p /etc/nginx/certs
-COPY arsenal.cert /etc/nginx/certs/arsenal.cert
-COPY arsenal.key /etc/nginx/certs/arsenal.key
 
 # Copy teamserver
 COPY ../teamserver /opt/arsenal
 
 # Configure teamserver
 COPY config.py /opt/arsenal/teamserver/config.py
+
+# Install dependencies
+RUN apk add --update python3 python3-dev gcc make libc-dev linux-headers
+RUN pip3 install --upgrade pip
+RUN pip3 install -r /opt/arsenal/teamserver/requirements/prod.txt
+
+# Configure ENTRYPOINT
+COPY entrypoint.sh /opt/arsenal/entrypoint.sh
+RUN chmod 0755 /opt/arsenal/entrypoint.sh
+ENTRYPOINT ["/opt/arsenal/entrypoint.sh"]
