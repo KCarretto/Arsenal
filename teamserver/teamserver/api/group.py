@@ -109,11 +109,12 @@ def add_group_rule(params):
         the '.' operator, for example: 'facts.interfaces'. Each attribute is converted into a str
         for regex matching.
     regex: The inclusion regex, targets with matching attributes are included as group members.
+    rule_id: Optionally specify a unique name for the rule.
     """
     rule = GroupAutomemberRule(
         attribute=params['attribute'],
         regex=params['regex'],
-        rule_id=str(uuid4())
+        rule_id=params.get('rule_id', str(uuid4())),
     )
     group = Group.get_by_name(params['name'])
     group.membership_rules.append(rule)
