@@ -102,6 +102,7 @@ class Group(Document):
         """
         return {
             'name': self.name,
+            'members': self.members,
             'whitelist_members': self.whitelist_members,
             'blacklist_members': self.blacklist_members,
             'rules': [rule.document for rule in self.membership_rules], # pylint: disable=not-an-iterable
