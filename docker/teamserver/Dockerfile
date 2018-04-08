@@ -1,16 +1,18 @@
 FROM nginx:alpine
 
+# Install package dependencies
+RUN apk add --update python3 python3-dev gcc make libc-dev linux-headers git
+
 # Configure nginx
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Copy teamserver
-COPY ../teamserver /opt/arsenal
+# Clone the teamserver
+RUN git clone https://github.com/kcarretto/arsenal /opt/arsenal
 
 # Configure teamserver
 COPY config.py /opt/arsenal/teamserver/config.py
 
-# Install dependencies
-RUN apk add --update python3 python3-dev gcc make libc-dev linux-headers
+# Install requirements
 RUN pip3 install --upgrade pip
 RUN pip3 install -r /opt/arsenal/teamserver/requirements/prod.txt
 
