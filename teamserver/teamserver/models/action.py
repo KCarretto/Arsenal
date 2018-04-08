@@ -124,9 +124,17 @@ class Action(DynamicDocument):
         owner = kwargs.get('owner')
         limit = kwargs.get('limit', MAX_RESULTS)
         offset = kwargs.get('offset', 0)
-        return Action.objects( #pylint: disable=no-member
-            owner=owner,
-            target_name=target_name).limit[offset:limit]
+        if owner and target_name:
+            return Action.objects( #pylint: disable=no-member
+                owner=owner,
+                target_name=target_name)[offset:limit]
+        elif owner:
+            return Action.objects( #pylint: disable=no-member
+                owner=owner)[offset:limit]
+        elif target_name:
+            return Action.objects( #pylint: disable=no-member
+                target_name=target_name)[offset:limit]
+        return Action.objects[offset:limit]
 
     @staticmethod
     def parse_action_string(action_string):
