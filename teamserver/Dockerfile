@@ -12,6 +12,7 @@ COPY docker/teamserver/nginx.conf /etc/nginx/nginx.conf
 RUN mkdir -p /opt/arsenal/
 COPY teamserver /opt/arsenal/teamserver
 COPY requirements /opt/arsenal/requirements
+COPY bin /opt/arsenal/bin
 COPY run.py /opt/arsenal/run.py
 COPY docker/teamserver/uwsgi.ini /opt/arsenal/uwsgi.ini
 
