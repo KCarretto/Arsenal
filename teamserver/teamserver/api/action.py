@@ -18,6 +18,7 @@ def create_action(params, commit=True):
     action_string (required): The action string that will be parsed into an action. <str>
     bound_session_id (optional): This will restrict the action to only be retrieved
                                  by a specific session. <str>
+    action_id (optional, unique): Specify a human readable action_id.
     """
     username = 'No owner'
 
@@ -40,7 +41,7 @@ def create_action(params, commit=True):
     parsed_action = Action.parse_action_string(action_string)
 
     action = Action(
-        action_id=str(uuid4()),
+        action_id=params.get('action_id', str(uuid4())),
         target_name=target_name,
         action_string=action_string,
         action_type=parsed_action['action_type'],

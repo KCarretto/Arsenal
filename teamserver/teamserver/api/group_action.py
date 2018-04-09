@@ -16,6 +16,7 @@ def create_group_action(params):
 
     group_name (required): The name of the group to create an action for.
     action_string (required): The action to perform on the targets.
+    group_action_id (optional, unique): Specify a human readable group_action_id.
     """
     username = 'No owner'
 
@@ -26,8 +27,10 @@ def create_group_action(params):
     except KeyError:
         pass
 
+
     action_string = params['action_string']
     group_name = params['group_name']
+    group_action_id = params.get('group_action_id', str(uuid4()))
     actions = []
 
     # Iterate through all desired targets
@@ -35,7 +38,8 @@ def create_group_action(params):
         # Invoke the API to create action objects without commiting to the database.
         action = create_action({
             'target_name': target_name,
-            'action_string': action_string
+            'action_string': action_string,
+            'action_id': '{}_{}'.format(group_action_id, str(uuid4()))
         }, False)
 
         actions.append(action)
@@ -48,7 +52,7 @@ def create_group_action(params):
 
     # Create a group action document to track the actions
     group_action = GroupAction(
-        group_action_id=str(uuid4()),
+        group_action_id=group_action_id,
         action_string=action_string,
         action_ids=action_ids,
         owner=username,
