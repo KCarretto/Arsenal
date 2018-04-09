@@ -1,6 +1,6 @@
 FROM nginx:alpine
 
-EXPOSE 8080
+EXPOSE 80
 
 # Install package dependencies
 RUN apk add --update python3 python3-dev gcc make libc-dev libffi-dev linux-headers git
