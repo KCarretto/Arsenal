@@ -102,3 +102,28 @@ API_KEY_SALT = os.environ.get('API_KEY_SALT', b'$2b$12$26F6CL6.zeSwMU610RNiau')
 # WEBHOOK SETTINGS
 CONNECT_TIMEOUT = 10.0
 READ_TIMEOUT = 30.0
+
+
+
+# INTEGRATION SETTINGS
+def read_api_key(api_key_file):
+    """
+    Reads an API key file.
+    """
+    api_key = None
+    if api_key_file and os.path.exists(api_key_file):
+        with open(api_key_file, 'r') as keyfile:
+            api_key = keyfile.readlines()[0].strip().strip('\n')
+
+    return api_key
+
+INTEGRATIONS = {
+    'SLACK_CONFIG': {
+        'enabled': True,
+        'API_TOKEN': os.environ.get('SLACK_API_TOKEN', read_api_key('.slack_api')),
+        'TIMEOUT': 10,
+
+        'ERROR_CHANNEL': 'arsenal-notifications',
+        'ACTION_CHANNEL': 'arsenal-notifications',
+    }
+}

@@ -8,9 +8,8 @@ from flask import Flask
 from flask_mongoengine import MongoEngine
 from mongoengine import connect, MongoEngineConnectionError
 
-from .config import DB_HOST, DB_PORT, DB_NAME
+from .config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
 from .config import CELERY_BROKER_URL, CELERY_RESULT_BACKEND
-from .utils import log
 
 DB = MongoEngine()
 
@@ -28,6 +27,10 @@ def create_app(**config_overrides):
         'host': DB_HOST,
         'port': DB_PORT
     }
+    if DB_USER and DB_PASS:
+        app.config['MONGODB_SETTINGS']['username'] = DB_USER
+        app.config['MONGODB_SETTINGS']['password'] = DB_PASS
+
     app.config['CELERY_BROKER_URL'] = CELERY_BROKER_URL
     app.config['CELERY_RESULT_BACKEND'] = CELERY_RESULT_BACKEND
 
@@ -38,8 +41,6 @@ def create_app(**config_overrides):
     try:
         DB.init_app(app)
     except MongoEngineConnectionError as conn_err:
-        log('FATAL', 'Failed to connect to database.')
-        log('DEBUG', conn_err)
         print(conn_err)
         sys.exit('Could not connect to database.')
 

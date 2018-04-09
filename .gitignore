@@ -2,6 +2,8 @@
 *.vscode*
 *TODO*
 *teamserver-latest.zip*
+*celery*.log
+*celery*.pid
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
