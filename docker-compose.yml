@@ -6,10 +6,10 @@ services:
     ports:
       - "80:80"
     environment:
-      - CELERY_BROKER_URL=amqp://arsenal-rabbitmq:5672
-      - CELERY_RESULT_BACKEND=amqp://arsenal-rabbitmq:5672
+      - CELERY_BROKER_URL=amqp://arsenal_rabbitmq_1:5672
+      - CELERY_RESULT_BACKEND=amqp://arsenal_rabbitmq_1:5672
       - DB_NAME=arsenal_sample
-      - DB_HOST=arsenal-mongo
+      - DB_HOST=arsenal_mongo_1
       - DB_PORT=27017
       - API_KEY_SALT=thebestsaltthebestsalt
 
