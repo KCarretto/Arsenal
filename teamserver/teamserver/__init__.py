@@ -10,7 +10,6 @@ from mongoengine import connect, MongoEngineConnectionError
 
 from .config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
 from .config import CELERY_BROKER_URL, CELERY_RESULT_BACKEND
-from .utils import log
 
 DB = MongoEngine()
 
@@ -42,8 +41,6 @@ def create_app(**config_overrides):
     try:
         DB.init_app(app)
     except MongoEngineConnectionError as conn_err:
-        log('FATAL', 'Failed to connect to database.')
-        log('DEBUG', conn_err)
         print(conn_err)
         sys.exit('Could not connect to database.')
 
