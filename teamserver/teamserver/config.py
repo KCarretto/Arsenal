@@ -1,16 +1,17 @@
 """
     This file describes the various configuration options available for tweaking.
 """
+import os
 
 # CELERY SETTINGS
 CELERY_MAIN_NAME = 'arsenal'
-CELERY_BROKER_URL = 'amqp://localhost:5672'
-CELERY_RESULT_BACKEND = 'amqp://localhost:5672'
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://localhost:5672')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'amqp://localhost:5672')
 
 # DATABASE CONNECTION SETTINGS
-DB_NAME = 'arsenal_sample'
-DB_HOST = 'localhost'
-DB_PORT = 27017
+DB_NAME = os.environ.get('DB_NAME', 'arsenal_sample')
+DB_HOST = os.environ.get('DB_HOST', 'localhost')
+DB_PORT = int(os.environ.get('DB_PORT', 27017))
 DB_USER = None
 DB_PASS = None
 
@@ -96,7 +97,7 @@ ACTION_TYPES = {
 }
 
 # AUTH SETTINGS
-API_KEY_SALT = 'thebestsaltthebestsalt'
+API_KEY_SALT = os.environ.get('API_KEY_SALT', 'thebestsaltthebestsalt')
 
 # WEBHOOK SETTINGS
 CONNECT_TIMEOUT = 10.0
