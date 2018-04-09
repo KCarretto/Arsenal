@@ -2,7 +2,7 @@
     This module contains all 'Auth' API functions.
 """
 from uuid import uuid4
-from passlib.hash import bcrypt
+import bcrypt
 
 from ..utils import handle_exceptions, success_response, get_context
 from ..exceptions import PermissionDenied
@@ -68,7 +68,7 @@ def create_api_key(params):
         str(uuid4()),
         )
     key = APIKey(
-        key=bcrypt.hash(original_key, salt=API_KEY_SALT),
+        key=bcrypt.hashpw(original_key, API_KEY_SALT),
         owner=owner,
         allowed_api_calls=allowed_api_calls
     )

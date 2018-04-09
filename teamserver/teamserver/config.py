@@ -97,7 +97,7 @@ ACTION_TYPES = {
 }
 
 # AUTH SETTINGS
-API_KEY_SALT = os.environ.get('API_KEY_SALT', 'thebestsaltthebestsalt')
+API_KEY_SALT = os.environ.get('API_KEY_SALT', b'$2b$12$26F6CL6.zeSwMU610RNiau')
 
 # WEBHOOK SETTINGS
 CONNECT_TIMEOUT = 10.0
