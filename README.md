@@ -2,7 +2,7 @@
 Extensible Red Team Framework
 
 ## Overview
-Arsenal is a framework designed to do be a back-end for Red Team command and control operations. It allows many Agent-C2 models to be integrated into one system, with a great interface and many useful features. The goal is to limit the time Red Team spends on back-end development, and invest more resources into the malware that is distributed to target systems.  
+Arsenal is a framework designed to be a back-end for Red Team command and control operations. It allows many Agent-C2 models to be integrated into one system, with a great interface and many useful features. The goal is to limit the time Red Team spends on back-end development, and invest more resources into the malware that is distributed to target systems.  
 
 ### Feature Highlights
 * Integrates with custom implants and C2 servers with ease
