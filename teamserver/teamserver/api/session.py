@@ -7,7 +7,7 @@ from uuid import uuid4
 from flask import current_app
 from mongoengine.errors import DoesNotExist
 
-import teamserver.events as events
+import teamserver.events.worker as events
 
 from .action import create_action
 from ..utils import success_response, handle_exceptions, log

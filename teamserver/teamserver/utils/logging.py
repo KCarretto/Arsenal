@@ -4,7 +4,7 @@ This module contains logging functionality for the teamserver.
 import time
 from flask import current_app
 
-import teamserver.events as events
+import teamserver.events.worker as events
 
 from ..config import LOG_LEVEL, LOG_LEVELS, APPLICATION
 from ..models import Log

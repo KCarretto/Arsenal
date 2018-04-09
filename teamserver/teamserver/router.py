@@ -6,7 +6,7 @@
 
 from flask import Blueprint, request, jsonify, current_app
 
-import teamserver.events as events
+import teamserver.events.worker as events
 
 from .api import create_target, get_target, rename_target
 from .api import set_target_facts, list_targets, migrate_target
