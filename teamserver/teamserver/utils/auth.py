@@ -66,6 +66,7 @@ def authenticate(request):
         except DoesNotExist:
             return (False, {
                 'status': 403,
+                'error-type': 'invalid-api-key',
                 'description': 'Invalid API Key.',
                 'error': True
             })
