@@ -30,6 +30,7 @@ Here are some quick deployment instructions to set up on Ubuntu 16.04 (The proje
 
 ### Deploy with docker compose
 `mkdir -p /var/log/arsenal`
+
 `cd /opt/arsenal; docker-compose up -d >> /var/log/arsenal/stdout.log 2>> /var/log/arsenal/stderr.log`
 
 ### Additional Information
