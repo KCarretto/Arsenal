@@ -14,9 +14,10 @@ def create_group_action(params):
     will complete the action, and the statuses of each action will be
     easily accessible through the created group action document.
 
-    group_name (required): The name of the group to create an action for.
-    action_string (required): The action to perform on the targets.
-    group_action_id (optional, unique): Specify a human readable group_action_id.
+    group_name (required): The name of the group to create an action for. <str>
+    action_string (required): The action to perform on the targets. <str>
+    group_action_id (optional, unique): Specify a human readable group_action_id. <str>
+    quick (optional): Only send to the target's fastest session. Default: False. <bool>
     """
     username = 'No owner'
 
@@ -39,7 +40,8 @@ def create_group_action(params):
         action = create_action({
             'target_name': target_name,
             'action_string': action_string,
-            'action_id': '{}_{}'.format(group_action_id, str(uuid4()))
+            'action_id': '{}_{}'.format(group_action_id, str(uuid4())),
+            'quick': params.get('quick', False)
         }, False)
 
         actions.append(action)
