@@ -7,7 +7,7 @@ import sys
 from uuid import uuid4
 from os.path import abspath, dirname
 from mongoengine import connect
-from passlib.hash import bcrypt
+import bcrypt
 
 sys.path.insert(0, abspath(dirname(abspath(dirname(__file__)))))
 from teamserver.models import User, Role, APIKey # pylint: disable-all
@@ -121,7 +121,7 @@ def create_api_key(username, allowed_api_calls):
             str(uuid4()),
             )
     key = APIKey(
-        key=bcrypt.hash(original_key, salt=API_KEY_SALT),
+        key=bcrypt.hashpw(original_key, API_KEY_SALT),
         owner=username,
         allowed_api_calls=allowed_api_calls
     )

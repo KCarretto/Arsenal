@@ -33,5 +33,9 @@ Here are some quick deployment instructions to set up on Ubuntu 16.04 (The proje
 
 `cd /opt/arsenal; docker-compose up -d >> /var/log/arsenal/stdout.log 2>> /var/log/arsenal/stderr.log`
 
+### Configure database defaults
+`docker exec -it arsenal_teamserver_1 /bin/sh -c "cd /opt/arsenal/bin; python3 setup.py"`
+This will populate the database with default users and roles defined in `bin/setup.py`
+
 ### Additional Information
 The teamserver will now launch using docker-compose. To ensure that it is functioning properly, you may run `curl 127.0.0.1/status` and you should receive the teamserver's status back. You may also install the teamserver to the system without docker, please see `/contrib` for useful setup scripts, service files, and installation information.
