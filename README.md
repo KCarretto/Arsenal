@@ -29,7 +29,8 @@ Here are some quick deployment instructions to set up on Ubuntu 16.04 (The proje
 `sudo chmod +x /usr/local/bin/docker-compose`
 
 ### Deploy with docker compose
-`cd /opt/arsenal; docker-compose up -d`
+`mkdir -p /var/log/arsenal`
+`cd /opt/arsenal; docker-compose up -d >> /var/log/arsenal/stdout.log 2>> /var/log/arsenal/stderr.log`
 
 ### Additional Information
 The teamserver will now launch using docker-compose. To ensure that it is functioning properly, you may run `curl 127.0.0.1/status` and you should receive the teamserver's status back. You may also install the teamserver to the system without docker, please see `/contrib` for useful setup scripts, service files, and installation information.
