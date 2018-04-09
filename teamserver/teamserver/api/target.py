@@ -3,9 +3,9 @@
 """
 from mongoengine.errors import DoesNotExist
 
-from .utils import success_response, _get_filtered_target
+from ..utils import success_response, get_filtered_target, handle_exceptions
 from ..models import Target, Action, Group
-from ..exceptions import handle_exceptions, CannotRenameTarget
+from ..exceptions import CannotRenameTarget
 
 @handle_exceptions
 def create_target(params):
@@ -13,16 +13,16 @@ def create_target(params):
     This API function creates a new target object in the database.
 
     name (required, unique): The name given to the target. <str>
-    mac_addrs (required, unique): The MAC addresses used to identify the target. <[str, str]>
+    uuid (required, unique): The unique identifier of the target. <str>
     facts (optional): A dictionary of key,value pairs to store for the target. <dict>
     """
     name = params['name']
-    mac_addrs = params['mac_addrs']
+    uuid = params['uuid']
     facts = params.get('facts', {})
 
     target = Target(
         name=name,
-        mac_addrs=mac_addrs,
+        uuid=uuid,
         facts=facts
     )
     target.save(force_insert=True)
@@ -43,7 +43,7 @@ def get_target(params):
     include_groups (optional): Should groups be included, default: False. <bool>
     """
     target = Target.get_by_name(params['name'])
-    return success_response(target=_get_filtered_target(target, params))
+    return success_response(target=get_filtered_target(target, params))
 
 @handle_exceptions
 def rename_target(params):
@@ -110,5 +110,30 @@ def list_targets(params): #pylint: disable=unused-argument
     include_groups (optional): Should groups be included, default: False. <bool>
     """
     return success_response(targets={
-        target.name: _get_filtered_target(target, params) for target in Target.list_targets()
+        target.name: get_filtered_target(target, params) for target in Target.list_targets()
     })
+
+@handle_exceptions
+def migrate_target(params):
+    """
+    This API function will move all sessions from one target, to another. It will then delete the
+    old target and rename the new target after the old one.
+
+    old_target (required): The name of the outdated target.
+    new_target (required): The name of the new target to migrate to.
+    """
+    old_target = Target.get_by_name(params['old_target'])
+    new_target = Target.get_by_name(params['new_target'])
+
+    new_name = old_target.name
+
+    # Delete old target
+    old_target.remove()
+
+    # Rename new target
+    rename_target({
+        'name': new_target.name,
+        'new_name': new_name
+    })
+
+    return success_response()

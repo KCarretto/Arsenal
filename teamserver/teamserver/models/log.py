@@ -2,26 +2,11 @@
     This module defines a python object model for the Log document
     in the backend MongoDB database.
 """
-import time
-
 from mongoengine import Document
 from mongoengine.fields import BooleanField, StringField, FloatField
 
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, COLLECTION_LOGS
-from ..config import LOG_LEVELS, LOG_LEVEL, APPLICATION
-
-def log(level, message, application=APPLICATION):
-    """
-    Log a message for the application at the given level.
-    """
-    if LOG_LEVELS.get(level.upper(), 0) >= LOG_LEVELS.get(LOG_LEVEL, 0):
-        entry = Log(
-            timestamp=time.time(),
-            application=application,
-            level=level.upper(),
-            message=message
-        )
-        entry.save(force_insert=True)
+from ..config import LOG_LEVELS
 
 class Log(Document):
     """
@@ -44,20 +29,31 @@ class Log(Document):
     archived = BooleanField(default=False)
 
     @staticmethod
-    def list_logs(include_archived=False, application=None, since=0):
+    def list_logs(include_archived=False, application=None, since=0, levels=None):
         """
         Return a list of logs.
         Optionally include archived logs.
         Optionally filter by application.
-        Optionally filter by a timestamp
+        Optionally filter by a timestamp.
+        Optionally filter by log level.
         """
+        if levels is None:
+            levels = LOG_LEVELS
+
         if application is not None:
             if include_archived:
-                return Log.objects(application=application, timestamp__gte=since) # pylint: disable=no-member
-            return Log.objects(application=application, archived=False, timestamp__gte=since) # pylint: disable=no-member
+                return Log.objects( # pylint: disable=no-member
+                    application=application,
+                    timestamp__gte=since,
+                    level__in=levels)
+            return Log.objects( # pylint: disable=no-member
+                application=application,
+                archived=False,
+                timestamp__gte=since,
+                level__in=levels)
         elif include_archived:
-            return Log.objects(timestamp__gte=since) # pylint: disable=no-member
-        return Log.objects(archived=False, timestamp__gte=since) # pylint: disable=no-member
+            return Log.objects(timestamp__gte=since, level__in=levels) # pylint: disable=no-member
+        return Log.objects(archived=False, timestamp__gte=since, level__in=levels) # pylint: disable=no-member
 
     @property
     def document(self):

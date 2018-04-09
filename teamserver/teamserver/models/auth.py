@@ -8,8 +8,11 @@
 """
 from mongoengine import Document
 from mongoengine.fields import ListField, StringField, BooleanField
+
 import bcrypt
-from ..exceptions import InvalidCredentials #, PermissionDenied
+
+from .webhook import Webhook
+from ..exceptions import InvalidCredentials, RoleException
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, API_KEY_SALT
 from ..config import COLLECTION_USERS, COLLECTION_ROLES, COLLECTION_APIKEYS
 
@@ -68,7 +71,8 @@ class Role(Document):
         if user.username not in self.users: #pylint: disable=unsupported-membership-test
             self.users.append(user.username) # pylint: disable=no-member
             self.save()
-        # TODO: Raise exception
+        else:
+            raise RoleException('User is already a member of this role.')
 
     def remove_member(self, username):
         """
@@ -77,7 +81,8 @@ class Role(Document):
         if username in self.users: #pylint: disable=unsupported-membership-test
             self.users.remove(username) #pylint: disable=no-member
             self.save()
-        # TODO: Raise exception if user not in list
+        else:
+            raise RoleException('User is not a member of this role.')
 
     def remove(self):
         """
@@ -189,6 +194,13 @@ class User(Document):
         """
         return APIKey.objects(owner=self.username) # pylint: disable=no-member
 
+    @property
+    def webhooks(self):
+        """
+        Return a list of all webhooks owned by this user.
+        """
+        return Webhook.list_hooks(self.username)
+
     def document(self, include_roles=False, include_api_calls=True):
         """
         This property filters and returns the JSON information for a queried user.
@@ -265,4 +277,8 @@ class User(Document):
         """
         for api_key in self.api_keys:
             api_key.remove()
+
+        for webhook in self.webhooks:
+            webhook.remove()
+
         self.delete()

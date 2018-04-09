@@ -1,17 +1,24 @@
 """
     This file describes the various configuration options available for tweaking.
 """
+import os
+
+# CELERY SETTINGS
+CELERY_MAIN_NAME = 'arsenal'
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://localhost:5672')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'amqp://localhost:5672')
 
 # DATABASE CONNECTION SETTINGS
-DB_NAME = 'arsenal_sample'
-DB_HOST = 'localhost'
-DB_PORT = 27017
+DB_NAME = os.environ.get('DB_NAME', 'arsenal_sample')
+DB_HOST = os.environ.get('DB_HOST', 'localhost')
+DB_PORT = int(os.environ.get('DB_PORT', 27017))
 DB_USER = None
 DB_PASS = None
 
 # DATABASE DOCUMENT SETTINGS
 MAX_STR_LEN = 100
 MAX_BIGSTR_LEN = 10000
+MAX_RESULTS = 500
 
 # DATABASE COLLECTION SETTINGS
 COLLECTION_ACTIONS = 'actions'
@@ -25,6 +32,7 @@ COLLECTION_AGENTS = 'agents'
 COLLECTION_USERS = 'users'
 COLLECTION_ROLES = 'roles'
 COLLECTION_APIKEYS = 'api_keys'
+COLLECTION_WEBHOOKS = 'webhooks'
 
 # LOG SETTINGS
 APPLICATION = 'teamserver-internal'
@@ -47,6 +55,7 @@ DEFAULT_SUBSET = 'all'
 # SESSION SETTINGS
 SESSION_CHECK_THRESHOLD = 5
 SESSION_CHECK_MODIFIER = 1.5
+SESSION_ARCHIVE_MODIFIER = 2
 SESSION_STATUSES = {
     'active': 'active',
     'missing': 'missing',
@@ -71,6 +80,7 @@ GROUP_ACTION_STATUSES = {
     'in progress': 'in progress',
     'mixed success': 'mixed success',
     'success': 'success',
+    'stale': 'stale',
     'failed': 'failed',
 }
 
@@ -87,4 +97,8 @@ ACTION_TYPES = {
 }
 
 # AUTH SETTINGS
-API_KEY_SALT = b'$2b$12$26F6CL6.zeSwMU610RNiau'
+API_KEY_SALT = os.environ.get('API_KEY_SALT', b'$2b$12$26F6CL6.zeSwMU610RNiau')
+
+# WEBHOOK SETTINGS
+CONNECT_TIMEOUT = 10.0
+READ_TIMEOUT = 30.0

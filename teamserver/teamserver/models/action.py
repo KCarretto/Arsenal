@@ -16,7 +16,7 @@ from ..exceptions import CannotCancelAction, CannotAssignAction
 from ..exceptions import ActionSyntaxError, ActionUnboundSession
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, ACTION_STATUSES, SESSION_STATUSES
 from ..config import COLLECTION_ACTIONS, ACTION_STALE_THRESHOLD
-from ..config import ACTION_TYPES, DEFAULT_SUBSET
+from ..config import ACTION_TYPES, DEFAULT_SUBSET, MAX_RESULTS
 
 class Response(EmbeddedDocument):
     """
@@ -85,6 +85,8 @@ class Action(DynamicDocument):
     response = EmbeddedDocumentField(Response)
     cancelled = BooleanField(default=False)
 
+    owner = StringField(max_length=MAX_STR_LEN)
+
     @staticmethod
     def get_by_id(action_id):
         """
@@ -114,11 +116,25 @@ class Action(DynamicDocument):
         return actions
 
     @staticmethod
-    def list_actions():
+    def list_actions(**kwargs):
         """
         This method queries for all action objects.
         """
-        return Action.objects() #pylint: disable=no-member
+        target_name = kwargs.get('target_name')
+        owner = kwargs.get('owner')
+        limit = kwargs.get('limit', MAX_RESULTS)
+        offset = kwargs.get('offset', 0)
+        if owner and target_name:
+            return Action.objects( #pylint: disable=no-member
+                owner=owner,
+                target_name=target_name)[offset:limit]
+        elif owner:
+            return Action.objects( #pylint: disable=no-member
+                owner=owner)[offset:limit]
+        elif target_name:
+            return Action.objects( #pylint: disable=no-member
+                target_name=target_name)[offset:limit]
+        return Action.objects[offset:limit] # pylint: disable=no-member
 
     @staticmethod
     def parse_action_string(action_string):
@@ -427,6 +443,7 @@ class Action(DynamicDocument):
         doc['queue_time'] = self.queue_time
         doc['sent_time'] = self.sent_time
         doc['complete_time'] = self.complete_time
+        doc['owner'] = self.owner
         if self.response:
             doc['response'] = self.response.document
         return doc
@@ -436,8 +453,6 @@ class Action(DynamicDocument):
         This function will assign the action to the given session_id.
         It does not attempt to lookup the session.
         """
-        # TODO: Generate Event
-
         if self.bound_session_id and session_id != self.bound_session_id:
             raise CannotAssignAction(
                 'Action cannot be assigned to session, because it is bound to another')
@@ -451,7 +466,6 @@ class Action(DynamicDocument):
         This function will update the action object with a response object,
         and set appropriate timestamps.
         """
-        # TODO: Generate Event
         self.response = response
         self.complete_time = time.time()
         self.save()

@@ -5,9 +5,9 @@ from uuid import uuid4
 
 import time
 
-from .utils import success_response
-from ..models import Action, Target, log
-from ..exceptions import handle_exceptions, CannotBindAction
+from ..utils import get_context, success_response, handle_exceptions, log
+from ..models import Action, Target
+from ..exceptions import CannotBindAction
 
 @handle_exceptions
 def create_action(params, commit=True):
@@ -19,6 +19,15 @@ def create_action(params, commit=True):
     bound_session_id (optional): This will restrict the action to only be retrieved
                                  by a specific session. <str>
     """
+    username = 'No owner'
+
+    try:
+        user, _, _ = get_context(params)
+        if user:
+            username = user.username
+    except KeyError:
+        pass
+
     target_name = params['target_name']
     action_string = params['action_string']
     bound_session_id = params.get('bound_session_id')
@@ -36,7 +45,8 @@ def create_action(params, commit=True):
         action_string=action_string,
         action_type=parsed_action['action_type'],
         bound_session_id=bound_session_id,
-        queue_time=time.time()
+        queue_time=time.time(),
+        owner=username,
     )
 
     action.update_fields(parsed_action)
@@ -81,6 +91,39 @@ def list_actions(params): #pylint: disable=unused-argument
     This API function will return a list of action documents.
     It is highly recommended to avoid using this function, as it
     can be very expensive.
+
+    Optionally filter by owner and target.
+
+    owner (optional): Only display actions owned by this user.
+    target_name (optional): Only display actions for given target.
+    limit (optional): Optionally limit how many values may be returned.
+    offset (optional): The position to start listing from.
     """
-    actions = Action.list_actions()
+    actions = Action.list_actions(
+        owner=params.get('owner'),
+        target_name=params.get('target_name'),
+        limit=params.get('limit'),
+        offset=params.get('offset', 0))
+
     return success_response(actions={action.action_id: action.document for action in actions})
+
+@handle_exceptions
+def duplicate_action(params):
+    """
+    This API function is used to queue an identical action to the given action_id.
+
+    Args:
+        action_id: The unique identifier of the action to clone.
+    """
+    action = Action.get_by_id(params['action_id'])
+
+    local_params = {
+        'arsenal_auth_object': params['arsenal_auth_object'],
+        'target_name': action.target_name,
+        'action_string': action.action_string,
+    }
+
+    if action.bound_session_id:
+        local_params['bound_session_id'] = action.bound_session_id
+
+    return create_action(local_params)

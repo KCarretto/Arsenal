@@ -5,7 +5,7 @@
 import time
 
 from mongoengine import Document
-from mongoengine.fields import StringField, DictField, FloatField, ListField
+from mongoengine.fields import StringField, DictField, FloatField, ListField, BooleanField
 
 from ..config import MAX_STR_LEN
 from ..config import COLLECTION_SESSIONS, COLLECTION_SESSION_HISTORIES
@@ -90,6 +90,8 @@ class Session(Document):
 
     agent_version = StringField(null=True, max_length=MAX_STR_LEN)
 
+    archived = BooleanField(required=False, null=False, default=False)
+
     @staticmethod
     def get_by_id(session_id):
         """
@@ -102,7 +104,7 @@ class Session(Document):
         """
         This method queries for all session objects.
         """
-        return Session.objects() #pylint: disable=no-member
+        return Session.objects(archived=False) #pylint: disable=no-member
 
     @property
     def config(self):
@@ -173,7 +175,17 @@ class Session(Document):
     def update_timestamp(self, new_timestamp):
         """
         This function will update a session's timestamp, and it's history document.
+        It will also ensure that the session is unarchived.
         """
         self.timestamp = new_timestamp
         self.history.add_checkin(new_timestamp)
+        self.archived = False
+        self.save()
+
+    def archive(self):
+        """
+        Archive a target. This will prevent it from being discovered by lists
+        and from being in target documents.
+        """
+        self.archived = True
         self.save()

@@ -67,47 +67,23 @@ class TargetModelTest(BaseTest):
             target2 = Database.create_target(self.TEST_NAME)
             self.assertEqual(target1.name, target2.name)
 
-    def test_create_dup_macs_fail(self):
+    def test_create_dup_uuid_fail(self):
         """
-        This test will attempt to create targets with the same mac_addrs,
+        This test will attempt to create targets with the same uuids,
         and it will fail as mongo should throw a not unique exception.
         """
 
-        # Single element, same order
+        # basic test
         with self.assertRaises(NotUniqueError):
-            target1 = Database.create_target(None, ['AA:BB:CC:DD:EE:FF'])
-            target2 = Database.create_target(None, ['AA:BB:CC:DD:EE:FF'])
-            self.assertEqual(target1.mac_addrs, target2.mac_addrs)
+            target1 = Database.create_target(None, 'AA:BB:CC:DD:EE:FF')
+            target2 = Database.create_target(None, 'AA:BB:CC:DD:EE:FF')
+            self.assertEqual(target1.uuid, target2.uuid)
 
-        # Multi element, same order
+        # different encoding
         with self.assertRaises(NotUniqueError):
-            target1 = Database.create_target(None, [
-                'AA:BB:CC:DD:EE:FF',
-                'AA:BB:CC:DD:EE:AA'])
-            target2 = Database.create_target(None, [
-                'AA:BB:CC:DD:EE:FF',
-                'AA:BB:CC:DD:EE:AA'])
-            self.assertEqual(target1.mac_addrs, target2.mac_addrs)
-
-        # Multi element, different order
-        with self.assertRaises(NotUniqueError):
-            target1 = Database.create_target(None, [
-                'AA:BB:CC:DD:EE:FF',
-                'AA:BB:CC:DD:EE:AA'])
-            target2 = Database.create_target(None, [
-                'AA:BB:CC:DD:EE:AA',
-                'AA:BB:CC:DD:EE:FF'])
-            self.assertEqual(target1.mac_addrs, target2.mac_addrs)
-
-        # Multi element, different order, different encoding
-        with self.assertRaises(NotUniqueError):
-            target1 = Database.create_target(None, [
-                'AA:BB:CC:DD:EE:FF'.encode('utf-8'),
-                'AA:BB:CC:DD:EE:AA'])
-            target2 = Database.create_target(None, [
-                'AA:BB:CC:DD:EE:AA',
-                'AA:BB:CC:DD:EE:FF'.encode('ascii')])
-            self.assertEqual(target1.mac_addrs, target2.mac_addrs)
+            target1 = Database.create_target(None, 'AA:BB:CC:DD:EE:FF'.encode('utf-8'))
+            target2 = Database.create_target(None, 'AA:BB:CC:DD:EE:FF'.encode('ascii'))
+            self.assertEqual(target1.uuid, target2.uuid)
 
     def test_find_no_name_fail(self):
         """

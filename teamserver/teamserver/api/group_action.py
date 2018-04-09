@@ -2,10 +2,10 @@
     This module contains all 'GroupAction' API functions.
 """
 from uuid import uuid4
-from .utils import success_response
+
+from ..utils import success_response, handle_exceptions, log, get_context
 from .action import create_action
-from ..models import GroupAction, Group, log
-from ..exceptions import handle_exceptions
+from ..models import GroupAction, Group
 
 @handle_exceptions
 def create_group_action(params):
@@ -17,13 +17,21 @@ def create_group_action(params):
     group_name (required): The name of the group to create an action for.
     action_string (required): The action to perform on the targets.
     """
+    username = 'No owner'
+
+    try:
+        user, _, _ = get_context(params)
+        if user:
+            username = user.username
+    except KeyError:
+        pass
 
     action_string = params['action_string']
     group_name = params['group_name']
     actions = []
 
     # Iterate through all desired targets
-    for target_name in Group.get_by_name(group_name).member_names:
+    for target_name in Group.get_by_name(group_name).members:
         # Invoke the API to create action objects without commiting to the database.
         action = create_action({
             'target_name': target_name,
@@ -42,7 +50,8 @@ def create_group_action(params):
     group_action = GroupAction(
         group_action_id=str(uuid4()),
         action_string=action_string,
-        action_ids=action_ids
+        action_ids=action_ids,
+        owner=username,
     )
     group_action.save(force_insert=True)
     log(

@@ -30,6 +30,8 @@ class GroupAction(Document):
         StringField(required=True, null=False, max_length=MAX_STR_LEN), required=True, null=False)
     cancelled = BooleanField(default=False)
 
+    owner = StringField(max_length=MAX_STR_LEN)
+
     @staticmethod
     def list_group_actions():
         """
@@ -64,10 +66,11 @@ class GroupAction(Document):
             'action_string': self.action_string,
             'status': self.get_status(actions),
             'action_ids': self.action_ids,
-            'actions': [action.document for action in actions]
+            'actions': [action.document for action in actions],
+            'owner': self.owner,
         }
 
-    def get_status(self, actions=None):
+    def get_status(self, actions=None): # pylint: disable=too-many-return-statements
         """
         This property determines the status of the group action, based on all of
         it's included actions. If no included action list is passed to this function,
@@ -81,6 +84,7 @@ class GroupAction(Document):
         queued = 0
         sent = 0
         complete = 0
+        stale = 0
 
         for action in actions:
             status = action.status
@@ -90,6 +94,8 @@ class GroupAction(Document):
                 sent += 1
             if status == ACTION_STATUSES.get('complete', 'complete'):
                 complete += 1
+            if status == ACTION_STATUSES.get('stale', 'stale'):
+                stale += 1
 
         if complete == len(actions):
             return GROUP_ACTION_STATUSES.get('success', 'success')
@@ -97,11 +103,14 @@ class GroupAction(Document):
         if sent > 0:
             return GROUP_ACTION_STATUSES.get('in progress', 'in progress')
 
-        if queued > 0:
-            return GROUP_ACTION_STATUSES.get('queued', 'queued')
-
         if complete > 0:
             return GROUP_ACTION_STATUSES.get('mixed success', 'mixed success')
+
+        if stale > 0:
+            return GROUP_ACTION_STATUSES.get('stale', 'stale')
+
+        if queued > 0:
+            return GROUP_ACTION_STATUSES.get('queued', 'queued')
 
         return GROUP_ACTION_STATUSES.get('failed', 'failed')
 

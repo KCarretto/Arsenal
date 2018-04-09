@@ -9,14 +9,14 @@ import time
 
 try:
     from teamserver.models import Action, Response, GroupAction, Log
-    from teamserver.models import Session, SessionHistory, Target, Group
+    from teamserver.models import Session, SessionHistory, Target, Group, GroupAutomemberRule
     from teamserver.config import SESSION_CHECK_THRESHOLD
 except ModuleNotFoundError:
     from os.path import abspath, dirname
     # Configure path to start at teamserver module
     sys.path.append(abspath(dirname(dirname(dirname(abspath(__file__))))))
     from teamserver.models import Action, Response, GroupAction, Log
-    from teamserver.models import Session, SessionHistory, Target, Group
+    from teamserver.models import Session, SessionHistory, Target, Group, GroupAutomemberRule
     from teamserver.config import SESSION_CHECK_THRESHOLD
 
 class Database(object):
@@ -28,12 +28,13 @@ class Database(object):
     #           Create Methods          #
     #####################################
     @staticmethod
-    def create_action(
+    def create_action( # pylint: disable=too-many-arguments
             target_name=None,
             action_string=None,
             action_type=None,
             response=None,
-            bound_session_id=None):
+            bound_session_id=None,
+            owner=None):
         """
         Create an action object in the database.
         """
@@ -50,7 +51,8 @@ class Database(object):
             target_name=target_name,
             bound_session_id=bound_session_id if bound_session_id is not None else '',
             queue_time=time.time(),
-            response=response
+            response=response,
+            owner=owner if owner else str(uuid4()),
         )
         parsed_action = Action.parse_action_string(action_string)
         action.update_fields(parsed_action)
@@ -60,7 +62,8 @@ class Database(object):
     @staticmethod
     def create_group_action(
             group_name=None,
-            action_string=None):
+            action_string=None,
+            owner=None):
         """
         Create a group action object in the database.
         """
@@ -78,7 +81,7 @@ class Database(object):
         group = Database.get_group(group_name)
         actions = [
             Database.create_action(target, action_string).action_id
-            for target in group.member_names
+            for target in group.members
         ]
 
         action_string = action_string if action_string is not None else 'exec echo test'
@@ -86,7 +89,8 @@ class Database(object):
         group_action = GroupAction(
             group_action_id=str(uuid4()),
             action_string=action_string,
-            action_ids=actions
+            action_ids=actions,
+            owner=owner if owner else str(uuid4()),
         )
         group_action.save(force_insert=True)
         return group_action
@@ -126,6 +130,20 @@ class Database(object):
         group.save(force_insert=True)
 
         return group
+
+    @staticmethod
+    def create_group_rule(
+            attribute,
+            regex,
+            rule_id=None):
+        """
+        Create an automember rule.
+        """
+        return GroupAutomemberRule(
+            attribute=attribute,
+            regex=regex,
+            rule_id=rule_id if rule_id else str(uuid4()),
+        )
 
     @staticmethod
     def create_session( # pylint: disable=too-many-arguments
@@ -180,7 +198,7 @@ class Database(object):
     @staticmethod
     def create_target(
             name=None,
-            mac_addrs=None,
+            uuid=None,
             facts=None,
             credentials=None):
         """
@@ -203,10 +221,7 @@ class Database(object):
                     }
                 ]
             },
-            mac_addrs=mac_addrs if mac_addrs is not None else [
-                'AA:BB:CC:DD:EE:FF',
-                str(uuid4())[0:17]
-                ],
+            uuid=uuid if uuid else str(uuid4()),
             credentials=credentials
         )
         target.save(force_insert=True)

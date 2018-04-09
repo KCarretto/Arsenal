@@ -3,15 +3,17 @@
     in the backend MongoDB database.
 """
 
+import time
+
 from mongoengine import Document, DynamicEmbeddedDocument
-from mongoengine.fields import StringField, DictField, ListField
+from mongoengine.fields import StringField, DictField
 from mongoengine.fields import EmbeddedDocumentListField
 
 from .session import Session
 
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN
 from ..config import COLLECTION_TARGETS
-from ..config import SESSION_STATUSES
+from ..config import SESSION_STATUSES, SESSION_ARCHIVE_MODIFIER
 
 class Credential(DynamicEmbeddedDocument):
     """
@@ -40,7 +42,7 @@ class Target(Document):
                 'unique': True
             },
             {
-                'fields': ['mac_addrs'],
+                'fields': ['uuid'],
                 'unique': True
             }
         ]
@@ -52,11 +54,13 @@ class Target(Document):
         max_length=MAX_STR_LEN,
         unique=True)
 
-    mac_addrs = ListField(
-        StringField(required=True, null=False, max_length=20),
-        required=True,
-        null=False,
-        unique=True)
+    #mac_addrs = ListField(
+    #    StringField(required=True, null=False, max_length=20),
+    #    required=True,
+    #    null=False,
+    #    unique=True)
+
+    uuid = StringField(required=True, null=False, max_length=MAX_BIGSTR_LEN, unique=True)
 
     facts = DictField(null=False)
 
@@ -69,14 +73,14 @@ class Target(Document):
         """
         This method queries for the target object matching the name provided.
         """
-        return Target.objects.get(name=name) #pylint: disable=no-member
+        return Target.objects.get(name__iexact=name) #pylint: disable=no-member
 
     @staticmethod
-    def get_by_macs(mac_addrs):
+    def get_by_uuid(uuid):
         """
         This method queries for the target object matching the mac_addrs provided.
         """
-        return Target.objects.get(mac_addrs=mac_addrs) #pylint: disable=no-member
+        return Target.objects.get(uuid__iexact=uuid) #pylint: disable=no-member
 
     @staticmethod
     def list_targets():
@@ -89,9 +93,17 @@ class Target(Document):
     def sessions(self):
         """
         This property returns all session objects that are
-        associated with this target.
+        associated with this target. Archive any sessions that have
+        not been seen in a long period of time.
         """
-        return Session.objects(target_name=self.name) #pylint: disable=no-member
+        sessions = list(Session.objects(target_name=self.name, archived=False)) #pylint: disable=no-member
+        for session in sessions:
+            threshold = session.timestamp + (session.interval + session.interval_delta)
+            threshold *= SESSION_ARCHIVE_MODIFIER
+            if time.time() > threshold:
+                session.archive()
+                sessions.remove(session)
+        return sessions
 
     @property
     def status(self):
@@ -135,7 +147,7 @@ class Target(Document):
         """
         doc = {
             'name': self.name,
-            'mac_addrs': self.mac_addrs,
+            'uuid': self.uuid,
         }
         if include_status:
             doc['status'] = self.status
@@ -157,3 +169,8 @@ class Target(Document):
             self.facts[key] = value #pylint: disable=unsupported-assignment-operation
         self.save()
 
+    def remove(self):
+        """
+        Remove this document from the database, and perform any related cleanup.
+        """
+        self.delete()

@@ -26,8 +26,7 @@ class SessionAPITest(BaseTest):
         This test will pass if the session is created.
         """
         target = Database.create_target()
-        data = APIClient.create_session(self.client, target.mac_addrs)
-        #TODO: Add other vars and check
+        data = APIClient.create_session(self.client, target.uuid)
 
         session_id = data['session_id']
         self.assertEqual(False, data['error'])

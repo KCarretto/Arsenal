@@ -4,10 +4,11 @@
 from uuid import uuid4
 import bcrypt
 
-from ..exceptions import handle_exceptions, PermissionDenied
+from ..utils import handle_exceptions, success_response, get_context
+from ..exceptions import PermissionDenied
 from ..models import User, APIKey, Role
 from ..config import API_KEY_SALT
-from .utils import success_response, _get_context
+
 @handle_exceptions
 def create_user(params):
     """
@@ -42,7 +43,7 @@ def create_api_key(params):
     user_context (optional, requires administrator)
     """
     # Retrieve the current user object (Allowing for administrator overrides)
-    user, allowed_methods, _ = _get_context(params)
+    user, allowed_methods, _ = get_context(params)
 
     # Set the owner of the new API key to be the current user
     owner = user.username
@@ -113,7 +114,7 @@ def update_user_password(params):
     user_context (optional, requires administrator): An administrator may specify which user
                                                     password to change.
     """
-    user, _, administrator = _get_context(params)
+    user, _, administrator = get_context(params)
 
     # Allow administrator to change (non-admin user) password without current
     if administrator and not user.administrator:
@@ -200,7 +201,7 @@ def get_current_context(params):
     """
     Return the currently authenticated username.
     """
-    user, allowed_methods, _ = _get_context(params)
+    user, allowed_methods, _ = get_context(params)
     return success_response(
         user={
             'username': user.username,
@@ -231,7 +232,7 @@ def list_api_keys(params):
 
     user_context (optional, requires administrator)
     """
-    user, _, _ = _get_context(params)
+    user, _, _ = get_context(params)
 
     return success_response(api_keys=[key.document for key in APIKey.list_keys(user.username)])
 
@@ -277,7 +278,7 @@ def revoke_api_key(params):
 
     user_context (optional, requires administrator)
     """
-    user, _, administrator = _get_context(params)
+    user, _, administrator = get_context(params)
 
     api_key = APIKey.get_key(params['api_key'])
 
