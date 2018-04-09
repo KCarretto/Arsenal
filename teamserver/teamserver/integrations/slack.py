@@ -74,6 +74,9 @@ class SlackIntegration(Integration):
         """
         Notify slack of an event.
         """
+        if not self.config.get('enabled', False):
+            return
+
         handled_events = {
             'logged_error': self.handle_error,
             'action_complete': self.handle_action,
@@ -81,4 +84,3 @@ class SlackIntegration(Integration):
         method = handled_events.get('event')
         if method and callable(method):
             method(event_data)
-

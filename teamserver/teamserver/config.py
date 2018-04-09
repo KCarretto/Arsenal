@@ -119,6 +119,7 @@ def read_api_key(api_key_file):
 
 INTEGRATIONS = {
     'SLACK_CONFIG': {
+        'enabled': True,
         'API_TOKEN': os.environ.get('SLACK_API_TOKEN', read_api_key('.slack_api')),
         'TIMEOUT': 10,
 
