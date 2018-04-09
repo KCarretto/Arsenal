@@ -121,7 +121,7 @@ def create_api_key(username, allowed_api_calls):
             str(uuid4()),
             )
     key = APIKey(
-        key=bcrypt.hashpw(original_key, API_KEY_SALT),
+        key=bcrypt.hashpw(original_key.encode('utf-8'), API_KEY_SALT),
         owner=username,
         allowed_api_calls=allowed_api_calls
     )

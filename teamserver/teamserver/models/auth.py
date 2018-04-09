@@ -127,7 +127,7 @@ class APIKey(Document):
         """
         Query for a key from the database.
         """
-        return APIKey.objects.get(key=bcrypt.hashpw(key, API_KEY_SALT)) # pylint: disable=no-member
+        return APIKey.objects.get(key=bcrypt.hashpw(key.encode('utf-8'), API_KEY_SALT)) # pylint: disable=no-member
 
     @property
     def document(self):
@@ -227,7 +227,7 @@ class User(Document):
         """
         Returns a hash of a password.
         """
-        return bcrypt.hashpw(password, bcrypt.gensalt())
+        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
     @property
     def allowed_api_calls(self):
@@ -258,7 +258,7 @@ class User(Document):
         Determines if a user is authenticated given a password.
         Raises an InvalidCredentials exception if the password was incorrect.
         """
-        if not bcrypt.checkpw(password, self.password):
+        if not bcrypt.checkpw(password.encode('utf-8'), self.password):
             raise InvalidCredentials('Password incorrect.')
         return True
 
