@@ -6,6 +6,7 @@ Babel==2.5.3
 backcall==0.1.0
 bcrypt==3.1.4
 billiard==3.5.0.3
+boto==2.48.0
 celery==4.1.0
 certifi==2018.1.18
 cffi==1.11.5
@@ -56,6 +57,7 @@ requests==2.18.4
 sentinels==1.0.0
 simplegeneric==0.8.1
 six==1.11.0
+slackclient==1.2.1
 snowballstemmer==1.2.1
 tornado==4.5.3
 traitlets==4.3.2
@@ -63,6 +65,7 @@ urllib3==1.22
 uWSGI==2.0.17
 vine==1.1.4
 wcwidth==0.1.7
+websocket-client==0.47.0
 Werkzeug==0.14.1
 wrapt==1.10.11
 WTForms==2.1
