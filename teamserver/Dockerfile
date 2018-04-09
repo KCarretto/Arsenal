@@ -15,6 +15,7 @@ COPY requirements /opt/arsenal/requirements
 COPY bin /opt/arsenal/bin
 COPY run.py /opt/arsenal/run.py
 COPY docker/teamserver/uwsgi.ini /opt/arsenal/uwsgi.ini
+COPY docker/teamserver/slack_api /opt/arsenal/teamserver/.slack_api
 
 # Install requirements
 RUN pip3 install --upgrade pip
