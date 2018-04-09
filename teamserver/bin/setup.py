@@ -11,7 +11,7 @@ import bcrypt
 
 sys.path.insert(0, abspath(dirname(abspath(dirname(__file__)))))
 from teamserver.models import User, Role, APIKey # pylint: disable-all
-from teamserver.config import DB_NAME, DB_HOST, DB_PORT, API_KEY_SALT # pylint: disable-all
+from teamserver.config import DB_NAME, DB_HOST, DB_PORT, API_KEY_SALT, DB_USER, DB_PASS # pylint: disable-all
 
 CONFIG = {
     'users': {
@@ -132,8 +132,11 @@ def main():
     """
     The main entry point of the program.
     """
-    connect(DB_NAME, host=DB_HOST, port=DB_PORT)
-
+    print("Connecting to database {}:{}".format(DB_HOST, DB_PORT))
+    if DB_USER and DB_PASS:
+        connect(DB_NAME, host=DB_HOST, port=DB_PORT, username=DB_USER, password=DB_PASS)
+    else:
+        connect(DB_NAME, host=DB_HOST, port=DB_PORT)
 
     print('Generating authentication schema...')
     for username, password in CONFIG['users'].items():
