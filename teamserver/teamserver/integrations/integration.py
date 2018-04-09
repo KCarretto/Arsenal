@@ -3,7 +3,7 @@
 """
 from abc import ABCMeta, abstractmethod
 
-class Integration(metaclass=ABCMeta):
+class Integration(metaclass=ABCMeta): # pylint: disable=too-few-public-methods
     """
     Provide an abstract class for integrations to inherit from.
     """
