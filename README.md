@@ -8,6 +8,7 @@ Arsenal is a framework designed to be a back-end for Red Team command and contro
 * Integrates with custom implants and C2 servers with ease
 * Easily group target machines and interact with all of them at once
 * 3rd Party applications can integrate using outgoing webhooks (i.e. Slack Integration)
+* Register agents and prevent them from receiving unsupported commands
 * Protected by authentication and custom RBAC implementation to restrict what users have access to
 * Easy to use console with autocomplete, history searching, and more
 * Enable action attribution, know who on your team did what and when
