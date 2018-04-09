@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  arsenal-teamserver:
+  teamserver:
     build: teamserver/
     ports:
       - "80:80"
@@ -13,11 +13,11 @@ services:
       - DB_PORT=27017
       - API_KEY_SALT=thebestsaltthebestsalt
 
-  arsenal-redis:
+  redis:
     image: redis
 
-  arsenal-mongo:
+  mongo:
     image: mongo
 
-  arsenal-rabbitmq:
+  rabbitmq:
     image: rabbitmq
