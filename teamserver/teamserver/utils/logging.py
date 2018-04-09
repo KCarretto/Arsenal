@@ -4,8 +4,6 @@ This module contains logging functionality for the teamserver.
 import time
 from flask import current_app
 
-import teamserver.events.worker as events
-
 from ..config import LOG_LEVEL, LOG_LEVELS, APPLICATION
 from ..models import Log
 
@@ -26,7 +24,8 @@ def log(level, message, application=APPLICATION):
 
         if message_level >= LOG_LEVELS.get('CRIT', 3):
             if not current_app.config.get('DISABLE_EVENTS', False):
-                events.trigger_event.delay(
+                from ..events import trigger_event
+                trigger_event.delay(
                     event='logged_error',
                     log=entry.document
                 )

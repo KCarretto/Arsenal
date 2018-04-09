@@ -6,12 +6,11 @@ import requests
 from celery import Celery
 from mongoengine import connect
 
+from teamserver.integrations import Integration, SlackIntegration
+from teamserver.models import Webhook
 from teamserver.config import CELERY_MAIN_NAME, CELERY_RESULT_BACKEND, CELERY_BROKER_URL
 from teamserver.config import DB_NAME, DB_HOST, DB_PORT
 from teamserver.config import CONNECT_TIMEOUT, READ_TIMEOUT, INTEGRATIONS
-from teamserver.models import Webhook
-from teamserver.utils import log
-from teamserver.integrations import Integration, SlackIntegration
 
 
 app = Celery( # pylint: disable=invalid-name
@@ -57,14 +56,12 @@ def trigger_event(**kwargs):
     # Trigger Webhooks
     subscribers = Webhook.get_subscribers(event)
     if subscribers and event:
-        log('INFO', 'Triggering event ({}).'.format(event))
         for subscriber in subscribers:
             notify_subscriber.delay(
                 post_url=subscriber.post_url,
                 data=kwargs
             )
     elif event:
-        log('INFO', 'Triggered event ({}) had no subscribers.'.format(event))
 
         # Notify Integrations
         notify_integration(integration=SLACK, event_data=kwargs)
