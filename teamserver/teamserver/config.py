@@ -123,7 +123,7 @@ INTEGRATIONS = {
         'API_TOKEN': os.environ.get('SLACK_API_TOKEN', read_api_key('.slack_api')),
         'TIMEOUT': 10,
 
-        'ERROR_CHANNEL': 'arsenal-notifications',
-        'ACTION_CHANNEL': 'arsenal-notifications',
+        'ERROR_CHANNEL': 'notifications',
+        'ACTION_CHANNEL': 'notifications',
     }
 }

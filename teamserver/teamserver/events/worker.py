@@ -28,6 +28,7 @@ def notify_subscriber(**kwargs):
     """
     Notify a subscriber with the given data.
     """
+    print('Notifying subscriber: {}'.format(kwargs.get('post_url')))
     requests.post(
         kwargs.get('posturl'),
         json=kwargs.get('data'),
@@ -41,6 +42,7 @@ def notify_integration(**kwargs):
     """
     integration = kwargs.get('integration')
     if integration and isinstance(integration, Integration):
+        print('Notifying integration: {}'.format(str(integration)))
         integration.run(
             event_data=kwargs.get('event_data'),
             **kwargs
@@ -52,6 +54,7 @@ def trigger_event(**kwargs):
     Trigger an event, and notify subscribers.
     """
     event = kwargs.get('event')
+    print('Triggering event {}'.format(event))
 
     # Trigger Webhooks
     subscribers = Webhook.get_subscribers(event)

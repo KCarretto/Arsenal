@@ -29,6 +29,12 @@ class SlackIntegration(Integration):
         self.timeout = config.get('TIMEOUT', 10)
         self.client = SlackClient(config.get('API_TOKEN'))
 
+    def __str__(self):
+        """
+        Return the integration name as the string.
+        """
+        return 'slack-integration'
+
     def post_message(self, channel, message):
         """
         Post a message to slack.
