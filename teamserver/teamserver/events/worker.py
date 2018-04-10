@@ -47,7 +47,7 @@ def notify_integration(**kwargs):
     if integration and isinstance(integration, Integration):
         print('Notifying integration: {}'.format(str(integration)))
         integration.run(
-            event_data=kwargs.get('event_data'),
+            event_data=kwargs.get('data'),
             **kwargs
         )
 
@@ -70,5 +70,5 @@ def trigger_event(**kwargs):
     elif event:
 
         # Notify Integrations
-        notify_integration(integration=SLACK, event_data=kwargs)
+        notify_integration(integration=SLACK, data=kwargs)
 
