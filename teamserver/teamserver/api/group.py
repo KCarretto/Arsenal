@@ -80,6 +80,21 @@ def blacklist_group_member(params):
     return success_response()
 
 @handle_exceptions
+def unblacklist_group_member(params):
+    """
+    Remove a target from the blacklist of a group.
+
+    group_name: The name of the group to modify. <str>
+    target_name: The name of the member to remove. <str>
+    """
+    group = Group.get_by_name(params['group_name'])
+    target = Target.get_by_name(params['target_name'])
+
+    group.unblacklist_member(target.name)
+
+    return success_response()
+
+@handle_exceptions
 def delete_group(params):
     """
     Delete a group from the database.

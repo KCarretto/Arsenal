@@ -5,7 +5,7 @@ from mongoengine.errors import DoesNotExist
 
 from ..utils import success_response, get_filtered_target, handle_exceptions
 from ..models import Target, Action, Group
-from ..exceptions import CannotRenameTarget
+from ..exceptions import CannotRenameTarget, MembershipError
 
 @handle_exceptions
 def create_target(params):
@@ -62,22 +62,39 @@ def rename_target(params):
     except DoesNotExist:
         pass
 
+    sessions = []
     for session in target.sessions:
         session.target_name = new_name
-        session.save()
+        sessions.append(session)
 
+    actions = []
     for action in Action.get_target_actions(target.name):
         action.target_name = new_name
-        action.save()
+        actions.append(action)
 
+    groups = []
     for group in Group.get_target_groups(target.name):
-        # TODO: Pull from whitelist, not dynamic members
-        group.remove_member(target.name)
-        group.whitelist_member(new_name)
-        group.save()
+        try:
+            if target.name in group.whitelist_members:
+                group.remove_member(target.name)
+                group.whitelist_member(new_name)
+                groups.append(group)
+            elif target.name in group.blacklist_members:
+                group.unblacklist_member(target.name)
+                group.blacklist_member(new_name)
+                groups.append(group)
+        except MembershipError:
+            pass
 
     target.name = new_name
     target.save()
+
+    for session in sessions:
+        session.save()
+    for action in actions:
+        action.save()
+    for group in groups:
+        group.save()
 
     return success_response()
 

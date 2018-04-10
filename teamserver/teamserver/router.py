@@ -14,7 +14,7 @@ from .api import create_session, get_session, session_check_in
 from .api import update_session_config, list_sessions
 from .api import create_action, get_action, cancel_action, list_actions, duplicate_action
 from .api import create_group_action, get_group_action, cancel_group_action, list_group_actions
-from .api import get_group, create_group, delete_group, list_groups
+from .api import get_group, create_group, delete_group, list_groups, unblacklist_group_member
 from .api import remove_group_member, add_group_member, blacklist_group_member
 from .api import add_group_rule, remove_group_rule, rebuild_group_members
 from .api import create_log, list_logs
@@ -117,6 +117,7 @@ def api_entry(): # pylint: disable=too-many-return-statements
         'AddGroupMember': add_group_member,
         'RemoveGroupMember': remove_group_member,
         'BlacklistGroupMember': blacklist_group_member,
+        'UnblacklistGroupMember': unblacklist_group_member,
         'DeleteGroup': delete_group,
         'ListGroups': list_groups,
         'AddGroupRule': add_group_rule,
