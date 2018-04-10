@@ -2,6 +2,9 @@
     This module integrates the teamserver with slack, and notifies
     a slack channel about events.
 """
+import time
+from datetime import datetime
+
 from slackclient import SlackClient
 
 from .integration import Integration
@@ -29,6 +32,12 @@ class SlackIntegration(Integration):
         self.timeout = config.get('TIMEOUT', 10)
         self.client = SlackClient(config.get('API_TOKEN'))
 
+    def __str__(self):
+        """
+        Return the integration name as the string.
+        """
+        return 'slack-integration'
+
     def post_message(self, channel, message):
         """
         Post a message to slack.
@@ -36,7 +45,7 @@ class SlackIntegration(Integration):
         self.client.api_call(
             'chat.postMessage',
             channel=channel,
-            message=message,
+            text=message,
             timeout=self.timeout,
             as_user=True,
         )
@@ -45,13 +54,17 @@ class SlackIntegration(Integration):
         """
         Handle an 'logged_error' event.
         """
+        entry = event_data.get('log')
+        timestamp = datetime.fromtimestamp(
+            entry.get('timestamp', time.time())).strftime('%Y-%m-%d %H:%M:%S')
+
         self.post_message(
             self.config.get('ERROR_CHANNEL'),
             'ERROR: [{}][{}]\t[{}] {}'.format(
-                str(event_data.get('level')),
-                str(event_data.get('timestamp')),
-                str(event_data.get('application')),
-                str(event_data.get('message')),
+                str(entry.get('level')),
+                str(timestamp),
+                str(entry.get('application')),
+                str(entry.get('message')),
             )
         )
 
@@ -81,6 +94,6 @@ class SlackIntegration(Integration):
             'logged_error': self.handle_error,
             'action_complete': self.handle_action,
         }
-        method = handled_events.get('event')
+        method = handled_events.get(event_data.get('event', ''))
         if method and callable(method):
             method(event_data)

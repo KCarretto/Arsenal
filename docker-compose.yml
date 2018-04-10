@@ -11,6 +11,7 @@ services:
       - DB_NAME=arsenal_sample
       - DB_HOST=arsenal_mongo_1
       - DB_PORT=27017
+      - SLACK_API_TOKEN=None
 
   redis:
     image: redis

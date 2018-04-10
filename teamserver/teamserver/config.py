@@ -7,7 +7,9 @@ import os
 CELERY_MAIN_NAME = 'arsenal'
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://localhost:5672')
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND')
-
+CELERY_BROKER_TRANSPORT = {
+    'region': 'us-west-2'
+}
 # DATABASE CONNECTION SETTINGS
 DB_NAME = os.environ.get('DB_NAME', 'arsenal_sample')
 DB_HOST = os.environ.get('DB_HOST', 'localhost')
@@ -123,7 +125,7 @@ INTEGRATIONS = {
         'API_TOKEN': os.environ.get('SLACK_API_TOKEN', read_api_key('.slack_api')),
         'TIMEOUT': 10,
 
-        'ERROR_CHANNEL': 'arsenal-notifications',
-        'ACTION_CHANNEL': 'arsenal-notifications',
+        'ERROR_CHANNEL': 'notifications',
+        'ACTION_CHANNEL': 'notifications',
     }
 }

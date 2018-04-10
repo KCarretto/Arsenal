@@ -38,7 +38,7 @@ class Log(Document):
         Optionally filter by log level.
         """
         if levels is None:
-            levels = LOG_LEVELS
+            levels = LOG_LEVELS.keys()
 
         if application is not None:
             if include_archived:

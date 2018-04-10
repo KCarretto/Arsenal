@@ -3,7 +3,7 @@ FROM nginx:alpine
 EXPOSE 80
 
 # Install package dependencies
-RUN apk add --update python3 python3-dev gcc make libc-dev libffi-dev linux-headers git
+RUN apk add --update python3 python3-dev gcc curl curl-dev openssl-dev make libc-dev libffi-dev linux-headers git
 
 # Configure nginx
 COPY docker/teamserver/nginx.conf /etc/nginx/nginx.conf
