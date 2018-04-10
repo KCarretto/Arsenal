@@ -4,11 +4,12 @@
     https://github.com/micahjmartin/pwnboard
     Author: Micah Martin
 """
-from .integration import Integration
-import requests
 import json
+import requests
+from .integration import Integration
 
-class PwnboardIntegration(Integration):
+
+class PwnboardIntegration(Integration): # pylint: disable=too-few-public-methods
     """
     Configuration:
         URL: the domain that the pwnboard is living on with protocal
@@ -21,7 +22,7 @@ class PwnboardIntegration(Integration):
         """
         self.config = config
         self.url = config.get("URL", "https://pwnboard.local/generic")
-    
+
     def __str__(self):
         """
         Return the integration name as the string.
@@ -35,30 +36,23 @@ class PwnboardIntegration(Integration):
         # The headers for the callback
         headers = {'Content-Type': 'application/json',
                    'Connection': 'Close'}
-        # Try to get teh agent string
-        try:
-            name = event_data.get("session", {}).get("agent_version")
-        except Exception as E:
-            name = "Arsenal"
-
-
-        try:
-            facts = event_data.get("facts", {})
-            # Stolen from cli.getTarget
-	    ip_addrs = []
-            for iface in facts.get('interfaces', []):
-                for addr in iface.get('ip_addrs', []):
-                    ip_addrs.append(addr)
-            if not ip_addrs:
-                raise Exception("No IP Address to be passed to the pwnboard")
-        except Exception as E:
+        # Try to get the agent string
+        name = event_data.get("session", {}).get("agent_version", "Arsenal")
+        # Get the facts
+        facts = event_data.get("facts", {})
+        # Stolen from cli.getTarget
+        ip_addrs = []
+        for iface in facts.get('interfaces', []):
+            for addr in iface.get('ip_addrs', []):
+                ip_addrs.append(addr)
+        if not ip_addrs:
             # If we dont have an IP, then we have nothing to update
             return False
 
         data = json.dumps({'ips': ip_addrs, 'type': name})
         try:
-            req = requests.post(host, data=data, headers=headers, timeout=3)
+            req = requests.post(self.url, data=data, headers=headers, timeout=3)
             print(req.text)
             return True
-        except Exception as E:
+        except requests.exceptions.RequestException:
             return False
