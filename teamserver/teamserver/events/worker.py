@@ -7,6 +7,7 @@ from celery import Celery
 from mongoengine import connect
 
 from teamserver.integrations import Integration, SlackIntegration
+from teamserver.integrations import PwnboardIntegration
 from teamserver.models import Webhook
 from teamserver.config import CELERY_MAIN_NAME, CELERY_RESULT_BACKEND, CELERY_BROKER_URL
 from teamserver.config import CELERY_BROKER_TRANSPORT
@@ -24,6 +25,8 @@ app = Celery( # pylint: disable=invalid-name
 connect(DB_NAME, host=DB_HOST, port=DB_PORT)
 
 SLACK = SlackIntegration(INTEGRATIONS.get('SLACK_CONFIG', {'enabled': False}))
+PWNBOARD = PwnboardIntegration(INTEGRATIONS.get('PWNBOARD_CONFIG',
+                                                {'enabled': False}))
 
 @app.task
 def notify_subscriber(**kwargs):
@@ -42,7 +45,9 @@ def notify_integration(integration, data):
     Trigger an integration with the given data.
     """
     if integration and isinstance(integration, Integration):
-        integration.run(data)
+        # Check if the integration is enabled
+        if integration.config.get("enabled", False):
+            integration.run(data)
 
 @app.task
 def trigger_event(**kwargs):

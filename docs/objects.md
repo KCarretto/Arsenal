@@ -58,6 +58,7 @@ A Session represents a running instance of an Agent on the Target system.
 | status      | no         | str        | The current status of the Session. See below for details.         |
 | timestamp   | no         | float      | The time of the Session's last check in.                          |
 | config      | no         | dict       | Contains the current configuration information for the Session.   |
+| agent_version | no       | str        | The agent version provided by the agent. May be None.             |
 
 ### Session Statuses
 | **Status** | **Description**                                                 |
