@@ -124,7 +124,7 @@ class Group(Document):
         """
         This function removes a target from the member whitelist.
         """
-        if not target_name in self.whitelist_members: #pylint: disable=unsupported-membership-test
+        if target_name not in self.whitelist_members: #pylint: disable=unsupported-membership-test
             raise MembershipError('Cannot remove member, member is not whitelisted.')
         self.whitelist_members.remove(target_name) #pylint: disable=no-member
         self.build_members()
@@ -136,13 +136,23 @@ class Group(Document):
         """
         try:
             self.remove_member(target_name)
-        except ValueError:
+        except (ValueError, MembershipError):
             pass
 
         if target_name in self.blacklist_members: #pylint: disable=unsupported-membership-test
             raise MembershipError('Member is already blacklisted.')
         self.blacklist_members.append(target_name) #pylint: disable=no-member
         self.build_members()
+
+    def unblacklist_member(self, target_name):
+        """
+        Remove a target from the blacklist.
+        """
+        if target_name not in self.blacklist_members: #pylint: disable=unsupported-membership-test
+            raise MembershipError('Cannot unblacklist member, member is not blacklisted.')
+        self.blacklist_members.remove(target_name) #pylint: disable=no-member
+        self.build_members()
+
 
     def remove(self):
         """
