@@ -6,7 +6,7 @@ import os
 # CELERY SETTINGS
 CELERY_MAIN_NAME = 'arsenal'
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://localhost:5672')
-CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'amqp://localhost:5672')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND')
 
 # DATABASE CONNECTION SETTINGS
 DB_NAME = os.environ.get('DB_NAME', 'arsenal_sample')
