@@ -9,6 +9,7 @@ from mongoengine import connect
 from teamserver.integrations import Integration, SlackIntegration
 from teamserver.models import Webhook
 from teamserver.config import CELERY_MAIN_NAME, CELERY_RESULT_BACKEND, CELERY_BROKER_URL
+from teamserver.config import CELERY_BROKER_TRANSPORT
 from teamserver.config import DB_NAME, DB_HOST, DB_PORT
 from teamserver.config import CONNECT_TIMEOUT, READ_TIMEOUT, INTEGRATIONS
 
@@ -17,7 +18,9 @@ app = Celery( # pylint: disable=invalid-name
     CELERY_MAIN_NAME,
     backend=CELERY_RESULT_BACKEND,
     broker=CELERY_BROKER_URL,
+    broker_transport_options=CELERY_BROKER_TRANSPORT,
 )
+
 
 connect(DB_NAME, host=DB_HOST, port=DB_PORT)
 
