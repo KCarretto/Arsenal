@@ -258,7 +258,7 @@ class User(Document):
         Determines if a user is authenticated given a password.
         Raises an InvalidCredentials exception if the password was incorrect.
         """
-        if not bcrypt.checkpw(password.encode('utf-8'), self.password):
+        if not bcrypt.checkpw(password.encode('utf-8'), self.password.encode('utf-8')):
             raise InvalidCredentials('Password incorrect.')
         return True
 
