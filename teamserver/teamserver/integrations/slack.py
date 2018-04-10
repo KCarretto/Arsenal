@@ -2,6 +2,9 @@
     This module integrates the teamserver with slack, and notifies
     a slack channel about events.
 """
+import time
+from datetime import datetime
+
 from slackclient import SlackClient
 
 from .integration import Integration
@@ -52,11 +55,14 @@ class SlackIntegration(Integration):
         Handle an 'logged_error' event.
         """
         entry = event_data.get('log')
+        timestamp = datetime.fromtimestamp(
+            entry.get('timestamp', time.time())).strftime('%Y-%m-%d %H:%M:%S')
+
         self.post_message(
             self.config.get('ERROR_CHANNEL'),
             'ERROR: [{}][{}]\t[{}] {}'.format(
                 str(entry.get('level')),
-                str(entry.get('timestamp')),
+                str(timestamp),
                 str(entry.get('application')),
                 str(entry.get('message')),
             )
