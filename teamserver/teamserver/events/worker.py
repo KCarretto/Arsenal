@@ -66,5 +66,5 @@ def trigger_event(**kwargs):
     elif event:
 
         # Notify Integrations
-        notify_integration(SLACK, **kwargs)
+        notify_integration(SLACK, kwargs)
 
