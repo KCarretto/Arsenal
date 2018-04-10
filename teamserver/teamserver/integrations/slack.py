@@ -91,6 +91,6 @@ class SlackIntegration(Integration):
             'logged_error': self.handle_error,
             'action_complete': self.handle_action,
         }
-        method = handled_events.get('event')
+        method = handled_events.get(event_data.get('event', ''))
         if method and callable(method):
             method(event_data)
