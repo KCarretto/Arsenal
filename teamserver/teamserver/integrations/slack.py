@@ -39,11 +39,10 @@ class SlackIntegration(Integration):
         """
         Post a message to slack.
         """
-        print('Sending message')
         self.client.api_call(
             'chat.postMessage',
             channel=channel,
-            message=message,
+            text=message,
             timeout=self.timeout,
             as_user=True,
         )
@@ -52,14 +51,14 @@ class SlackIntegration(Integration):
         """
         Handle an 'logged_error' event.
         """
-        print('Handling error')
+        entry = event_data.get('log')
         self.post_message(
             self.config.get('ERROR_CHANNEL'),
             'ERROR: [{}][{}]\t[{}] {}'.format(
-                str(event_data.get('level')),
-                str(event_data.get('timestamp')),
-                str(event_data.get('application')),
-                str(event_data.get('message')),
+                str(entry.get('level')),
+                str(entry.get('timestamp')),
+                str(entry.get('application')),
+                str(entry.get('message')),
             )
         )
 
@@ -67,7 +66,6 @@ class SlackIntegration(Integration):
         """
         Handle an 'action_complete' event.
         """
-        print('Handling action')
         action = event_data.get('action')
         message = 'Action Completed: [{}] {} {}'.format(
             action.status,
@@ -85,7 +83,6 @@ class SlackIntegration(Integration):
         """
         if not self.config.get('enabled', False):
             return
-        print('Running slack integration')
 
         handled_events = {
             'logged_error': self.handle_error,

@@ -21,7 +21,6 @@ app = Celery( # pylint: disable=invalid-name
     broker_transport_options=CELERY_BROKER_TRANSPORT,
 )
 
-
 connect(DB_NAME, host=DB_HOST, port=DB_PORT)
 
 SLACK = SlackIntegration(INTEGRATIONS.get('SLACK_CONFIG', {'enabled': False}))
@@ -31,7 +30,6 @@ def notify_subscriber(**kwargs):
     """
     Notify a subscriber with the given data.
     """
-    print('Notifying subscriber: {}'.format(kwargs.get('post_url')))
     requests.post(
         kwargs.get('posturl'),
         json=kwargs.get('data'),
@@ -44,7 +42,6 @@ def notify_integration(integration, data):
     Trigger an integration with the given data.
     """
     if integration and isinstance(integration, Integration):
-        print('Notifying integration: {}'.format(str(integration)))
         integration.run(data)
 
 @app.task
@@ -53,7 +50,6 @@ def trigger_event(**kwargs):
     Trigger an event, and notify subscribers.
     """
     event = kwargs.get('event')
-    print('Triggering event {}'.format(event))
 
     # Trigger Webhooks
     subscribers = Webhook.get_subscribers(event)
