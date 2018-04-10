@@ -127,7 +127,7 @@ class APIKey(Document):
         """
         Query for a key from the database.
         """
-        return APIKey.objects.get(key=bcrypt.hashpw(key.encode('utf-8'), API_KEY_SALT)) # pylint: disable=no-member
+        return APIKey.objects.get(key=bcrypt.hashpw(key.encode('utf-8'), API_KEY_SALT).decode()) # pylint: disable=no-member
 
     @property
     def document(self):
