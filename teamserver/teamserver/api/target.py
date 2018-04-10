@@ -75,14 +75,23 @@ def rename_target(params):
     groups = []
     for group in Group.get_target_groups(target.name):
         try:
+            # Update explicit membership
             if target.name in group.whitelist_members:
-                group.remove_member(target.name)
-                group.whitelist_member(new_name)
-                groups.append(group)
+                group.whitelist_members = [
+                    name if name != target.name else new_name for name in group.whitelist_members
+                ]
             elif target.name in group.blacklist_members:
-                group.unblacklist_member(target.name)
-                group.blacklist_member(new_name)
-                groups.append(group)
+                group.blacklist_members = [
+                    name if name != target.name else new_name for name in group.blacklist_members
+                ]
+
+            # Update dynamic membership
+            group.built_members = [
+                name if name != target.name else new_name for name in group.built_members
+            ]
+
+            groups.append(group)
+
         except MembershipError:
             pass
 
