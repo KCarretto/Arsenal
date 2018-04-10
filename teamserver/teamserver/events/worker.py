@@ -39,17 +39,13 @@ def notify_subscriber(**kwargs):
     )
 
 @app.task
-def notify_integration(**kwargs):
+def notify_integration(integration, data):
     """
     Trigger an integration with the given data.
     """
-    integration = kwargs.get('integration')
     if integration and isinstance(integration, Integration):
         print('Notifying integration: {}'.format(str(integration)))
-        integration.run(
-            event_data=kwargs.get('data'),
-            **kwargs
-        )
+        integration.run(data)
 
 @app.task
 def trigger_event(**kwargs):
@@ -70,5 +66,5 @@ def trigger_event(**kwargs):
     elif event:
 
         # Notify Integrations
-        notify_integration(integration=SLACK, data=kwargs)
+        notify_integration(SLACK, **kwargs)
 
