@@ -62,29 +62,39 @@ def rename_target(params):
     except DoesNotExist:
         pass
 
+    sessions = []
     for session in target.sessions:
         session.target_name = new_name
-        session.save()
+        sessions.append(session)
 
+    actions = []
     for action in Action.get_target_actions(target.name):
         action.target_name = new_name
-        action.save()
+        actions.append(action)
 
+    groups = []
     for group in Group.get_target_groups(target.name):
         try:
             if target.name in group.whitelist_members:
                 group.remove_member(target.name)
                 group.whitelist_member(new_name)
-                group.save()
+                groups.append(group)
             elif target.name in group.blacklist_members:
                 group.unblacklist_member(target.name)
                 group.blacklist_member(new_name)
-                group.save()
+                groups.append(group)
         except MembershipError:
             pass
 
     target.name = new_name
     target.save()
+
+    for session in sessions:
+        session.save()
+    for action in actions:
+        action.save()
+    for group in groups:
+        group.save()
 
     return success_response()
 
