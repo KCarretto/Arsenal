@@ -6,7 +6,7 @@ from uuid import uuid4
 import time
 
 from ..utils import get_context, success_response, handle_exceptions, log
-from ..models import Action, Target
+from ..models import Action, Target, Session
 from ..exceptions import CannotBindAction
 
 @handle_exceptions
@@ -18,6 +18,9 @@ def create_action(params, commit=True):
     action_string (required): The action string that will be parsed into an action. <str>
     bound_session_id (optional): This will restrict the action to only be retrieved
                                  by a specific session. <str>
+    action_id (optional, unique): Specify a human readable action_id.
+    quick (optional): Only send to the target's fastest session. Default: False. <bool>
+                      Note: This overrides bound_session_id
     """
     username = 'No owner'
 
@@ -39,8 +42,13 @@ def create_action(params, commit=True):
 
     parsed_action = Action.parse_action_string(action_string)
 
+    if params.get('quick', False):
+        bound_session = min(target.sessions, key=lambda x: x.session.interval)
+        if bound_session and isinstance(bound_session, Session):
+            bound_session_id = bound_session.session_id
+
     action = Action(
-        action_id=str(uuid4()),
+        action_id=params.get('action_id', str(uuid4())),
         target_name=target_name,
         action_string=action_string,
         action_type=parsed_action['action_type'],

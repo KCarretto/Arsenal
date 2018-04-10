@@ -1,41 +1,76 @@
-# Arsenal [![Build Status](https://travis-ci.org/KCarretto/Arsenal.svg?branch=master)](https://travis-ci.org/KCarretto/Arsenal)
-Extensible Red Team Framework
-
-## Overview
-Arsenal is a framework designed to be a back-end for Red Team command and control operations. It allows many Agent-C2 models to be integrated into one system, with a great interface and many useful features. The goal is to limit the time Red Team spends on back-end development, and invest more resources into the malware that is distributed to target systems.  
-
-### Feature Highlights
-* Integrates with custom implants and C2 servers with ease
-* Easily group target machines and interact with all of them at once
-* 3rd Party applications can integrate using outgoing webhooks (i.e. Slack Integration)
-* Register agents and prevent them from receiving unsupported commands
-* Protected by authentication and custom RBAC implementation to restrict what users have access to
-* Easy to use console with autocomplete, history searching, and more
-* Enable action attribution, know who on your team did what and when
-
-## Quick Start
-Here are some quick deployment instructions to set up on Ubuntu 16.04 (The project will work across various distros however). It is recommended to loadbalance the teamserver for production use.
-
-### Install dependencies
-`sudo apt-get update && sudo apt-get install docker.io git curl`
-
-### Clone this repository
-`sudo git clone https://github.com/kcarretto/arsenal /opt/arsenal`
-
-### Install docker compose
-
-`sudo curl -L https://github.com/docker/compose/releases/download/1.20.1/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose`
-
-`sudo chmod +x /usr/local/bin/docker-compose`
-
-### Deploy with docker compose
-`mkdir -p /var/log/arsenal`
-
-`cd /opt/arsenal; docker-compose up -d >> /var/log/arsenal/stdout.log 2>> /var/log/arsenal/stderr.log`
-
-### Configure database defaults
-`docker exec -it arsenal_teamserver_1 /bin/sh -c "cd /opt/arsenal/bin; python3 setup.py"`
-This will populate the database with default users and roles defined in `bin/setup.py`
-
-### Additional Information
-The teamserver will now launch using docker-compose. To ensure that it is functioning properly, you may run `curl 127.0.0.1/status` and you should receive the teamserver's status back. You may also install the teamserver to the system without docker, please see `/contrib` for useful setup scripts, service files, and installation information.
+alabaster==0.7.10
+amqp==2.2.2
+appnope==0.1.0
+astroid==1.6.1
+Babel==2.5.3
+backcall==0.1.0
+bcrypt==3.1.4
+billiard==3.5.0.3
+boto==2.48.0
+boto3==1.7.2
+botocore==1.10.2
+celery==4.1.0
+certifi==2018.1.18
+cffi==1.11.5
+chardet==3.0.4
+click==6.7
+CommonMark==0.5.4
+decorator==4.2.1
+docutils==0.14
+Flask==0.12.2
+flask-mongoengine==0.9.3
+Flask-WTF==0.14.2
+idna==2.6
+imagesize==1.0.0
+ipython==6.3.0
+ipython-genutils==0.2.0
+isort==4.3.4
+itsdangerous==0.24
+jedi==0.11.1
+Jinja2==2.10
+jmespath==0.9.3
+kombu==4.1.0
+lazy-object-proxy==1.3.1
+livereload==2.5.1
+Markdown==2.6.11
+MarkupSafe==1.0
+mccabe==0.6.1
+mkdocs==0.17.3
+mock==2.0.0
+mongoengine==0.15.0
+mongomock==3.9.0
+packaging==17.1
+parso==0.1.1
+passlib==1.7.1
+pbr==3.1.1
+pexpect==4.4.0
+pickleshare==0.7.4
+prompt-toolkit==1.0.15
+ptyprocess==0.5.2
+pycparser==2.18
+pydoc-markdown==2.0.2
+Pygments==2.2.0
+pylint==1.8.2
+pymongo==3.6.0
+pyparsing==2.2.0
+python-dateutil==2.6.1
+pytz==2018.3
+PyYAML==3.12
+recommonmark==0.4.0
+requests==2.18.4
+s3transfer==0.1.13
+sentinels==1.0.0
+simplegeneric==0.8.1
+six==1.11.0
+slackclient==1.2.1
+snowballstemmer==1.2.1
+tornado==4.5.3
+traitlets==4.3.2
+urllib3==1.22
+uWSGI==2.0.17
+vine==1.1.4
+wcwidth==0.1.7
+websocket-client==0.47.0
+Werkzeug==0.14.1
+wrapt==1.10.11
+WTForms==2.1
