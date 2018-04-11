@@ -4,8 +4,8 @@
     https://github.com/micahjmartin/pwnboard
     Author: Micah Martin
 """
-import json
 import requests
+from requests.exceptions import RequestException
 from .integration import Integration
 
 
@@ -33,9 +33,12 @@ class PwnboardIntegration(Integration): # pylint: disable=too-few-public-methods
         """
         Post an update to the pwnboard
         """
+        event = event_data.get("event")
+        if event != "session_checkin":
+            return False
         # The headers for the callback
-        headers = {'Content-Type': 'application/json',
-                   'Connection': 'Close'}
+        # headers = {'Content-Type': 'application/json',
+        #            'Connection': 'Close'}
         # Try to get the agent string
         name = event_data.get("session", {}).get("agent_version", "Arsenal")
         # Get the facts
@@ -49,10 +52,10 @@ class PwnboardIntegration(Integration): # pylint: disable=too-few-public-methods
             # If we dont have an IP, then we have nothing to update
             return False
 
-        data = json.dumps({'ips': ip_addrs, 'type': name})
+        data = {'ips': ip_addrs, 'type': name}
         try:
-            req = requests.post(self.url, data=data, headers=headers, timeout=3)
+            req = requests.post(self.url, json=data, timeout=3)
             print(req.text)
             return True
-        except requests.exceptions.RequestException:
+        except RequestException:
             return False
