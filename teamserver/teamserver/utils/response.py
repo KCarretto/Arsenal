@@ -4,7 +4,7 @@ This module includes functionality that can be used to build responses to return
 import gzip
 import functools
 
-from cStringIO import StringIO as IO
+from io import StringIO as IO
 from flask import jsonify, after_this_request, request
 
 from ..config import LOG_LEVEL
