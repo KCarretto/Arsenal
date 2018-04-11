@@ -27,7 +27,7 @@ from .api import list_api_keys, list_roles, list_users
 from .api import delete_role, delete_user, revoke_api_key
 from .api import register_webhook, unregister_webhook, list_webhooks
 from .models import APIKey, User
-from .utils import authenticate, respond, log
+from .utils import authenticate, respond, log, gzipped
 
 API = Blueprint('router', __name__)
 
@@ -67,6 +67,7 @@ def login():
 @API.route('/', methods=['POST'])
 @API.route('/api', methods=['POST'])
 @API.route('/api/v1', methods=['POST'])
+@gzipped
 def api_entry(): # pylint: disable=too-many-return-statements
     """
     This function serves as the entry point for the v1 JSON API.
