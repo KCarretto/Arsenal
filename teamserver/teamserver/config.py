@@ -127,5 +127,9 @@ INTEGRATIONS = {
 
         'ERROR_CHANNEL': 'notifications',
         'ACTION_CHANNEL': 'notifications',
+    },
+    'PWNBOARD_CONFIG': {
+        'enabled': False,
+        'URL': os.environ.get('PWNBOARD_URL', 'https://pwnboard.local/generic')
     }
 }
