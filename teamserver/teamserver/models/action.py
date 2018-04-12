@@ -292,7 +292,11 @@ class Action(DynamicDocument):
         if method is None or not callable(method):
             raise ActionSyntaxError("Invalid action type.")
 
-        parsed = method(cmd[1:])
+        parsed = None
+        try:
+            parsed = method(cmd[1:])
+        except IndexError:
+            raise ActionSyntaxError("Invalid number of arguments.")
 
         return parsed
 

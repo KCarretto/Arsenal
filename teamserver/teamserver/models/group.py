@@ -173,10 +173,16 @@ class Group(Document):
             if attributes:
                 if hasattr(value, attributes[0]):
                     value = getattr(value, attributes[0])
-                    return get_value(value, attributes[1:])
+                    if len(attributes) > 1:
+                        attributes = attributes[1:]
+                    return get_value(value, attributes)
                 elif isinstance(value, dict) and value.get(attributes[0]):
                     value = value[attributes[0]]
-                    return get_value(value, attributes[1:])
+                    if len(attributes) > 1:
+                        attributes = attributes[1:]
+                    return get_value(value, attributes)
+                elif isinstance(value, list):
+                    return [get_value(obj, attributes) for obj in value]
             return value
 
         # Filter through objects and compute regexes
@@ -185,6 +191,9 @@ class Group(Document):
                 for rule in self.membership_rules: # pylint: disable=not-an-iterable
                     pattern = re.compile(rule.regex)
                     value = get_value(target, rule.attribute.split('.')) # pylint: disable=no-member
+                    if isinstance(value, list):
+                        if any(pattern.match(str(obj)) for obj in value):
+                            targets.append(target.name)
                     if pattern.match(str(value)):
                         targets.append(target.name)
                         break

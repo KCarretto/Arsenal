@@ -166,7 +166,7 @@ def session_check_in(params): #pylint: disable=too-many-locals
     # TODO: Implement locking to avoid duplication
 
     # Gather new actions
-    actions_raw = Action.get_target_unassigned_actions(session.target_name)
+    actions_raw = Action.get_target_unassigned_actions(session.target_name, session.session_id)
     actions = []
 
     # Assign each action to this status, and append it's document to the list
