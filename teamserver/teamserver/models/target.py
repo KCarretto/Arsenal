@@ -103,6 +103,8 @@ class Target(Document):
             if time.time() > threshold:
                 session.archive()
                 sessions.remove(session)
+
+        self._session_cache = sessions
         return sessions
 
     @property
@@ -155,7 +157,8 @@ class Target(Document):
         if include_facts:
             doc['facts'] = self.facts
         if include_sessions:
-            doc['sessions'] = self.sessions
+            sessions = self._session_cache if self._session_cache else self.sessions
+            doc['sessions'] = [session.document for session in sessions]
         if include_credentials:
             doc['credentials'] = self.credentials
 
