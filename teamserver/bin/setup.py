@@ -7,11 +7,14 @@ import sys
 from uuid import uuid4
 from os.path import abspath, dirname
 from mongoengine import connect
-import bcrypt
+
+from argon2 import argon2_hash
+from base64 import b64encode
 
 sys.path.insert(0, abspath(dirname(abspath(dirname(__file__)))))
 from teamserver.models import User, Role, APIKey # pylint: disable-all
 from teamserver.config import DB_NAME, DB_HOST, DB_PORT, API_KEY_SALT, DB_USER, DB_PASS # pylint: disable-all
+from teamserver.config import HASH_TIME_PARAM, HASH_MEMORY_PARAM, HASH_PARALLELIZATION_PARAM # pylint: disable-all
 
 CONFIG = {
     'users': {
@@ -120,8 +123,13 @@ def create_api_key(username, allowed_api_calls):
             str(uuid4()),
             str(uuid4()),
             )
+    mid_hash = b64encode(argon2_hash(password=original_key,
+                                         salt=API_KEY_SALT,
+                                         t=HASH_TIME_PARAM,
+                                         m=HASH_MEMORY_PARAM,
+                                         p=HASH_PARALLELIZATION_PARAM)).decode()
     key = APIKey(
-        key=bcrypt.hashpw(original_key.encode('utf-8'), API_KEY_SALT),
+        key=API_KEY_SALT + "$" + mid_hash,
         owner=username,
         allowed_api_calls=allowed_api_calls
     )
