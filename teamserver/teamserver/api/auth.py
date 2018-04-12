@@ -3,8 +3,8 @@
 """
 from uuid import uuid4
 
-from argon2 import argon2_hash
 from base64 import b64encode
+from argon2 import argon2_hash
 
 from ..utils import handle_exceptions, success_response, get_context
 from ..exceptions import PermissionDenied
@@ -70,10 +70,10 @@ def create_api_key(params):
         str(uuid4()),
         )
     mid_hash = b64encode(argon2_hash(password=original_key,
-                                         salt=API_KEY_SALT,
-                                         t=HASH_TIME_PARAM,
-                                         m=HASH_MEMORY_PARAM,
-                                         p=HASH_PARALLELIZATION_PARAM)).decode()
+                                     salt=API_KEY_SALT,
+                                     t=HASH_TIME_PARAM,
+                                     m=HASH_MEMORY_PARAM,
+                                     p=HASH_PARALLELIZATION_PARAM)).decode()
 
     key = APIKey(
         key=API_KEY_SALT + "$" + mid_hash,

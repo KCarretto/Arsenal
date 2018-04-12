@@ -6,16 +6,18 @@
     API keys have Roles
     Roles have permissions
 """
+from base64 import b64encode
+from os import urandom
+
 from mongoengine import Document
 from mongoengine.fields import ListField, StringField, BooleanField
 
 from argon2 import argon2_hash
-from base64 import b64encode
-from os import urandom
 
 from .webhook import Webhook
 from ..exceptions import InvalidCredentials, RoleException
-from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, API_KEY_SALT, HASH_TIME_PARAM, HASH_MEMORY_PARAM, HASH_PARALLELIZATION_PARAM
+from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, API_KEY_SALT
+from ..config import HASH_TIME_PARAM, HASH_MEMORY_PARAM, HASH_PARALLELIZATION_PARAM
 from ..config import COLLECTION_USERS, COLLECTION_ROLES, COLLECTION_APIKEYS
 
 class Role(Document):
@@ -129,11 +131,11 @@ class APIKey(Document):
         """
         Query for a key from the database.
         """
-        mid_hash = b64encode(argon2_hash(password=original_key,
-                                             salt=API_KEY_SALT,
-                                             t=HASH_TIME_PARAM,
-                                             m=HASH_MEMORY_PARAM,
-                                             p=HASH_PARALLELIZATION_PARAM)).decode()
+        mid_hash = b64encode(argon2_hash(password=key,
+                                         salt=API_KEY_SALT,
+                                         t=HASH_TIME_PARAM,
+                                         m=HASH_MEMORY_PARAM,
+                                         p=HASH_PARALLELIZATION_PARAM)).decode()
         return APIKey.objects.get(key=API_KEY_SALT + "$" + mid_hash) # pylint: disable=no-member
 
     @property
@@ -237,10 +239,10 @@ class User(Document):
         if salt is None:
             salt = b64encode(urandom(15)).decode()
         mid_hash = b64encode(argon2_hash(password=password,
-                                             salt=salt,
-                                             t=HASH_TIME_PARAM,
-                                             m=HASH_MEMORY_PARAM,
-                                             p=HASH_PARALLELIZATION_PARAM)).decode()
+                                         salt=salt,
+                                         t=HASH_TIME_PARAM,
+                                         m=HASH_MEMORY_PARAM,
+                                         p=HASH_PARALLELIZATION_PARAM)).decode()
         return salt + "$" + mid_hash
 
     @property
