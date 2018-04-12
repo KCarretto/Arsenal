@@ -73,7 +73,8 @@ class SlackIntegration(Integration):
         Handle an 'action_complete' event.
         """
         action = event_data.get('action')
-        message = 'Action Completed: [{}] {} {}'.format(
+        message = 'Action Completed (id: `{}`) [{}] {} `{}`'.format(
+            action.get('action_id'),
             action.get('status'),
             action.get('target_name'),
             action.get('action_string'),
