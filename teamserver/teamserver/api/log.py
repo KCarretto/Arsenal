@@ -7,11 +7,13 @@ from ..models import Log
 @handle_exceptions
 def create_log(params):
     """
+    ### Overview
     Log an entry (if current log level deems necessary)
 
-    application (required): The application that is requesting to log a message. <str>
-    level (required): The log level that the message is at. <str, LOG_LEVELS from config.py>
-    message (required): The message to log. <str>
+    ### Parameters
+    application:    The application that is requesting to log a message. <str>
+    level:          The log level that the message is at (LOG_LEVELS in config.py). <str>
+    message:        The message to log. <str>
     """
     log(params['level'], params['message'], params['application'])
     return success_response()
@@ -19,12 +21,14 @@ def create_log(params):
 @handle_exceptions
 def list_logs(params):
     """
+    ### Overview
     Show filtered log entries
 
-    application (optional): The application to filter for. <str>
-    since (optional): The timestamp that logs must be newer than. <float>
-    include_archived (optional): Should archived messages be included (default=False). <boolean>
-    levels (optional): The level to filter for. <list[<str>]>
+    ### Parameters
+    application (optional):         The application to filter for. <str>
+    since (optional):               The timestamp that logs must be newer than. <float>
+    include_archived (optional):    Should archived messages be included. Default: False. <bool>
+    levels (optional):              The level to filter for. <list[str]>
     """
     logs = Log.list_logs(
         params.get('include_archived', False),

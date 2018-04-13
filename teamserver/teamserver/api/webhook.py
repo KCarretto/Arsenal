@@ -10,10 +10,13 @@ from ..models import Webhook
 @handle_exceptions
 def register_webhook(params):
     """
+    ### Overview
     This API function will register a new webhook.
 
-    post_url (required): The url that the data should be sent via JSON in a POST request. <str>
-    event_triggers (required): A list of events to subscribe to. <str>
+    ### Parameters
+    post_url (required):        The url that the data should be sent via JSON in a POST request.
+                                    <str>
+    event_triggers (required):  A list of events to subscribe to. <str>
     """
     user, _, _ = get_context(params)
 
@@ -30,8 +33,10 @@ def register_webhook(params):
 @handle_exceptions
 def unregister_webhook(params):
     """
+    ### Overview
     This API function will unregister a webhook.
 
+    ### Parameters
     hook_id (required): The identifier of the hook to unregister.
     """
     user, _, administrator = get_context(params)
@@ -48,7 +53,11 @@ def unregister_webhook(params):
 @handle_exceptions
 def list_webhooks(params): #pylint: disable=unused-argument
     """
+    ### Overview
     This API function will return a list of a user's webhooks.
+
+    ### Parameters
+    user_context (optional, requires administrator) <str>
     """
     user, _, _ = get_context(params)
 

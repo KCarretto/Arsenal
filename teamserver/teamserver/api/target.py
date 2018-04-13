@@ -10,11 +10,13 @@ from ..exceptions import CannotRenameTarget, MembershipError
 @handle_exceptions
 def create_target(params):
     """
+    ### Overview
     This API function creates a new target object in the database.
 
-    name (required, unique): The name given to the target. <str>
-    uuid (required, unique): The unique identifier of the target. <str>
-    facts (optional): A dictionary of key,value pairs to store for the target. <dict>
+    ### Parameters
+    name (unique):      The name given to the target. <str>
+    uuid (unique):      The unique identifier of the target. <str>
+    facts (optional):   A dictionary of key,value pairs to store for the target. <dict>
     """
     name = params['name']
     uuid = params['uuid']
@@ -32,15 +34,17 @@ def create_target(params):
 @handle_exceptions
 def get_target(params):
     """
+    ### Overview
     This API function queries and returns a target object with the given name.
 
-    name (required): The name of the target to search for. <str>
-    include_status (optional): Should status be included, default: True. <bool>
-    include_facts (optional): Should facts be included, default: False. <bool>
-    include_sessions (optional): Should sessions be included, default: False. <bool>
+    ### Parameters
+    name:                           The name of the target to search for. <str>
+    include_status (optional):      Should status be included, default: True. <bool>
+    include_facts (optional):       Should facts be included, default: False. <bool>
+    include_sessions (optional):    Should sessions be included, default: False. <bool>
     include_credentials (optional): Should credentials be included, default: False. <bool>
-    include_actions (optional): Should actions be included, default: False. <bool>
-    include_groups (optional): Should groups be included, default: False. <bool>
+    include_actions (optional):     Should actions be included, default: False. <bool>
+    include_groups (optional):      Should groups be included, default: False. <bool>
     """
     target = Target.get_by_name(params['name'])
     return success_response(target=get_filtered_target(target, params))
@@ -48,10 +52,12 @@ def get_target(params):
 @handle_exceptions
 def rename_target(params):
     """
+    ### Overview
     This API function will rename a target.
 
-    name (required): The name of the target to search for. <str>
-    new_name (required): The new name to assign the target. <str>
+    ### Parameters
+    name:       The name of the target to search for. <str>
+    new_name:   The new name to assign the target. <str>
     """
     target = Target.get_by_name(params['name'])
     new_name = params['new_name']
@@ -114,8 +120,8 @@ def set_target_facts(params):
     It will overwrite any currently existing keys, but will not remove
     existing keys that are not specified in the 'facts' parameter.
 
-    name (required): The name of the target to update. <str>
-    facts (required): The dictionary of facts to use. <dict>
+    name: The name of the target to update. <str>
+    facts: The dictionary of facts to use. <dict>
     """
     target = Target.get_by_name(params['name'])
 
@@ -128,12 +134,12 @@ def list_targets(params): #pylint: disable=unused-argument
     """
     This API function will return a list of target documents.
 
-    include_status (optional): Should status be included, default: True. <bool>
-    include_facts (optional): Should facts be included, default: False. <bool>
-    include_sessions (optional): Should sessions be included, default: False. <bool>
-    include_credentials (optional): Should credentials be included, default: False. <bool>
-    include_actions (optional): Should actions be included, default: False. <bool>
-    include_groups (optional): Should groups be included, default: False. <bool>
+    include_status (optional):      Should status be included, Default: True. <bool>
+    include_facts (optional):       Should facts be included, Default: False. <bool>
+    include_sessions (optional):    Should sessions be included, Default: False. <bool>
+    include_credentials (optional): Should credentials be included, Default: False. <bool>
+    include_actions (optional):     Should actions be included, Default: False. <bool>
+    include_groups (optional):      Should groups be included, Default: False. <bool>
     """
     return success_response(targets={
         target.name: get_filtered_target(target, params) for target in Target.list_targets()
@@ -142,11 +148,13 @@ def list_targets(params): #pylint: disable=unused-argument
 @handle_exceptions
 def migrate_target(params):
     """
+    ### Overview
     This API function will move all sessions from one target, to another. It will then delete the
     old target and rename the new target after the old one.
 
-    old_target (required): The name of the outdated target.
-    new_target (required): The name of the new target to migrate to.
+    ### Parameters
+    old_target: The name of the outdated target. <str>
+    new_target: The name of the new target to migrate to. <str>
     """
     old_target = Target.get_by_name(params['old_target'])
     new_target = Target.get_by_name(params['new_target'])

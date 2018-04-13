@@ -12,10 +12,12 @@ from ..config import API_KEY_SALT
 @handle_exceptions
 def create_user(params):
     """
+    ### Overview
     Create a user.
 
-    username (required, unique): The username of the user.
-    password (required): The desired password for the user.
+    ### Parameters
+    username (unique):  The username of the user. <str>
+    password:           The desired password for the user. <str>
     """
 
     password_hash = User.hash_password(params['password'])
@@ -33,14 +35,15 @@ def create_user(params):
 @handle_exceptions
 def create_api_key(params):
     """
-    Create an API key for a user.
+    ### Overview
+    Create an API key for a user. Only administrators may create api keys for other users.
 
+    ### Parameters
     allowed_api_calls (optional): A list of API calls that the API token can perform. If left
                                   empty, all of the user's permissions will be granted to the
                                   token. This may not specify any API call that the user does not
                                   currently have access to. <list>
-
-    user_context (optional, requires administrator)
+    user_context (optional, requires administrator) <str>
     """
     # Retrieve the current user object (Allowing for administrator overrides)
     user, allowed_methods, _ = get_context(params)
@@ -79,12 +82,12 @@ def create_api_key(params):
 @handle_exceptions
 def create_role(params):
     """
+    ### Overview
     Create a role.
 
-    name (required, unique): The name of the role.
-    allowed_api_calls (required): The list of API methods that users with this role may invoke.
-
-    users (optional): Specify a list of users to add to the role.
+    name (unique):      The name of the role.
+    allowed_api_calls:  The list of API methods that users with this role may invoke.
+    users (optional):   Specify a list of users to add to the role.
     """
     # Get role parameters
     name = params['name']
@@ -106,13 +109,13 @@ def create_role(params):
 @handle_exceptions
 def update_user_password(params):
     """
+    ### Overview
     Changes a users password. Requires the user's current password.
 
-    current_password (required): The user's current password.
-    new_password (required): The user's new password.
-
-    user_context (optional, requires administrator): An administrator may specify which user
-                                                    password to change.
+    ### Parameters
+    current_password:   The user's current password. <str>
+    new_password:       The user's new password. <str>
+    user_context (optional, requires administrator)
     """
     user, _, administrator = get_context(params)
 
@@ -129,10 +132,12 @@ def update_user_password(params):
 @handle_exceptions
 def update_role_permissions(params):
     """
+    ### Overview
     Update the permission set of a role.
 
-    role_name (required): The name of the role to update.
-    allowed_api_calls (required): The new list of allowed api methods.
+    ### Parameters
+    role_name:          The name of the role to update. <str>
+    allowed_api_calls:  The new list of allowed api methods. <list[str]>
     """
     role = Role.get_role(params['role_name'])
     role.allowed_api_calls = params['allowed_api_calls']
@@ -143,10 +148,12 @@ def update_role_permissions(params):
 @handle_exceptions
 def add_role_member(params):
     """
+    ### Overview
     Add a user to a role.
 
-    role_name (required): The name of the role to modify.
-    username (required): The name of the user to add.
+    ### Parameters
+    role_name:  The name of the role to modify. <str>
+    username:   The name of the user to add. <str>
     """
     role = Role.get_role(params['role_name'])
     role.add_member(params['username'])
@@ -156,10 +163,12 @@ def add_role_member(params):
 @handle_exceptions
 def remove_role_member(params):
     """
+    ### Overview
     Remove a user from a role.
 
-    role_name (required): The name of the role to modify.
-    username (required): The name of the user to remove.
+    ### Parameters
+    role_name:  The name of the role to modify. <str>
+    username:   The name of the user to remove. <str>
     """
     role = Role.get_role(params['role_name'])
     role.remove_member(params['username'])
@@ -169,13 +178,14 @@ def remove_role_member(params):
 @handle_exceptions
 def get_user(params):
     """
+    ### Overview
     Retrieve a user object.
 
-    username (required): The name of the user object to fetch. <str>
-    include_roles (optional): Optionally include roles.
-                                    default: False. <bool>
-    include_api_calls (optional): Display the set of permitted API calls for the user.
-                                    default: True. <bool>
+    ### Parameters
+    username:                       The name of the user object to fetch. <str>
+    include_roles (optional):       Optionally include roles. default: False. <bool>
+    include_api_calls (optional):   Display the set of permitted API calls for the user.
+                                        default: True. <bool>
     """
     user = User.get_user(params['username'])
 
@@ -188,9 +198,11 @@ def get_user(params):
 @handle_exceptions
 def get_role(params):
     """
+    ### Overview
     Retrieve a role object.
 
-    role_name (required): The name of the role to fetch. <str>
+    ### Parameters
+    role_name: The name of the role to fetch. <str>
     """
     role = Role.get_role(params['role_name'])
 
@@ -199,6 +211,7 @@ def get_role(params):
 @handle_exceptions
 def get_current_context(params):
     """
+    ### Overview
     Return the currently authenticated username.
     """
     user, allowed_methods, _ = get_context(params)
@@ -212,12 +225,13 @@ def get_current_context(params):
 @handle_exceptions
 def list_users(params):
     """
+    ### Overview
     Return a list of users.
 
-    include_roles (optional): Optionally include roles.
-                                    default: False. <bool>
-    include_api_calls (optional): Display the set of permitted API calls for the user.
-                                    default: True. <bool>
+    ### Parameters
+    include_roles (optional):       Optionally include roles. Default: False. <bool>
+    include_api_calls (optional):   Display the set of permitted API calls for the user.
+                                        default: True. <bool>
     """
 
     return success_response(users=[user.document(
@@ -228,8 +242,10 @@ def list_users(params):
 @handle_exceptions
 def list_api_keys(params):
     """
+    ### Overview
     Lists the permissions of API keys that you own. This will not return the API key itself.
 
+    ### Parameters
     user_context (optional, requires administrator)
     """
     user, _, _ = get_context(params)
@@ -239,6 +255,7 @@ def list_api_keys(params):
 @handle_exceptions
 def list_roles(params): #pylint: disable=unused-argument
     """
+    ### Overview
     Return a list of roles.
     """
     return success_response(roles=[role.document for role in Role.list_roles()])
@@ -246,9 +263,11 @@ def list_roles(params): #pylint: disable=unused-argument
 @handle_exceptions
 def delete_user(params):
     """
+    ### Overview
     Delete a user.
 
-    username (required): The name of the user to delete. <str>
+    ### Parameters
+    username:   The name of the user to delete. <str>
     """
     user = User.get_user(params['username'])
 
@@ -259,9 +278,11 @@ def delete_user(params):
 @handle_exceptions
 def delete_role(params):
     """
+    ### Overview
     Delete a role.
 
-    role_name(required): The name of the role to delete.
+    ### Parameters
+    role_name:  The name of the role to delete. <str>
     """
     role = Role.get_role(params['role_name'])
 
@@ -272,10 +293,11 @@ def delete_role(params):
 @handle_exceptions
 def revoke_api_key(params):
     """
+    ### Overview
     Revoke a user's API key.
 
-    api_key (required): The API key to revoke.
-
+    ### Parameters
+    api_key:    The API key to revoke. <str>
     user_context (optional, requires administrator)
     """
     user, _, administrator = get_context(params)
