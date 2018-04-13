@@ -20,7 +20,7 @@ def main():
         call = ''.join([word.capitalize() for word in call.replace('_', ' ').split()])
 
         print('## {}'.format(call))
-        print(obj.__doc__)
+        print(obj.__doc__.replace('    ###', '###'))
         print('\n\n')
 
 if __name__ == '__main__':

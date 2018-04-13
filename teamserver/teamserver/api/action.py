@@ -45,7 +45,7 @@ def create_action(params, commit=True):
     parsed_action = Action.parse_action_string(action_string)
 
     if params.get('quick', False):
-        bound_session = min(target.sessions, key=lambda x: x.session.interval)
+        bound_session = min(target.sessions, key=lambda x: x.interval)
         if bound_session and isinstance(bound_session, Session):
             bound_session_id = bound_session.session_id
 
