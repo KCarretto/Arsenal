@@ -14,8 +14,8 @@ CELERY_BROKER_TRANSPORT = {
 DB_NAME = os.environ.get('DB_NAME', 'arsenal_sample')
 DB_HOST = os.environ.get('DB_HOST', 'localhost')
 DB_PORT = int(os.environ.get('DB_PORT', 27017))
-DB_USER = None
-DB_PASS = None
+DB_USER = os.environ.get('DB_USER')
+DB_PASS = os.environ.get('DB_PASS')
 
 # DATABASE DOCUMENT SETTINGS
 MAX_STR_LEN = 500
