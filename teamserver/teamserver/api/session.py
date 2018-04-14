@@ -19,17 +19,20 @@ from ..config import DEFAULT_AGENT_INTERVAL_DELTA, DEFAULT_AGENT_CONFIG_DICT
 @handle_exceptions
 def create_session(params):
     """
+    ### Overview
     This API function creates a new session object in the database.
 
-    target_uuid (required): The unique identifier of the target. <str>
-    servers (optional): Which servers the agent will initially be configured with. <[str, str]>
-    interval (optional): The interval the agent will initially be configured with. <float>
-    interval_delta (optional): The interval delta the agent will initially be
-                               configured with. <float>
-    config_dict (optional): Any other configuration options that the agent is initially
-                            configured with. <dict>
-    facts (optional): An optional facts dictionary to update the target with. <dict>
-    agent_version (optional): The agent_version to register. <str>
+    ### Parameters
+    target_uuid:                The unique identifier of the target. <str>
+    servers (optional):         Which servers the agent will initially be configured with.
+                                    <list[str]>
+    interval (optional):        The interval the agent will initially be configured with. <float>
+    interval_delta (optional):  The interval delta the agent will initially be
+                                    configured with. <float>
+    config_dict (optional):     Any other configuration options that the agent is initially
+                                    configured with. <dict>
+    facts (optional):           An optional facts dictionary to update the target with. <dict>
+    agent_version (optional):   The agent_version to register. <str>
     """
     # Fetch Target, create it automatically if it does not exist
     try:
@@ -94,9 +97,11 @@ def create_session(params):
 @handle_exceptions
 def get_session(params):
     """
+    ### Overview
     This API function queries and returns a session object with the given session_id.
 
-    session_id (required): The session_id to search for. <str>
+    ### Parameters
+    session_id: The session_id to search for. <str>
     """
     session = Session.get_by_id(params['session_id'])
     return success_response(session=session.document)
@@ -104,13 +109,15 @@ def get_session(params):
 @handle_exceptions
 def session_check_in(params): #pylint: disable=too-many-locals
     """
+    ### Overview
     This API function checks in a session, updating timestamps and history, submitting
     action responses, and will return new actions for the session to complete.
 
-    session_id (required): The session_id of the session to check in. <str>
-    responses (optional): Any responses to actions that the session is submitting. <[dict, dict]>
-    facts (optional): Any updates to the Target's fact collection. <dict>
-    config (optional): Any updates to the Session's config. <dict>
+    ### Parameters
+    session_id:             The session_id of the session to check in. <str>
+    responses (optional):   Any responses to actions that the session is submitting. <list[dict]>
+    facts (optional):       Any updates to the Target's fact collection. <dict>
+    config (optional):      Any updates to the Session's config. <dict>
     """
     # Fetch session object, create one if it does not exist
     session = Session.get_by_id(params['session_id'])
@@ -211,6 +218,7 @@ def session_check_in(params): #pylint: disable=too-many-locals
 @handle_exceptions
 def update_session_config(params):
     """
+    ### Overview
     This API function updates the config dictionary for a session.
     It will overwrite any currently existing keys, but will not remove
     existing keys that are not specified in the 'config' parameter.
@@ -218,11 +226,12 @@ def update_session_config(params):
     NOTE: This should only be called when a session's config HAS been updated.
           to update a session's config, queue an action of type 'config'.
 
-    session_id (required): The session_id of the session to update. <str>
-    config_dict (optional): The config dictionary to use. <dict>
-    servers (optional): The session's new servers. <[str, str]>
-    interval (optional): The session's new interval. <float>
-    interval_delta (optional): The session's new interval_delta. <float>
+    ### Parameters
+    session_id:                 The session_id of the session to update. <str>
+    config_dict (optional):     The config dictionary to use. <dict>
+    servers (optional):         The session's new servers. <list[str]>
+    interval (optional):        The session's new interval. <float>
+    interval_delta (optional):  The session's new interval_delta. <float>
     """
     session = Session.get_by_id(params['session_id'])
 
@@ -238,6 +247,7 @@ def update_session_config(params):
 @handle_exceptions
 def list_sessions(params): #pylint: disable=unused-argument
     """
+    ### Overview
     This API function will return a list of session documents.
     It is highly recommended to avoid using this function, as it
     can be very expensive.

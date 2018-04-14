@@ -32,4 +32,12 @@ Each time a response is submitted to an action, the `action_complete` event is t
 'event': 'action_complete',
 'action': <Action Object>
 }
-
+```
+### Logged Error
+Each time a log with level CRIT or higher is generated, the `logged_error` event is triggered with the following data:
+```
+{
+'event': 'logged_error',
+'log': <Log Object>
+}
+```

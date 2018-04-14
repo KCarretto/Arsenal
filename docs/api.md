@@ -3,47 +3,62 @@
 Read here about how to interact with the teamserver's API.
 
 ## Table of Contents
-
-- [Web Hooks](#web-hooks)
-  * [RegisterWebhook](#registerwebhook)
-  * [RemoveWebhook](#removewebhook)
-  * [ListWebhooks](#listwebhooks)
-- [API Tokens](#api-tokens)
-  * [CreateAPIToken](#createapitoken)
-  * [DeleteAPIToken](#deleteapitoken)
-- [Targets](#targets)
-  * [CreateTarget](#createtarget)
-  * [GetTarget](#gettarget)
-  * [SetTargetFacts](#settargetfacts)
-  * [ArchiveTarget](#archivetarget)
-  * [ListTargets](#listtargets)
-- [Sessions](#sessions)
-  * [CreateSession](#createsession)
-  * [GetSession](#getsession)
-  * [SessionCheckin](#sessioncheckin)
-  * [ListSessions](#listsessions)
-- [Actions](#actions)
-  * [CreateAction](#createaction)
-  * [CreateGroupAction](#creategroupaction)
-  * [GetAction](#getaction)
-  * [CancelAction](#cancelaction)
-  * [CancelGroupAction](#cancelgroupaction)
-  * [ListActions](#listactions)
-- [Groups](#groups)
-  * [CreateGroup](#creategroup)
-  * [GetGroup](#getgroup)
-  * [AddGroupMembers](#addgroupmembers)
-  * [RemoveGroupMembers](#removegroupmembers)
-  * [ListGroups](#listgroups)
-  * [DeleteGroup](#deletegroup)
-- [Credentials](#credentials)
-  * [CreateCredentials](#createcredentials)
-  * [GetValidCredentials](#getvalidcredentials)
-  * [InvalidateCredentials](#invalidatecredentials)
-  * [ListCredentials](#listcredentials)
-- [Logs](#logs)
-  * [CreateLog](#createlog)
-  * [ListLogs](#listlogs)
+- [AddGroupMember](#addgroupmember)
+- [AddGroupRule](#addgrouprule)
+- [AddRoleMember](#addrolemember)
+- [BlacklistGroupMember](#blacklistgroupmember)
+- [CancelAction](#cancelaction)
+- [CancelGroupAction](#cancelgroupaction)
+- [CreateAction](#createaction)
+- [CreateAPIKey](#createapikey)
+- [CreateGroup](#creategroup)
+- [CreateGroupAction](#creategroupaction)
+- [CreateLog](#createlog)
+- [CreateRole](#createrole)
+- [CreateSession](#createsession)
+- [CreateTarget](#createtarget)
+- [CreateUser](#createuser)
+- [DeleteGroup](#deletegroup)
+- [DeleteRole](#deleterole)
+- [DeleteUser](#deleteuser)
+- [DuplicateAction](#duplicateaction)
+- [GetAction](#getaction)
+- [GetAgent](#getagent)
+- [GetCurrentContext](#getcurrentcontext)
+- [GetGroup](#getgroup)
+- [GetGroupAction](#getgroupaction)
+- [GetRole](#getrole)
+- [GetSession](#getsession)
+- [GetTarget](#gettarget)
+- [GetUser](#getuser)
+- [ListActions](#listactions)
+- [ListAgents](#listagents)
+- [ListAPIKeys](#listapikeys)
+- [ListGroupActions](#listgroupactions)
+- [ListGroups](#listgroups)
+- [ListLogs](#listlogs)
+- [ListRoles](#listroles)
+- [ListSessions](#listsessions)
+- [ListTargets](#listtargets)
+- [ListUsers](#listusers)
+- [ListWebhooks](#listwebhooks)
+- [MigrateTarget](#migratetarget)
+- [RebuildGroupMembers](#rebuildgroupmembers)
+- [RegisterAgent](#registeragent)
+- [RegisterWebhook](#registerwebhook)
+- [RemoveGroupMember](#removegroupmember)
+- [RemoveGroupRule](#removegrouprule)
+- [RemoveRoleMember](#removerolemember)
+- [RenameTarget](#renametarget)
+- [RevokeAPIKey](#revokeapikey)
+- [SessionCheckIn](#sessioncheckin)
+- [SetTargetFacts](#settargetfacts)
+- [UnblacklistGroupMember](#unblacklistgroupmember)
+- [UnregisterAgent](#unregisteragent)
+- [UnregisterWebhook](#unregisterwebhook)
+- [UpdateRolePermissions](#updaterolepermissions)
+- [UpdateSessionConfig](#updatesessionconfig)
+- [UpdateUserPassword](#updateuserpassword)
 
 ## Interacting with the API
 ### Overview
@@ -57,484 +72,699 @@ The Arsenal teamserver exposes a '/api' endpoint for users, applications, and c2
 }
 ```
 
-## Web Hooks
-Not yet implemented.
-### RegisterWebhook
-### RemoveWebhook 
-### ListWebhooks
+## API Method Documentation
+## AddGroupMember
 
-## API Tokens
-Not yet implemented.
-### CreateAPIToken
-### DeleteAPIToken
+### Overview
+    This whitelists a member into a group. This means that
+    regardless of properties, the member will be a part of the
+    group.
 
-## Targets
-### CreateTarget 
-#### Overview
-This API call will create a Target object on the teamserver, which represents a server or machine that is being attacked.
-#### Parameters
-| **Name**   | **Required** | **Unique** | **Type** | **Description**                                               |
-| :--------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
-| name       | yes          | yes        | str      | A human-readable unique identifier.                           |
-| mac_addrs  | yes          | yes        | list<str>| A list of mac addresses. Each target must have a unique list. |
-| facts      | no           | no         | dict     | Information that has been gathered about the target system.   |
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False
-}
-```
-
-### GetTarget
-#### Overview
-This API call will fetch Target information from the teamserver.
-#### Parameters
-| **Name**   | **Required** | **Unique** | **Type** | **Description**                                |                         
-| :--------- | :----------- | :--------- | :------- | :--------------------------------------------- |
-| name       | yes          | yes        | str      | A human-readable unique identifier.            |
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False,
-"target": <Target Object>
-}
-```
-### SetTargetFacts
-#### Overview
-Update the Target's fact dictionary. This will override any existing facts.
-
-#### Parameters
-| **Name**   | **Required** | **Unique** | **Type** | **Description**                                |                         
-| :--------- | :----------- | :--------- | :------- | :--------------------------------------------- |
-| name       | yes          | yes        | str      | A human-readable unique identifier.            |
-| facts      | yes          | no         | dict     | A dictionary with key value pairs to update.   |
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False,
-"target": {
-  "name": "<target_name>",
-  "facts": {
-    "A Fact": "A Value",
-    "Old Fact": "Old Value"
-  }
-}
-}
-```
-### ArchiveTarget
-Not yet implemented.
-
-### ListTargets
-#### Overview
-Return a list of Target objects tracked by the teamserver.
-#### Parameters
-None.
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False,
-"targets": {
-  "target_id": <Target Object>
-}
-}
-```
-
-## Sessions
-### CreateSession 
-#### Overview
-This API call creates a new instance of an Agent on a given Target. We call this instance a Session.
-#### Parameters
-| **Name**      | **Required** | **Unique** | **Type**  | **Description**                                |                       
-| :------------ | :----------- | :--------- | :-------- | :--------------------------------------------- |
-| mac_addrs     | yes          | yes        | list<str> | The mac addresses of the system that the agent was run on. This is used to associate the Session with a target.  |   
-| servers       | no           | no         | list<str> | The C2 servers that the Agent is configured with. |
-| interval      | no           | no         | float     | The amount of time a Session will wait inbetween check ins. |
-| interval_delta| no           | no         | float     | The random delta to add to each interval (+ or -). |
-| config_dict   | no           | no         | dict      | Any additional configuration information from the Agent. |
-
-#### Example Response
-```
-{
-"status": 200,
-"error": False,
-"session_id": "<session_id>"
-}
-```
-### GetSession 
-#### Overview
-This API call retrieves Session information from the teamserver.
-#### Parameters
-| **Name**   | **Required** | **Unique** | **Type** | **Description**                                |                         
-| :--------- | :----------- | :--------- | :------- | :--------------------------------------------- |
-| session_id | yes          | yes        | str      | A unique identifier.                           |
-
-#### Example Response
-```
-{
-"status": 200,
-"error": False,
-"session": <Session Object>
-}
-```
-
-### SessionCheckin
-#### Overview
-This API call will check in a Session, and update appropriate timestamps. This will allow the Session to submit Responses to any Actions it was tasked with, and will also provide any new Actions that the Session should perform.
-
-#### Parameters
-| **Name**   | **Required** | **Unique** | **Type** | **Description**                                |                         
-| :--------- | :----------- | :--------- | :------- | :--------------------------------------------- |
-| session_id | yes          | yes        | str      | A unique identifier.                           |
-| responses  | no           | no         | list     | Any output from Actions that were executed by the Session.|
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False,
-"session_id": "<session_id>",
-"actions": [ <Action Object> ] 
-}
-```
-
-### UpdateSessionConfig
-#### Overview
-This API method is used to update the teamserver's perspective of what the Session's configuration currently is. This method will usually be called by the C2, and can not be used to update the Sessions config. It's only used for tracking purposes. In order to actually modify the Session's config, a config Action must be queued which will be sent to the session.
-
-#### Parameters
-| **Name**      | **Required** | **Unique** | **Type** | **Description**                                |                     
-| :------------ | :----------- | :--------- | :------- | :--------------------------------------------- |
-| session_id    | yes          | yes        | str      | A unique identifier.                           |
-| servers       | no           | no         | list<str> | The C2 servers that the Agent is configured with. |
-| interval      | no           | no         | float     | The amount of time a Session will wait inbetween check ins. |
-| interval_delta| no           | no         | float     | The random delta to add to each interval (+ or -). |
-| config_dict   | no           | no         | dict      | Any additional configuration information from the Agent. |
-
-#### Example Success Response 
-```
-{
-"status": 200,
-"error": False,
-"config": {
-    <Session Config>
-}
-}
-```
-
-### ListSessions
-#### Overview
-This API will return a list of Session objects.
-#### Parameters
-None
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False,
-"sessions": {
-    "<session_id>": <Session Object>
-}
-}
-```
-
-## Actions
-### CreateAction
-#### Overview
-This API call queues an Action with the teamserver, and assigns it to a given Target. The first Session to check in for a given Target will receive any Actions in that Target's queue. On the next check in, the Session will submit responses for any Actions that were queued on the previous round. Special options may be given in the `action_string` parameter to specify how the Action is handled and executed.
-
-#### Parameters
-| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
-| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
-| target_name      | yes          | yes        | str      | The name of the Target to queue the Action for.               |
-| action_string    | yes          | no         | str      | Conforms to Arsenal Action Syntax.                            |
-| bound_session_id | no           | yes        | str      | Optionally specify which Session the Action will be given to. |
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False,
-"action_id": "<action_id>"
-}
-```
-
-### CreateGroupAction
-#### Overview
-This API call queues Actions for an entire Group of Targets. It will provide an identifier for tracking the progress of each created Action.
-
-#### Parameters
-| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
-| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
-| group_name       | yes          | yes        | str      | The name of the Group to queue the Actions for.               |
-| action_string    | yes          | no         | str      | Conforms to Arsenal Action Syntax.                            |
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False,
-"group_action_id": "The group action identifier."
-}
-```
-
-### GetAction
-#### Overview
-Retrieve information about an Action object on the teamserver.
-
-#### Parameters
-| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
-| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
-| action_id        | yes          | yes        | str      | The unique identifier of the Action.                          |
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False,
-"action": <Action Object>
-}
-```
-
-### GetGroupAction
-#### Parameters
-| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
-| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
-| group_action_id  | yes          | yes        | str      | The unique identifier of the Group Action.                    |
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False,
-"action": <GroupAction Object>
-}
-```
-
-### CancelAction
-#### Overview
-This API call attempts to cancel an Action before it is sent. This will fail if the Action is in any state other than queued.
-#### Parameters
-| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
-| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
-| action_id        | yes          | yes        | str      | The unique identifier of the Action.                          |
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False
-}
-```
-
-### CancelGroupAction
-#### Overview
-This API call attempts to cancel all Actions associated with a Group Action. This will fail if an Action is in any state other than queued.
-
-#### Parameters
-| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
-| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
-| group_action_id  | yes          | yes        | str      | The unique identifier of the Group Action.                    |
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False
-}
-```
-
-### ListActions
-#### Overview
-This API call will provide a list of Action objects.
-#### Parameters
-None
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False,
-"actions": [ <Action Object> ]
-}
-```
-
-### ListGroupActions
-#### Overview
-This API call will provide a list of Group Action objects.
-#### Parameters
-None
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False,
-"group_actions": [ <GroupAction Object> ]
-}
-```
-
-## Groups
-### CreateGroup 
-#### Overview
-Create a Group of Targets, uniquely identified by a name. This allows for easily batched Actions, as well as viewing the status information for each Target in the Group.
-#### Parameters
-| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
-| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
-| name             | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False
-}
-```
-### GetGroup
-#### Overview
-Retrieve a Group object from the teamserver. This will include a list of Target names that exist within the group.
-#### Parameters
-| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
-| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
-| name             | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False,
-"group": <Group Object> 
-}
-```
-### AddGroupMember
-#### Overview
-Add a Target to the Group. This will whitelist the Target, so regardless of features and auto member rules, this Target will always be included in the Group until removed or blacklisted.
-
-#### Parameters
-| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
-| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
-| group_name       | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
-| target_name      | yes          | yes        | str      | The human-readable unique identifier of the Target.           |
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False
-}
-```
-### RemoveGroupMember
-#### Overview
-Removes a Target from the Group whitelist. This will only remove members that have been added through the AddGroupMember API call, it will not prevent Targets from being included as members due to Automember rules.
-#### Parameters
-| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
-| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
-| group_name       | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
-| target_name      | yes          | yes        | str      | The human-readable unique identifier of the Target.           |
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False
-}
-```
-
-### BlacklistGroupMember
-#### Overview
-This blacklists a Target from the Group. If the Target is currently a member, it is removed. This will prevent the Target from being included as a member due to Automember rules.
-
-#### Parameters
-| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
-| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
-| group_name       | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
-| target_name      | yes          | yes        | str      | The human-readable unique identifier of the Target.           |
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False
-}
-```
-
-### ListGroups
-#### Overview
-This operation will list each Group, along with all of the membership details for each Group.
-
-#### Parameters
-None
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False,
-"groups": [ <Group Object> ]
-}
-```
-
-### DeleteGroup
-#### Overview
-Delete a Group from the teamserver.
-#### Parameters
-| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
-| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
-| name             | yes          | yes        | str      | The human-readable unique identifier of the Group.            |
-
-#### Example Success Response
-```
-{
-"status": 200,
-"error": False
-}
-```
-
-## Credentials
-Not yet implemented.
-### CreateCredentials
-### GetValidCredentials
-### InvalidateCredentials
-### ListCredentials
+### Parameters
+    group_name:     The name of the group to modify. <str>
+    target_name:    The name of the member to add. <str>
 
 
-## Logs
-### CreateLog
-#### Overview
-Add a log entry to the log server. This is mostly useful for Agents and C2 servers, but may be utilized by any application that wishes to have a centralized and easy place to view logs.
-#### Parameters
-| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
-| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
-| application      | yes          | no         | str      | The name of the application submitting the log.               |
 
-#### Example Response
-```
-{
-"status": 200,
-"error": False
-}
-```
-### ListLogs
-#### Overview
-View log entries that have been stored on the log server. You may filter by application, or timestamps.
-#### Parameters
-| **Name**         | **Required** | **Unique** | **Type** | **Description**                                               |
-| :--------------- | :----------- | :--------- | :------- | :------------------------------------------------------------ |
-| application      | no           | no         | str      | The name of the application submitting the log to filter for. |
-| since            | no           | no         | float    | Filter for any logs before this timestamp.                    |
-| include_archived | no           | no         | bool     | Whether archived logs should be included in the search.       |
 
-#### Example Response
-```
-{
-"status": 200,
-"error": False,
-"logs": [ <Log Object> ]
-}
-```
+## AddGroupRule
 
+### Overview
+    Add a membership rule for the group.
+
+### Parameters
+    name:       The name of the group to modify. <str>
+    attribute:  The attribute to build membership based on. You may access fields using
+                    the '.' operator, for example: 'facts.interfaces'. Each attribute is
+                    converted into a str for regex matching. <str>
+    regex:      The inclusion regex, targets with matching attributes are included as
+                    group members. <str>
+    rule_id:    Optionally specify a unique name for the rule. <str>
+
+
+
+
+## AddRoleMember
+
+### Overview
+    Add a user to a role.
+
+### Parameters
+    role_name:  The name of the role to modify. <str>
+    username:   The name of the user to add. <str>
+
+
+
+
+## BlacklistGroupMember
+
+### Overview
+    Blacklist a target from ever being a member of a group.
+
+### Parameters
+    group_name:     The name of the group to modify. <str>
+    target_name:    The name of the member to remove. <str>
+
+
+
+
+## CancelAction
+
+### Overview
+    Cancels an action if it has not yet been sent.
+    This will prevent sessions from retrieving it.
+
+### Parameters
+    action_id: The action_id of the action to cancel. <str>
+
+
+
+
+## CancelGroupAction
+
+### Overview
+    Cancels all actions associated with a group action (only if status is queued).
+
+### Parameters
+    group_action_id:    The unique identifier associated with the group action. <str>
+
+
+
+
+## CreateAction
+
+### Overview
+    This API function creates a new action object in the database.
+
+### Parameters
+    target_name (unique):           The name of the target to perform the action on. <str>
+    action_string:                  The action string that will be parsed into an action. <str>
+    bound_session_id (optional):    This will restrict the action to only be retrieved
+                                        by a specific session. <str>
+    action_id (optional, unique):   Specify a human readable action_id. <str>
+    quick (optional):               Only send to the target's fastest session. <bool>
+                                        Default: False. This overrides bound_session_id
+
+
+
+
+## CreateAPIKey
+
+### Overview
+    Create an API key for a user. Only administrators may create api keys for other users.
+
+### Parameters
+    allowed_api_calls (optional): A list of API calls that the API token can perform. If left
+                                  empty, all of the user's permissions will be granted to the
+                                  token. This may not specify any API call that the user does not
+                                  currently have access to. <list>
+    user_context (optional, requires administrator) <str>
+
+
+
+
+## CreateGroup
+
+### Overview
+    This function creates a group object in the database.
+
+### Parameters
+    name (unique):  A unique and human readable identifier for the group. <str>
+
+
+
+
+## CreateGroupAction
+
+### Overview
+    Creates an action and assigns it to a group of targets. Each target
+    will complete the action, and the statuses of each action will be
+    easily accessible through the created group action document.
+
+### Parameters
+    group_name:                         The name of the group to create an action for. <str>
+    action_string:                      The action to perform on the targets. <str>
+    group_action_id (optional, unique): Specify a human readable group_action_id. <str>
+    quick (optional):                   Only send to the target's fastest session.
+                                            Default: False. <bool>
+
+
+
+
+## CreateLog
+
+### Overview
+    Log an entry (if current log level deems necessary)
+
+### Parameters
+    application:    The application that is requesting to log a message. <str>
+    level:          The log level that the message is at (LOG_LEVELS in config.py). <str>
+    message:        The message to log. <str>
+
+
+
+
+## CreateRole
+
+### Overview
+    Create a role.
+
+    name (unique):      The name of the role.
+    allowed_api_calls:  The list of API methods that users with this role may invoke.
+    users (optional):   Specify a list of users to add to the role.
+
+
+
+
+## CreateSession
+
+### Overview
+    This API function creates a new session object in the database.
+
+### Parameters
+    target_uuid:                The unique identifier of the target. <str>
+    servers (optional):         Which servers the agent will initially be configured with.
+                                    <list[str]>
+    interval (optional):        The interval the agent will initially be configured with. <float>
+    interval_delta (optional):  The interval delta the agent will initially be
+                                    configured with. <float>
+    config_dict (optional):     Any other configuration options that the agent is initially
+                                    configured with. <dict>
+    facts (optional):           An optional facts dictionary to update the target with. <dict>
+    agent_version (optional):   The agent_version to register. <str>
+
+
+
+
+## CreateTarget
+
+### Overview
+    This API function creates a new target object in the database.
+
+### Parameters
+    name (unique):      The name given to the target. <str>
+    uuid (unique):      The unique identifier of the target. <str>
+    facts (optional):   A dictionary of key,value pairs to store for the target. <dict>
+
+
+
+
+## CreateUser
+
+### Overview
+    Create a user.
+
+### Parameters
+    username (unique):  The username of the user. <str>
+    password:           The desired password for the user. <str>
+
+
+
+
+## DeleteGroup
+
+### Overview
+    Delete a group from the database.
+
+### Parameters
+    name:   The unique identifier for the group to delete. <str>
+
+
+
+
+## DeleteRole
+
+### Overview
+    Delete a role.
+
+### Parameters
+    role_name:  The name of the role to delete. <str>
+
+
+
+
+## DeleteUser
+
+### Overview
+    Delete a user.
+
+### Parameters
+    username:   The name of the user to delete. <str>
+
+
+
+
+## DuplicateAction
+
+### Overview
+    This API function is used to queue an identical action to the given action_id.
+
+### Parameters
+    action_id: The unique identifier of the action to clone. <str>
+
+
+
+
+## GetAction
+
+### Overview
+    Retrieves an action from the database based on action_id.
+
+### Parameters
+    action_id: The action_id of the action to query for. <str>
+
+
+
+
+## GetAgent
+
+### Overview
+    This function retrieves an Agent from the database.
+
+### Parameters
+    agent_version: The agent version string to search for. <str>
+
+
+
+
+## GetCurrentContext
+
+### Overview
+    Return the currently authenticated username.
+
+
+
+
+## GetGroup
+
+### Overview
+    Retrieves a group from the database based on name.
+
+### Parameters
+    name:   The name of the group to query for. <str>
+
+
+
+
+## GetGroupAction
+
+### Overview
+    Retrieves a group action from the database based on the group_action_id.
+
+### Parameters
+    group_action_id:    The group action identifier to query for. <str>
+
+
+
+
+## GetRole
+
+### Overview
+    Retrieve a role object.
+
+### Parameters
+    role_name: The name of the role to fetch. <str>
+
+
+
+
+## GetSession
+
+### Overview
+    This API function queries and returns a session object with the given session_id.
+
+### Parameters
+    session_id: The session_id to search for. <str>
+
+
+
+
+## GetTarget
+
+### Overview
+    This API function queries and returns a target object with the given name.
+
+### Parameters
+    name:                           The name of the target to search for. <str>
+    include_status (optional):      Should status be included, default: True. <bool>
+    include_facts (optional):       Should facts be included, default: False. <bool>
+    include_sessions (optional):    Should sessions be included, default: False. <bool>
+    include_credentials (optional): Should credentials be included, default: False. <bool>
+    include_actions (optional):     Should actions be included, default: False. <bool>
+    include_groups (optional):      Should groups be included, default: False. <bool>
+
+
+
+
+## GetUser
+
+### Overview
+    Retrieve a user object.
+
+### Parameters
+    username:                       The name of the user object to fetch. <str>
+    include_roles (optional):       Optionally include roles. default: False. <bool>
+    include_api_calls (optional):   Display the set of permitted API calls for the user.
+                                        default: True. <bool>
+
+
+
+
+## ListActions
+
+### Overview
+    This API function will return a list of action documents.
+    Filters are available for added efficiency.
+
+### Parameters
+    owner (optional):       Only display actions owned by this user. <str>
+    target_name (optional): Only display actions for given target. <str>
+    limit (optional):       Optionally limit how many values may be returned. <int>
+    offset (optional):      The position to start listing from. <int>
+
+
+
+
+## ListAgents
+
+### Overview
+    This function returns a list of agent documents.
+
+
+
+
+## ListAPIKeys
+
+### Overview
+    Lists the permissions of API keys that you own. This will not return the API key itself.
+
+### Parameters
+    user_context (optional, requires administrator)
+
+
+
+
+## ListGroupActions
+
+### Overview
+    This API function will return a list of group action documents.
+    It is highly recommended to avoid using this function, as it
+    can be very expensive.
+
+
+
+
+## ListGroups
+
+### Overview
+    List all groups that currently exist.
+    WARNING: This will be quite an expensive operation.
+
+
+
+
+## ListLogs
+
+### Overview
+    Show filtered log entries
+
+### Parameters
+    application (optional):         The application to filter for. <str>
+    since (optional):               The timestamp that logs must be newer than. <float>
+    include_archived (optional):    Should archived messages be included. Default: False. <bool>
+    levels (optional):              The level to filter for. <list[str]>
+
+
+
+
+## ListRoles
+
+### Overview
+    Return a list of roles.
+
+
+
+
+## ListSessions
+
+### Overview
+    This API function will return a list of session documents.
+    It is highly recommended to avoid using this function, as it
+    can be very expensive.
+
+
+
+
+## ListTargets
+
+    This API function will return a list of target documents.
+
+    include_status (optional):      Should status be included, Default: True. <bool>
+    include_facts (optional):       Should facts be included, Default: False. <bool>
+    include_sessions (optional):    Should sessions be included, Default: False. <bool>
+    include_credentials (optional): Should credentials be included, Default: False. <bool>
+    include_actions (optional):     Should actions be included, Default: False. <bool>
+    include_groups (optional):      Should groups be included, Default: False. <bool>
+
+
+
+
+## ListUsers
+
+### Overview
+    Return a list of users.
+
+### Parameters
+    include_roles (optional):       Optionally include roles. Default: False. <bool>
+    include_api_calls (optional):   Display the set of permitted API calls for the user.
+                                        default: True. <bool>
+
+
+
+
+## ListWebhooks
+
+### Overview
+    This API function will return a list of a user's webhooks.
+
+### Parameters
+    user_context (optional, requires administrator) <str>
+
+
+
+
+## MigrateTarget
+
+### Overview
+    This API function will move all sessions from one target, to another. It will then delete the
+    old target and rename the new target after the old one.
+
+### Parameters
+    old_target: The name of the outdated target. <str>
+    new_target: The name of the new target to migrate to. <str>
+
+
+
+
+## RebuildGroupMembers
+
+### Overview
+    Recalculate group members.
+
+### Parameters
+    name (optional):    Optionally specify a single group to rebuild membership for. <str>
+
+
+
+
+## RegisterAgent
+
+### Overview
+    This API function registers an agent version with the teamserver. This is used to denote
+    what action types an agent supports, to avoid unsupported action types from being sent to
+    an agent. If an unregistered agent calls back, there will be no restrictions on what action
+    types it receives. If an agent_version already exists, it will be overwritten by the new
+    registration.
+
+### Parameters
+    agent_version (unique): The agent version string to update capabilities for. <str>
+    supported_actions:      A list of supported action types. i.e. [0, 1, 3]. <list>
+
+
+
+
+## RegisterWebhook
+
+### Overview
+    This API function will register a new webhook.
+
+### Parameters
+    post_url (required):        The url that the data should be sent via JSON in a POST request.
+                                    <str>
+    event_triggers (required):  A list of events to subscribe to. <str>
+
+
+
+
+## RemoveGroupMember
+
+### Overview
+    Removes a target from a group's membership whitelist.
+
+### Parameters
+    group_name:     The name of the group to modify. <str>
+    target_name:    The name of the member to remove. <str>
+
+
+
+
+## RemoveGroupRule
+
+### Overview
+    Remove an automembership rule for the group.
+
+### Parameters
+    name:       The name of the group to modify. <str>
+    rule_id:    The unique identifier of the rule to remove. <str>
+
+
+
+
+## RemoveRoleMember
+
+### Overview
+    Remove a user from a role.
+
+### Parameters
+    role_name:  The name of the role to modify. <str>
+    username:   The name of the user to remove. <str>
+
+
+
+
+## RenameTarget
+
+### Overview
+    This API function will rename a target.
+
+### Parameters
+    name:       The name of the target to search for. <str>
+    new_name:   The new name to assign the target. <str>
+
+
+
+
+## RevokeAPIKey
+
+### Overview
+    Revoke a user's API key.
+
+### Parameters
+    api_key:    The API key to revoke. <str>
+    user_context (optional, requires administrator)
+
+
+
+
+## SessionCheckIn
+
+### Overview
+    This API function checks in a session, updating timestamps and history, submitting
+    action responses, and will return new actions for the session to complete.
+
+### Parameters
+    session_id:             The session_id of the session to check in. <str>
+    responses (optional):   Any responses to actions that the session is submitting. <list[dict]>
+    facts (optional):       Any updates to the Target's fact collection. <dict>
+    config (optional):      Any updates to the Session's config. <dict>
+
+
+
+
+## SetTargetFacts
+
+    This API function updates the facts dictionary for a target.
+    It will overwrite any currently existing keys, but will not remove
+    existing keys that are not specified in the 'facts' parameter.
+
+    name: The name of the target to update. <str>
+    facts: The dictionary of facts to use. <dict>
+
+
+
+
+## UnblacklistGroupMember
+
+### Overview
+    Remove a target from the blacklist of a group.
+
+### Parameters
+    group_name:     The name of the group to modify. <str>
+    target_name:    The name of the member to remove. <str>
+
+
+
+
+## UnregisterAgent
+
+### Overview
+    This function deletes an Agent from the database.
+
+### Parameters
+    agent_version: The agent version string to search for. <str>
+
+
+
+
+## UnregisterWebhook
+
+### Overview
+    This API function will unregister a webhook.
+
+### Parameters
+    hook_id (required): The identifier of the hook to unregister.
+
+
+
+
+## UpdateRolePermissions
+
+### Overview
+    Update the permission set of a role.
+
+### Parameters
+    role_name:          The name of the role to update. <str>
+    allowed_api_calls:  The new list of allowed api methods. <list[str]>
+
+
+
+
+## UpdateSessionConfig
+
+### Overview
+    This API function updates the config dictionary for a session.
+    It will overwrite any currently existing keys, but will not remove
+    existing keys that are not specified in the 'config' parameter.
+
+    NOTE: This should only be called when a session's config HAS been updated.
+          to update a session's config, queue an action of type 'config'.
+
+### Parameters
+    session_id:                 The session_id of the session to update. <str>
+    config_dict (optional):     The config dictionary to use. <dict>
+    servers (optional):         The session's new servers. <list[str]>
+    interval (optional):        The session's new interval. <float>
+    interval_delta (optional):  The session's new interval_delta. <float>
+
+
+
+
+## UpdateUserPassword
+
+### Overview
+    Changes a users password. Requires the user's current password.
+
+### Parameters
+    current_password:   The user's current password. <str>
+    new_password:       The user's new password. <str>
+    user_context (optional, requires administrator)
