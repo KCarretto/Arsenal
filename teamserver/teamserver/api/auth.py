@@ -2,12 +2,14 @@
     This module contains all 'Auth' API functions.
 """
 from uuid import uuid4
-import bcrypt
+
+from base64 import b64encode
+from argon2 import argon2_hash
 
 from ..utils import handle_exceptions, success_response, get_context
 from ..exceptions import PermissionDenied
 from ..models import User, APIKey, Role
-from ..config import API_KEY_SALT
+from ..config import API_KEY_SALT, HASH_TIME_PARAM, HASH_MEMORY_PARAM, HASH_PARALLELIZATION_PARAM
 
 @handle_exceptions
 def create_user(params):
@@ -70,8 +72,14 @@ def create_api_key(params):
         str(uuid4()),
         str(uuid4()),
         )
+    mid_hash = b64encode(argon2_hash(password=original_key,
+                                     salt=API_KEY_SALT,
+                                     t=HASH_TIME_PARAM,
+                                     m=HASH_MEMORY_PARAM,
+                                     p=HASH_PARALLELIZATION_PARAM)).decode()
+
     key = APIKey(
-        key=bcrypt.hashpw(original_key.encode('utf-8'), API_KEY_SALT).decode(),
+        key=API_KEY_SALT + "$" + mid_hash,
         owner=owner,
         allowed_api_calls=allowed_api_calls
     )

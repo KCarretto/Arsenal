@@ -6,14 +6,18 @@
     API keys have Roles
     Roles have permissions
 """
+from base64 import b64encode
+from os import urandom
+
 from mongoengine import Document
 from mongoengine.fields import ListField, StringField, BooleanField
 
-import bcrypt
+from argon2 import argon2_hash
 
 from .webhook import Webhook
 from ..exceptions import InvalidCredentials, RoleException
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, API_KEY_SALT
+from ..config import HASH_TIME_PARAM, HASH_MEMORY_PARAM, HASH_PARALLELIZATION_PARAM
 from ..config import COLLECTION_USERS, COLLECTION_ROLES, COLLECTION_APIKEYS
 
 class Role(Document):
@@ -127,7 +131,12 @@ class APIKey(Document):
         """
         Query for a key from the database.
         """
-        return APIKey.objects.get(key=bcrypt.hashpw(key.encode('utf-8'), API_KEY_SALT).decode()) # pylint: disable=no-member
+        mid_hash = b64encode(argon2_hash(password=key,
+                                         salt=API_KEY_SALT,
+                                         t=HASH_TIME_PARAM,
+                                         m=HASH_MEMORY_PARAM,
+                                         p=HASH_PARALLELIZATION_PARAM)).decode()
+        return APIKey.objects.get(key=API_KEY_SALT + "$" + mid_hash) # pylint: disable=no-member
 
     @property
     def document(self):
@@ -223,11 +232,18 @@ class User(Document):
         return Role.objects(users=self.username) # pylint: disable=no-member
 
     @staticmethod
-    def hash_password(password):
+    def hash_password(password, salt=None):
         """
         Returns a hash of a password.
         """
-        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        if salt is None:
+            salt = b64encode(urandom(15)).decode()
+        mid_hash = b64encode(argon2_hash(password=password,
+                                         salt=salt,
+                                         t=HASH_TIME_PARAM,
+                                         m=HASH_MEMORY_PARAM,
+                                         p=HASH_PARALLELIZATION_PARAM)).decode()
+        return salt + "$" + mid_hash
 
     @property
     def allowed_api_calls(self):
@@ -258,7 +274,10 @@ class User(Document):
         Determines if a user is authenticated given a password.
         Raises an InvalidCredentials exception if the password was incorrect.
         """
-        if not bcrypt.checkpw(password.encode('utf-8'), self.password.encode('utf-8')):
+        salt = self.password[:self.password.find("$")]
+        suspect_hash = User.hash_password(password, salt=salt)
+
+        if suspect_hash != self.password:
             raise InvalidCredentials('Password incorrect.')
         return True
 
@@ -267,7 +286,7 @@ class User(Document):
         Updates a user's password.
         """
         if self.authenticate(current_password):
-            self.password = self.hash_password(new_password)
+            self.password = User.hash_password(new_password)
             self.save()
         return True
 
