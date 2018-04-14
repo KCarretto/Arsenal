@@ -118,6 +118,8 @@ def session_check_in(params): #pylint: disable=too-many-locals
     responses (optional):   Any responses to actions that the session is submitting. <list[dict]>
     facts (optional):       Any updates to the Target's fact collection. <dict>
     config (optional):      Any updates to the Session's config. <dict>
+    public_ip (optional):   The public IP the session was seen from.
+                                Appended to the target's list. <str>
     """
     # Fetch session object, create one if it does not exist
     session = Session.get_by_id(params['session_id'])
@@ -199,10 +201,15 @@ def session_check_in(params): #pylint: disable=too-many-locals
         servers = config.get('servers')
         session.update_config(interval, interval_delta, servers, config)
 
-    # Update facts if they were included
+    # Update target facts if they were included
     facts = params.get('facts')
     if facts and isinstance(facts, dict):
         target.set_facts(facts)
+
+    # Update target public ips if they were included
+    public_ip = params.get('public_ip')
+    if public_ip and isinstance(public_ip, str):
+        target.add_public_ip(public_ip)
 
     # Generate Event
     if not current_app.config.get('DISABLE_EVENTS', False):

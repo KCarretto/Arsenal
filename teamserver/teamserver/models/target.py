@@ -6,7 +6,7 @@
 import time
 
 from mongoengine import Document, DynamicEmbeddedDocument
-from mongoengine.fields import StringField, DictField
+from mongoengine.fields import StringField, DictField, ListField
 from mongoengine.fields import EmbeddedDocumentListField
 
 from .session import Session
@@ -54,13 +54,10 @@ class Target(Document):
         max_length=MAX_STR_LEN,
         unique=True)
 
-    #mac_addrs = ListField(
-    #    StringField(required=True, null=False, max_length=20),
-    #    required=True,
-    #    null=False,
-    #    unique=True)
-
     uuid = StringField(required=True, null=False, max_length=MAX_BIGSTR_LEN, unique=True)
+
+    public_ips = ListField(
+        StringField(required=True, null=False, max_length=MAX_STR_LEN), required=False)
 
     facts = DictField(null=False)
 
@@ -150,6 +147,7 @@ class Target(Document):
         doc = {
             'name': self.name,
             'uuid': self.uuid,
+            'public_ips': self.public_ips,
         }
         if include_status:
             doc['status'] = self.status
@@ -171,6 +169,14 @@ class Target(Document):
         for key, value in facts.items():
             self.facts[key] = value #pylint: disable=unsupported-assignment-operation
         self.save()
+
+    def add_public_ip(self, public_ip):
+        """
+        Associate a public ip with the target.
+        """
+        if public_ip not in self.public_ips: # pylint: disable=unsupported-membership-test
+            self.public_ips.append(public_ip) # pylint: disable=no-member
+            self.save()
 
     def remove(self):
         """
