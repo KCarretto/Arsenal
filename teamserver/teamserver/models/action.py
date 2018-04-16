@@ -5,7 +5,6 @@
 import time
 import shlex
 import argparse
-import json
 
 from mongoengine import DynamicDocument, EmbeddedDocument
 from mongoengine.fields import StringField, IntField, FloatField
@@ -161,12 +160,15 @@ class Action(DynamicDocument):
             parser = argparse.ArgumentParser('config_action_parser')
             parser.add_argument('-i', '--interval', type=float)
             parser.add_argument('-d', '--delta', type=float)
-            parser.add_argument('-c', '--config', type=json.loads)
+            parser.add_argument('-c', '--config', nargs=2, action='append')
             parser.add_argument('-s', '--servers', nargs='+', type=list)
             args = parser.parse_args(tokens)
             config = {}
-            if args.config and isinstance(config, dict):
-                config = args.config
+            if args.config and isinstance(config, list):
+                for arg in args.config:
+                    if isinstance(arg, list) and len(arg) > 1:
+                        config[arg[0]] = arg[1]
+
             if args.servers:
                 config['servers'] = [''.join(server) for server in args.servers]
             if args.interval:
