@@ -164,7 +164,7 @@ class Action(DynamicDocument):
             parser.add_argument('-s', '--servers', nargs='+', type=list)
             args = parser.parse_args(tokens)
             config = {}
-            if args.config and isinstance(config, list):
+            if args.config and isinstance(args.config, list):
                 for arg in args.config:
                     if isinstance(arg, list) and len(arg) > 1:
                         config[arg[0]] = arg[1]
