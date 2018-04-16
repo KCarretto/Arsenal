@@ -170,8 +170,7 @@ class Action(DynamicDocument):
                         try:
                             config[arg[0]] = int(arg[1])
                         except ValueError:
-                            pass
-                        config[arg[0]] = arg[1]
+                            config[arg[0]] = arg[1]
 
             if args.servers:
                 config['servers'] = [''.join(server) for server in args.servers]
