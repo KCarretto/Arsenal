@@ -45,7 +45,7 @@ def create_group_action(params):
             'action_string': action_string,
             'action_id': '{}_{}'.format(group_action_id, str(uuid4())),
             'quick': params.get('quick', False),
-            'arsenal_auth_obj': params.get('arsenal_auth_obj', None),
+            'arsenal_auth_object': params.get('arsenal_auth_object', None),
         }, False)
 
         actions.append(action)
