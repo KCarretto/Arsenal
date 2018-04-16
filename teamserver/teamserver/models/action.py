@@ -167,6 +167,10 @@ class Action(DynamicDocument):
             if args.config and isinstance(args.config, list):
                 for arg in args.config:
                     if isinstance(arg, list) and len(arg) > 1:
+                        try:
+                            config[arg[0]] = int(arg[1])
+                        except ValueError:
+                            pass
                         config[arg[0]] = arg[1]
 
             if args.servers:
