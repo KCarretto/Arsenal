@@ -7,6 +7,7 @@ import time
 
 from ..utils import get_context, success_response, handle_exceptions, log
 from ..models import Action, Target, Session
+from ..config import SESSION_STATUSES
 from ..exceptions import CannotBindAction
 
 @handle_exceptions
@@ -45,7 +46,13 @@ def create_action(params, commit=True):
     parsed_action = Action.parse_action_string(action_string)
 
     if params.get('quick', False):
-        bound_session = min(target.sessions, key=lambda x: x.interval)
+        bound_session = min(
+            filter(
+                lambda x: x.status == SESSION_STATUSES.get('active', 'active'),
+                target.sessions),
+            key=lambda x: x.interval
+        )
+
         if bound_session and isinstance(bound_session, Session):
             bound_session_id = bound_session.session_id
 
