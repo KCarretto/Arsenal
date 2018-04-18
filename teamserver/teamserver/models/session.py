@@ -154,6 +154,7 @@ class Session(Document):
             'status': self.status,
             'timestamp': self.timestamp,
             'config': self.config,
+            'agent_version': self.agent_version,
         }
 
     def update_config(self, interval=None, interval_delta=None, servers=None, config=None):
