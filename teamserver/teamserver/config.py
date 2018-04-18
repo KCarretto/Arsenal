@@ -39,7 +39,7 @@ COLLECTION_WEBHOOKS = 'webhooks'
 
 # LOG SETTINGS
 APPLICATION = 'teamserver-internal'
-LOG_LEVEL = 'INFO'
+LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
 LOG_LEVELS = {
     'DEBUG': 0,
     'INFO': 1,
@@ -127,10 +127,10 @@ INTEGRATIONS = {
     'SLACK_CONFIG': {
         'enabled': True,
         'API_TOKEN': os.environ.get('SLACK_API_TOKEN', read_api_key('.slack_api')),
-        'TIMEOUT': 10,
+        'TIMEOUT': int(os.environ.get('SLACK_TIMEOUT', 10)),
 
-        'ERROR_CHANNEL': 'notifications',
-        'ACTION_CHANNEL': 'notifications',
+        'ERROR_CHANNEL': os.environ.get('SLACK_ERROR_CHANNEL', 'notifications'),
+        'ACTION_CHANNEL': os.environ.get('SLACK_ACTION_CHANNEL', 'notifications'),
     },
     'PWNBOARD_CONFIG': {
         'enabled': False,
