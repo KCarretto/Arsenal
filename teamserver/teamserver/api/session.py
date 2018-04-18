@@ -71,7 +71,7 @@ def create_session(params):
         target.set_facts(facts)
 
     log(
-        'INFO',
+        'DEBUG',
         'New Session on (target: {}) (session: {})'.format(target.name, session.session_id))
 
     if agent_version:
@@ -84,7 +84,7 @@ def create_session(params):
                     'bound_session_id': session.session_id
                 })
                 log(
-                    'INFO',
+                    'DEBUG',
                     'Queued default config action for new session {} (agent_version: {})'.format(
                         session.session_id,
                         agent.agent_version)
@@ -139,7 +139,7 @@ def session_check_in(params): #pylint: disable=too-many-locals
         pass
 
     log(
-        'INFO',
+        'DEBUG',
         'Session checked in from (target: {}) (session: {})'.format(
             session.target_name,
             session.session_id))
