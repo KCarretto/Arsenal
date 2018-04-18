@@ -125,7 +125,7 @@ def read_api_key(api_key_file):
 
 INTEGRATIONS = {
     'SLACK_CONFIG': {
-        'enabled': True,
+        'enabled': os.environ.get('SLACK_ENABLED', False),
         'API_TOKEN': os.environ.get('SLACK_API_TOKEN', read_api_key('.slack_api')),
         'TIMEOUT': int(os.environ.get('SLACK_TIMEOUT', 10)),
 
@@ -133,7 +133,7 @@ INTEGRATIONS = {
         'ACTION_CHANNEL': os.environ.get('SLACK_ACTION_CHANNEL', 'notifications'),
     },
     'PWNBOARD_CONFIG': {
-        'enabled': False,
+        'enabled': os.environ.get('PWNBOARD_ENABLED', False),
         'URL': os.environ.get('PWNBOARD_URL', 'https://pwnboard.local/generic')
     }
 }

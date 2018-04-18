@@ -13,6 +13,7 @@ services:
       - DB_PORT=27017
       #- DB_USER=
       #- DB_PASS=password
+      #- SLACK_ENABLED=True
       #- SLACK_API_TOKEN=None
 
   redis:
