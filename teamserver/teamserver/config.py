@@ -10,6 +10,7 @@ CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND')
 CELERY_BROKER_TRANSPORT = {
     'region': 'us-west-2'
 }
+
 # DATABASE CONNECTION SETTINGS
 DB_NAME = os.environ.get('DB_NAME', 'arsenal_sample')
 DB_HOST = os.environ.get('DB_HOST', 'localhost')
@@ -38,7 +39,7 @@ COLLECTION_WEBHOOKS = 'webhooks'
 
 # LOG SETTINGS
 APPLICATION = 'teamserver-internal'
-LOG_LEVEL = 'DEBUG'
+LOG_LEVEL = 'INFO'
 LOG_LEVELS = {
     'DEBUG': 0,
     'INFO': 1,
