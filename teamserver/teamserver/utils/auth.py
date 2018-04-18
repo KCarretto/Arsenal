@@ -1,6 +1,7 @@
 """
 This module is used to determine if a request is properly authenticated.
 """
+from flask import current_app
 from mongoengine import DoesNotExist
 from ..models import User, APIKey
 from ..exceptions import InvalidCredentials
@@ -24,6 +25,12 @@ def get_context(params):
     """
     Allow administrative users to assume another user context.
     """
+    # If authentication is disabled, return
+    if current_app.config.get('DISABLE_AUTH', False):
+        return (
+            None, ['*'], True
+        )
+
     user, allowed_methods = _get_user(params)
     administrator = user.administrator
     # Allow administrators to override the owner with a custom value
