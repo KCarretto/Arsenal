@@ -7,8 +7,8 @@ import functools
 from io import BytesIO as IO
 from flask import jsonify, after_this_request, request
 
+from .logging import log
 from ..config import LOG_LEVEL
-
 
 def respond(response):
     """
@@ -46,7 +46,7 @@ def failed_response(status, description, error_type, log_msg=None, log_level=Non
     """
 
     if log_msg is not None and log_level is not None:
-        #log(log_level, '{}|{}'.format(description, str(log_msg)))
+        log(log_level, '{}|{}'.format(description, str(log_msg)))
 
         if LOG_LEVEL == 'DEBUG':
             return {
