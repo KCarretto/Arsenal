@@ -1,4 +1,4 @@
-# Arsenal [![Build Status](https://travis-ci.org/KCarretto/Arsenal.svg?branch=master)](https://travis-ci.org/KCarretto/Arsenal)
+# Arsenal [![Build Status](https://travis-ci.org/KCarretto/Arsenal.svg?branch=master)](https://travis-ci.org/KCarretto/Arsenal) ![python 3.6](https://img.shields.io/badge/python-3.6-green.svg)
 Extensible Red Team Framework
 
 ## Overview
