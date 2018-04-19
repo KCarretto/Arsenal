@@ -32,6 +32,13 @@ def create_target(params):
     )
     target.save(force_insert=True)
 
+    # Generate Event
+    if not current_app.config.get('DISABLE_EVENTS', False):
+        events.trigger_event.delay(
+            event='target_create',
+            target=target.document(True, True, True),
+        )
+
     return success_response()
 
 @handle_exceptions
@@ -117,7 +124,7 @@ def rename_target(params):
     # Generate Event
     if not current_app.config.get('DISABLE_EVENTS', False):
         events.trigger_event.delay(
-            event='target_name',
+            event='target_rename',
             old_name=params['name'],
             new_name=new_name,
         )
