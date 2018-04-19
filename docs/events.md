@@ -15,6 +15,25 @@ Each API method call generates the `api_call` event, with the following data:
 }
 ```
 
+### Target Create
+Each time a target is created, the `target_create` event is triggered with the following data:
+```
+{
+'event': 'target_create',
+'target': <Target Object (with facts, status, and sessions)
+}
+```
+
+### Target Rename
+Each time a target is renamed, the `target_rename` event is triggered with the following data:
+```
+{
+'event': 'target_rename',
+'old_name': 'Target's old name',
+'new_name': 'Target's new name',
+}
+```
+
 ### Session Check In
 Each time a session checks in with the teamserver, the `session_checkin` event is triggered with the following data:
 ```
