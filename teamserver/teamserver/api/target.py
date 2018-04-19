@@ -1,7 +1,10 @@
 """
     This module contains all 'Target' API functions.
 """
+from flask import current_app
 from mongoengine.errors import DoesNotExist
+
+import teamserver.events.worker as events
 
 from ..utils import success_response, get_filtered_target, handle_exceptions
 from ..models import Target, Action, Group
@@ -110,6 +113,14 @@ def rename_target(params):
         action.save()
     for group in groups:
         group.save()
+
+    # Generate Event
+    if not current_app.config.get('DISABLE_EVENTS', False):
+        events.trigger_event.delay(
+            event='target_name',
+            old_name=params['name'],
+            new_name=new_name,
+        )
 
     return success_response()
 
