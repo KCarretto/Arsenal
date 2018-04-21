@@ -10,6 +10,7 @@ import teamserver.events.worker as events
 
 from .api import create_target, get_target, rename_target
 from .api import set_target_facts, list_targets, migrate_target
+from .api import add_credentials, invalidate_credentials, list_credentials
 from .api import create_session, get_session, session_check_in
 from .api import update_session_config, list_sessions
 from .api import create_action, get_action, cancel_action, list_actions, duplicate_action
@@ -91,6 +92,11 @@ def api_entry(): # pylint: disable=too-many-return-statements
         'ListTargets': list_targets,
         'MigrateTarget': migrate_target,
 
+        # Target Creds
+        'AddCredentials': add_credentials,
+        'InvalidateCredentials': invalidate_credentials,
+        'ListCredentials': list_credentials,
+
         # Sessions
         'CreateSession': create_session,
         'GetSession': get_session,
@@ -124,12 +130,6 @@ def api_entry(): # pylint: disable=too-many-return-statements
         'AddGroupRule': add_group_rule,
         'RemoveGroupRule': remove_group_rule,
         'RebuildGroupMembers': rebuild_group_members,
-
-        # Credentials
-        'CreateCredentials': None,
-        'GetValidCredentials': None,
-        'InvalidateCredentials': None,
-        'ListCredentials': None,
 
         # Logs
         'CreateLog': create_log,

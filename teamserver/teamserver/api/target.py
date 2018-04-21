@@ -237,16 +237,11 @@ def invalidate_credentials(params):
     return success_response()
 
 @handle_exceptions
-def list_credentials(params):
+def list_credentials(params): # pylint: disable=unused-argument
     """
     ### Overview
-    This API function is used to list valid credentials for a target.
-
-    ### Parameters
-    target_name: The name of the target to list credentials for.
+    This API function is used to list valid credentials.
     """
-    target = Target.get_by_name(params['target_name'])
-
     return success_response(
-        credentials=[creds.document for creds in target.credentials]
+        credentials=[creds.document for creds in Credential.objects] # pylint: disable=no-member
     )
