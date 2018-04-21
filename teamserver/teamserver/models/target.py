@@ -5,27 +5,32 @@
 
 import time
 
-from mongoengine import Document, DynamicEmbeddedDocument
-from mongoengine.fields import StringField, DictField, ListField
-from mongoengine.fields import EmbeddedDocumentListField
+from mongoengine import Document
+from mongoengine.fields import StringField, DictField, ListField, BooleanField
 
 from .session import Session
 
 from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN
-from ..config import COLLECTION_TARGETS
+from ..config import COLLECTION_TARGETS, COLLECTION_TARGET_CREDS
 from ..config import SESSION_STATUSES, SESSION_ARCHIVE_MODIFIER
 
-class Credential(DynamicEmbeddedDocument):
+class Credential(Document):
     """
-    This class represents information that can be used to access a
-    target, usually in the form of credentials. The below formatting
-    is suggested, so that automated tasks can be executed, but it is
-    a dynamic document, so data can be added here at will.
+    This class represents a set of credentials for the target system.
     """
+    meta = {
+        'collection': COLLECTION_TARGET_CREDS,
+        'indexes': [
+            {
+                'fields': ['target_name'],
+            },
+        ]
+    }
+    target_name = StringField(max_length=MAX_STR_LEN)
     user = StringField(max_length=MAX_STR_LEN)
-    password = StringField(max_length=MAX_STR_LEN)
-    service = StringField(max_length=MAX_STR_LEN)
     key = StringField(max_length=MAX_BIGSTR_LEN)
+    service = StringField(max_length=MAX_STR_LEN)
+    valid = BooleanField(null=False, default=True)
 
 class Target(Document):
     """
@@ -60,8 +65,6 @@ class Target(Document):
         StringField(required=True, null=False, max_length=MAX_STR_LEN), required=False)
 
     facts = DictField(null=False)
-
-    credentials = EmbeddedDocumentListField(Credential)
 
     _session_cache = None
 
@@ -103,6 +106,13 @@ class Target(Document):
 
         self._session_cache = sessions
         return sessions
+
+    @property
+    def credentials(self):
+        """
+        This property returns all valid credentials for a target.
+        """
+        return list(Credential.objects(valid=True, target_name=self.name)) #pylint: disable=no-member
 
     @property
     def status(self):
