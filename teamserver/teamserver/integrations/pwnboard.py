@@ -51,7 +51,7 @@ class PwnboardIntegration(Integration): # pylint: disable=too-few-public-methods
 
         data = {'ips': ip_addrs, 'type': name}
         try:
-            req = requests.post(self.url, json=data, timeout=3)
+            requests.post(self.url, json=data, timeout=3)
             return True
         except RequestException:
             return False
