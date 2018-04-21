@@ -11,10 +11,14 @@ A Target represents a system to attack.
 "name": "Target A",
 "status": "inactive",
 "lastseen": 1522096823,
-"mac_addrs": ["AA:BB:CC:DD:EE:FF", "DD:BB:CC:EE:AA:FF"],
 "facts": {
   "hostname": "example",
   "os_arch": "x86_64",
+  "interfaces": [{
+      "name": "eth0 example",
+      "ip_addrs": ["ip1/mask or ip1", "ip2/mask or ip2" some bots do not record /mask],
+      "mac_addr": "AA:AA:AA:AA:AA:AA"
+    }]
 },
 "sessions": [ <Session Object> ],
 }
@@ -34,7 +38,7 @@ A Target represents a system to attack.
 ### Overview
 A Session represents a running instance of an Agent on the Target system.
 
-### Example 
+### Example
 ```
 {
 "session_id": "ac198dd6-94be-4b6a-988f-dd9e0ba61f0e",
@@ -64,7 +68,7 @@ A Session represents a running instance of an Agent on the Target system.
 | **Status** | **Description**                                                 |
 | :--------- | :-------------------------------------------------------------- |
 | active     | The Session has checked in within it's interval +/- it's delta. |
-| missing    | The Session has missed it's expected check in time.             | 
+| missing    | The Session has missed it's expected check in time.             |
 | inactive   | The Session has not been seen in a significant amount of time.  |
 
 ## Action
@@ -186,4 +190,3 @@ A Log object represents an entry of a log message that was submitted to the log 
 | application      | no         | str        | The application that submitted the log.                           |
 | level            | no         | str        | The level that the message was logged at. (DEBUG, INFO, WARN, CRIT, FATAL)|
 | message          | no         | str        | The message being recorded.                                       |
-
