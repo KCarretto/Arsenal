@@ -7,7 +7,7 @@ from mongoengine.errors import DoesNotExist
 import teamserver.events.worker as events
 
 from ..utils import success_response, get_filtered_target, handle_exceptions
-from ..models import Target, Action, Group
+from ..models import Target, Credential, Action, Group
 from ..exceptions import CannotRenameTarget, MembershipError
 
 @handle_exceptions
@@ -189,3 +189,59 @@ def migrate_target(params):
     })
 
     return success_response()
+
+@handle_exceptions
+def add_credentials(params):
+    """
+    ### Overview
+    This API function associates valid credentials with a target.
+
+    ### Parameters
+    target_name: The name of the target to associate credentials with.
+    user: The user that the credentials are for.
+    key: The secret key. This could be the password, or SSH key.
+    service(optional): Optionally document what service this is for.
+    """
+    target = Target.get_by_name(params['target_name'])
+
+    creds = Credential(
+        target_name=target.name,
+        user=params['user'],
+        key=params['key'],
+        service=params.get('service')
+    )
+    creds.save()
+
+    return success_response()
+
+
+@handle_exceptions
+def invalidate_credentials(params):
+    """
+    ### Overview
+    This API function invalidates a set of credentials.
+
+    ### Parameters
+    target_name: The name of the target to invalidate credentials for.
+    user: The username for the credentials.
+    key: The secret key for the credentials.
+    """
+    cred = Credential.objects.get( # pylint: disable=no-member
+        target_name=params['target_name'],
+        user=params['user'],
+        key=params['key']
+    )
+    cred.valid = False
+    cred.save()
+
+    return success_response()
+
+@handle_exceptions
+def list_credentials(params): # pylint: disable=unused-argument
+    """
+    ### Overview
+    This API function is used to list valid credentials.
+    """
+    return success_response(
+        credentials=[creds.document for creds in Credential.objects] # pylint: disable=no-member
+    )
