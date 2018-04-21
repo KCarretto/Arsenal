@@ -6,7 +6,9 @@ import requests
 from celery import Celery
 from mongoengine import connect
 
-from teamserver.integrations import Integration, SlackIntegration, PwnboardIntegration
+from teamserver.integrations import Integration
+from teamserver.integrations import SlackIntegration, PwnboardIntegration, ChanganIntegration
+
 from teamserver.models import Webhook
 from teamserver.config import CELERY_MAIN_NAME, CELERY_RESULT_BACKEND, CELERY_BROKER_URL
 from teamserver.config import CELERY_BROKER_TRANSPORT
@@ -23,9 +25,15 @@ app = Celery( # pylint: disable=invalid-name
 
 connect(DB_NAME, host=DB_HOST, port=DB_PORT)
 
-SLACK = SlackIntegration(INTEGRATIONS.get('SLACK_CONFIG', {'enabled': False}))
-PWNBOARD = PwnboardIntegration(INTEGRATIONS.get('PWNBOARD_CONFIG',
-                                                {'enabled': False}))
+SLACK = SlackIntegration(INTEGRATIONS.get(
+    'SLACK_CONFIG',
+    {'enabled': False}))
+PWNBOARD = PwnboardIntegration(INTEGRATIONS.get(
+    'PWNBOARD_CONFIG',
+    {'enabled': False}))
+CHANGAN = ChanganIntegration(INTEGRATIONS.get(
+    'CHANGAN_CONFIG',
+    {'enabled': False}))
 
 @app.task
 def notify_subscriber(**kwargs):
@@ -67,3 +75,4 @@ def trigger_event(**kwargs):
         # Notify Integrations
         notify_integration(SLACK, kwargs)
         notify_integration(PWNBOARD, kwargs)
+        notify_integration(CHANGAN, kwargs)

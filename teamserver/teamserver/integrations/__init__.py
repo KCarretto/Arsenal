@@ -5,3 +5,4 @@
 from .integration import Integration
 from .slack import SlackIntegration
 from .pwnboard import PwnboardIntegration
+from .changan import ChanganIntegration
