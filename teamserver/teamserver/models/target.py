@@ -32,6 +32,19 @@ class Credential(Document):
     service = StringField(max_length=MAX_STR_LEN)
     valid = BooleanField(null=False, default=True)
 
+    @property
+    def document(self):
+        """
+        Return as formatted JSON.
+        """
+        return {
+            'target_name': self.target_name,
+            'user': self.user,
+            'key': self.key,
+            'service': self.service,
+            'valid': self.valid,
+        }
+
 class Target(Document):
     """
     This class represents a target system. It stores facts about the
