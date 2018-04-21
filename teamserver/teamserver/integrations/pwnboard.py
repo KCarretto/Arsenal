@@ -36,13 +36,10 @@ class PwnboardIntegration(Integration): # pylint: disable=too-few-public-methods
         event = event_data.get("event")
         if event != "session_checkin":
             return False
-        # The headers for the callback
-        # headers = {'Content-Type': 'application/json',
-        #            'Connection': 'Close'}
         # Try to get the agent string
         name = event_data.get("session", {}).get("agent_version", "Arsenal")
         # Get the facts
-        facts = event_data.get("facts", {})
+        facts = event_data.get("target", {}).get("facts", {})
         # Stolen from cli.getTarget
         ip_addrs = []
         for iface in facts.get('interfaces', []):
