@@ -136,5 +136,9 @@ INTEGRATIONS = {
     'PWNBOARD_CONFIG': {
         'enabled': os.environ.get('PWNBOARD_ENABLED', False),
         'URL': os.environ.get('PWNBOARD_URL', 'https://pwnboard.local/generic')
+    },
+    'CHANGAN_CONFIG': {
+        'enabled': os.environ.get('CHANGAN_ENABLED', False),
+        'URL': os.environ.get('CHANGAN_URL', 'https://changan.koalatea.me:8080/')
     }
 }
