@@ -52,7 +52,6 @@ def get_target(params):
     include_status (optional):      Should status be included, default: True. <bool>
     include_facts (optional):       Should facts be included, default: False. <bool>
     include_sessions (optional):    Should sessions be included, default: False. <bool>
-    include_credentials (optional): Should credentials be included, default: False. <bool>
     include_actions (optional):     Should actions be included, default: False. <bool>
     include_groups (optional):      Should groups be included, default: False. <bool>
     """
@@ -155,7 +154,6 @@ def list_targets(params): #pylint: disable=unused-argument
     include_status (optional):      Should status be included, Default: True. <bool>
     include_facts (optional):       Should facts be included, Default: False. <bool>
     include_sessions (optional):    Should sessions be included, Default: False. <bool>
-    include_credentials (optional): Should credentials be included, Default: False. <bool>
     include_actions (optional):     Should actions be included, Default: False. <bool>
     include_groups (optional):      Should groups be included, Default: False. <bool>
     """

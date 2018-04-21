@@ -68,8 +68,7 @@ class APIClient(object): # pylint: disable=too-many-public-methods
             include_facts=False,
             include_sessions=False,
             include_actions=False,
-            include_groups=False,
-            include_credentials=False):
+            include_groups=False):
         """
         Invoke the GetTarget API function using the provided client.
         """
@@ -82,7 +81,6 @@ class APIClient(object): # pylint: disable=too-many-public-methods
                 include_sessions=include_sessions,
                 include_actions=include_actions,
                 include_groups=include_groups,
-                include_credentials=include_credentials,
             )),
             content_type='application/json',
             follow_redirects=True
