@@ -162,8 +162,7 @@ class Target(Document):
             self,
             include_status=True,
             include_facts=False,
-            include_sessions=False,
-            include_credentials=False):
+            include_sessions=False):
         """
         This property returns a filtered JSON document representation of the target.
         """
@@ -180,8 +179,6 @@ class Target(Document):
         if include_sessions:
             sessions = self._session_cache if self._session_cache else self.sessions
             doc['sessions'] = [session.document for session in sessions]
-        if include_credentials:
-            doc['credentials'] = self.credentials
 
         return doc
 
