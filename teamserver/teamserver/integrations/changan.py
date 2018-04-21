@@ -68,6 +68,6 @@ class ChanganIntegration(Integration): #pylint: disable=too-few-public-methods
             'target_create': self.handle_create_target,
             'target_rename': self.handle_target_name_change,
         }
-        method = handled_events.get(event_data('event', ''))
+        method = handled_events.get(event_data.get('event', ''))
         if method and callable(method):
             method(event_data)
