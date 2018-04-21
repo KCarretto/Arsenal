@@ -30,7 +30,7 @@ class ChanganIntegration(Integration): #pylint: disable=too-few-public-methods
         """
         try:
             interfaces = []
-            for interface in event_data['facts']['interfaces']:
+            for interface in event_data.get('target', {})['facts']['interfaces']:
                 my_interface = {}
                 my_interface['name'] = interface['name']
                 my_interface['mac'] = interface['mac_addr']
@@ -40,8 +40,8 @@ class ChanganIntegration(Integration): #pylint: disable=too-few-public-methods
                 interfaces.append(my_interface)
             add_client_data = {'device_name': event_data['name'], 'interface': my_interface}
             requests.put('{}api/v1/devices'.format(self.url), json=add_client_data, verify=False)
-        except: #pylint: disable=bare-except
-            return
+        except Exception as exception: #pylint: disable=broad-except
+            print(exception)
 
     def handle_target_name_change(self, event_data):
         """
@@ -55,8 +55,8 @@ class ChanganIntegration(Integration): #pylint: disable=too-few-public-methods
                 change_data = {'device_id': device_id, 'device_name': event_data['new_name']}
                 resp = requests.post('{}api/v1/devices'.format(self.url), json=change_data,
                                      verify=False)
-        except: #pylint: disable=bare-except
-            return
+        except Exception as exception: #pylint: disable=broad-except
+            print(exception)
 
     def run(self, event_data, **kwargs):
         """
