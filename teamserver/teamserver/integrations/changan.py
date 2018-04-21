@@ -39,7 +39,7 @@ class ChanganIntegration(Integration): #pylint: disable=too-few-public-methods
                     my_interface['ips'].append(ip_addr.split('/')[0])
                 interfaces.append(my_interface)
             add_client_data = {'device_name': event_data['name'], 'interface': my_interface}
-            requests.put('{}api/v1/devices'.format(self.url), json=add_client_data, veriy=False)
+            requests.put('{}api/v1/devices'.format(self.url), json=add_client_data, verify=False)
         except: #pylint: disable=bare-except
             return
 
