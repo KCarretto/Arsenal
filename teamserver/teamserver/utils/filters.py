@@ -11,7 +11,6 @@ def get_filtered_target(target, params):
         params.get('include_status', True),
         params.get('include_facts', False),
         params.get('include_sessions', False),
-        params.get('include_credentials', False)
     )
     if params.get('include_actions', False):
         doc['actions'] = [action.document for action in Action.get_target_actions(target.name)]
