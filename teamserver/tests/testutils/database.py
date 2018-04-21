@@ -199,8 +199,7 @@ class Database(object):
     def create_target(
             name=None,
             uuid=None,
-            facts=None,
-            credentials=None):
+            facts=None):
         """
         Create an target object in the database.
         """
@@ -222,7 +221,6 @@ class Database(object):
                 ]
             },
             uuid=uuid if uuid else str(uuid4()),
-            credentials=credentials
         )
         target.save(force_insert=True)
         return target
