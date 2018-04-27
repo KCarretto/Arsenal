@@ -43,12 +43,6 @@ def create_session(params):
             uuid=params['target_uuid'],
         )
         target.save(force_insert=True)
-        # Generate Event
-        if not current_app.config.get('DISABLE_EVENTS', False):
-            events.trigger_event.delay(
-                event='target_create',
-                target=target.document(True, True, True),
-            )
 
     # Determine Agent Version
     agent_version = params.get('agent_version')
