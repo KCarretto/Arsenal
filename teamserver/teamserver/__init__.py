@@ -8,6 +8,8 @@ from flask import Flask
 from flask_mongoengine import MongoEngine
 from mongoengine import connect, MongoEngineConnectionError
 
+from flask_graphql import GraphQLView
+
 from .config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
 from .config import CELERY_BROKER_URL, CELERY_RESULT_BACKEND
 
@@ -45,8 +47,14 @@ def create_app(**config_overrides):
         sys.exit('Could not connect to database.')
 
     # Import endpoints
-    from teamserver.router import API
-    app.register_blueprint(API)
+    #from teamserver.router import API
+    #app.register_blueprint(API)
+
+    # Register GraphQL
+    from teamserver.api import SCHEMA
+    app.add_url_rule(
+        '/graphql',
+        view_func=GraphQLView.as_view('graphql', schema=SCHEMA, graphiql=True))
 
 
     return app
