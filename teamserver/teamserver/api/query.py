@@ -5,11 +5,19 @@ import graphene
 
 from graphene_mongo import MongoengineConnectionField
 
-from .schema import Target, Session
+from .target import Target
+from .session import Session, CreateSession
 
 class Query(graphene.ObjectType):
     """
-    Represents a basic graphql query.
+    Represents the root of GraphQL queries.
     """
     all_targets = MongoengineConnectionField(Target)
     all_sessions = MongoengineConnectionField(Session)
+
+class Mutation(graphene.ObjectType):
+    """
+    Represents all possible data mutations.
+    """
+    create_session = CreateSession.Field()
+
