@@ -4,7 +4,10 @@ This module contains standard CRUD mutations for mongoengine models.
 
 import graphene
 
-def get_create(object_model, arguments):
+def get_create(object_model, arguments, **kwargs):
+
+    input_hook = kwargs.get('input_hook')
+    output_hook = kwargs.get('output_hook')
 
     class CreateMutation(graphene.Mutation):
         Arguments = arguments
@@ -12,8 +15,15 @@ def get_create(object_model, arguments):
         model = graphene.Field(object_model)
 
         def mutate(self, _, **kwargs):
+            if input_hook and callable(input_hook):
+                kwargs = input_hook(**kwargs)
+
             model = object_model._meta.model(**kwargs)
             model.save(force_insert=True)
+
+            if output_hook and callable(output_hook):
+                output_hook(model)
+
             return CreateMutation(model=model)
 
     return type(

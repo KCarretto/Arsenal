@@ -8,9 +8,8 @@ from graphene_mongo import MongoengineConnectionField
 from teamserver import models
 
 from .mutations import get_create, get_delete, get_update
-
 from .objects import Target, Session, SessionConfig
-
+from .hooks import in_create_session
 from .arguments import (
     CreateTargetArgs,
     DeleteTargetArgs,
@@ -41,5 +40,8 @@ class Mutation(graphene.ObjectType):
         lambda **kwargs: models.Target.objects.get(name=kwargs['name'])).Field()
     delete_target = get_delete(Target, DeleteTargetArgs).Field()
 
-    create_session = get_create(Session, CreateSessionArgs).Field()
+    create_session = get_create(
+        Session,
+        CreateSessionArgs,
+        input_hook=in_create_session).Field()
 
