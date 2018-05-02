@@ -25,8 +25,6 @@ def get_create(object_model, arguments):
         }
     )
 
-#    return CreateMutation
-
 def get_update(object_model, arguments, custom_get=None):
     class UpdateMutation(graphene.Mutation):
         Arguments = arguments
@@ -44,7 +42,14 @@ def get_update(object_model, arguments, custom_get=None):
 
             return UpdateMutation(model=model)
 
-    return UpdateMutation
+    return type(
+        "update{}".format(object_model.__name__),
+        (UpdateMutation,),
+        {
+            "Arguments": arguments,
+            "model": graphene.Field(object_model)
+        }
+    )
 
 def get_delete(object_model, arguments, custom_get=None):
     class DeleteMutation(graphene.Mutation):
@@ -61,5 +66,11 @@ def get_delete(object_model, arguments, custom_get=None):
             model.delete()
             return DeleteMutation(ok=True)
 
-    return DeleteMutation
-
+    return type(
+        "delete{}".format(object_model.__name__),
+        (DeleteMutation,),
+        {
+            "Arguments": arguments,
+            "model": graphene.Field(object_model)
+        }
+    )
