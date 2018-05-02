@@ -27,3 +27,4 @@ class Target(Model):
     }
     name = StringField(required=True, unique=True, null=False)
     uuid = StringField(required=True, unique=True, null=False)
+    test = StringField()
