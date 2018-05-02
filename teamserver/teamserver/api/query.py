@@ -5,7 +5,7 @@ import graphene
 
 from graphene_mongo import MongoengineConnectionField
 
-from .target import Target
+from .target import Target, CreateTarget
 from .session import Session, CreateSession
 
 class Query(graphene.ObjectType):
@@ -20,4 +20,5 @@ class Mutation(graphene.ObjectType):
     Represents all possible data mutations.
     """
     create_session = CreateSession.Field()
+    create_target = CreateTarget.Field()
 

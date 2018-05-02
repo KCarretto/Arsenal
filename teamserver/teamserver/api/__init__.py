@@ -5,6 +5,11 @@ import graphene
 
 from .target import Target
 from .session import Session, SessionConfig
-from .query import Query, Mutation
+from .query import Query#, Mutation
+from .mutate import Mutation
 
-SCHEMA = graphene.Schema(query=Query, mutation=Mutation, types=[Target, Session, SessionConfig])
+SCHEMA = graphene.Schema(
+    query=Query,
+    mutation=Mutation,
+    types=[Target, Session, SessionConfig]
+)

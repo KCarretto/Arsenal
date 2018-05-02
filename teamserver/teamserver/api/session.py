@@ -1,6 +1,8 @@
 """
 This module contains the schema for Session objects.
 """
+from uuid import uuid4
+
 import time
 import graphene
 
@@ -47,21 +49,21 @@ class CreateSession(graphene.Mutation):
         """
         Accepted arguments.
         """
-        session_id = graphene.String(required=True)
         target_name = graphene.String(required=True)
+        agent_version = graphene.String(required=True)
         config = SessionConfigInput(required=True)
 
     session = graphene.Field(Session)
 
-    def mutate(self, _, session_id, target_name, config, **kwargs):
+    def mutate(self, _, target_name, config, agent_version=None):
         """
         Create a new session object model.
         """
         session = models.Session(
-            session_id=session_id,
+            session_id=str(uuid4()),
             target_name=target_name,
             timestamp=time.time(),
-            agent_version=kwargs.get('agent_version'),
+            agent_version=agent_version,
             config=models.SessionConfig(
                 config.interval,
                 config.delta,
