@@ -133,6 +133,15 @@ INTEGRATIONS = {
         'ERROR_CHANNEL': os.environ.get('SLACK_ERROR_CHANNEL', 'notifications'),
         'ACTION_CHANNEL': os.environ.get('SLACK_ACTION_CHANNEL', 'notifications'),
     },
+    'WORKPLACE_CONFIG': {
+        'enabled': os.environ.get('WK_ENABLED', False),
+        'API_TOKEN': os.environ.get('WK_API_TOKEN', read_api_key('.wk_api')),
+        'TIMEOUT': int(os.environ.get('WK_TIMEOUT', 10)),
+        'URL': os.environ.get('WK_URL', 'https://graph.facebook.com/v3.2/me/messages')
+
+        'ERROR_THREAD': os.environ.get('WK_ERROR_THREAD', 1904319826302854),
+        'ACTION_THREAD': os.environ.get('WK_ACTION_THREAD', 1904319826302854),
+    },
     'PWNBOARD_CONFIG': {
         'enabled': os.environ.get('PWNBOARD_ENABLED', False),
         'URL': os.environ.get('PWNBOARD_URL', 'https://pwnboard.local/generic')
