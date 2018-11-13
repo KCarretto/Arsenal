@@ -1,6 +1,6 @@
 """
-    This module integrates the teamserver with slack, and notifies
-    a slack channel about events.
+    This module integrates the teamserver with workplace, and notifies
+    a workplace channel about events.
 """
 import time
 import requests
@@ -9,7 +9,7 @@ from datetime import datetime
 from .integration import Integration
 
 
-class SlackIntegration(Integration):
+class WorkplaceIntegration(Integration):
     """
     Handle integration with workplace.
 
@@ -39,7 +39,7 @@ class SlackIntegration(Integration):
 
     def post_message(self, thread_key, message):
         """
-        Post a message to slack.
+        Post a message to workchat.
         """
         post_data = {
             "recipient": {"thread_key": thread_key},

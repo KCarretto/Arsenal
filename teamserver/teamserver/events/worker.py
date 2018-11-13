@@ -7,7 +7,7 @@ from celery import Celery
 from mongoengine import connect
 
 from teamserver.integrations import Integration
-from teamserver.integrations import SlackIntegration, PwnboardIntegration, ChanganIntegration
+from teamserver.integrations import SlackIntegration, PwnboardIntegration, ChanganIntegration, WorkplaceIntegration
 
 from teamserver.models import Webhook
 from teamserver.config import CELERY_MAIN_NAME, CELERY_RESULT_BACKEND, CELERY_BROKER_URL
@@ -33,6 +33,9 @@ PWNBOARD = PwnboardIntegration(INTEGRATIONS.get(
     {'enabled': False}))
 CHANGAN = ChanganIntegration(INTEGRATIONS.get(
     'CHANGAN_CONFIG',
+    {'enabled': False}))
+WORKPLACE = WorkplaceIntegration(INTEGRATIONS.get(
+    'WORKPLACE_CONFIG',
     {'enabled': False}))
 
 @app.task
@@ -76,3 +79,4 @@ def trigger_event(**kwargs):
         notify_integration(SLACK, kwargs)
         notify_integration(PWNBOARD, kwargs)
         notify_integration(CHANGAN, kwargs)
+        notify_integration(WORKPLACE, kwargs)
