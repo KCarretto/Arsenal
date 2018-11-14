@@ -11,7 +11,7 @@
 # usage: ./install.sh
 #   Install a new teamserver, but don't populate the database
 echo "Installing dependencies" | tee install.log
-apt-get update -y && apt-get install docker.io git curl > install.log && echo "Installed packages" | tee install.log
+apt-get update -y && apt-get install -y docker.io git curl > install.log && echo "Installed packages" | tee install.log
 curl -L https://github.com/docker/compose/releases/download/1.20.1/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose >> install.log && echo "Installed docker-compose" | tee install.log
 sudo chmod +x /usr/local/bin/docker-compose >> install.log && echo "docker-compose marked executable" | tee install.log
 echo "Dependencies installed" | tee install.log
