@@ -3,7 +3,7 @@ FROM nginx:alpine
 EXPOSE 80
 
 # Install package dependencies
-RUN apk add --update python3 python3-dev gcc curl curl-dev openssl-dev make libc-dev libffi-dev linux-headers git
+RUN apk add --update python3 python3-dev gcc curl curl-dev make libc-dev libffi-dev linux-headers git
 
 # Install pip dependencies
 RUN mkdir -p /opt/arsenal/

@@ -16,6 +16,17 @@ Arsenal is a framework designed to be a back-end for Red Team command and contro
 ## Quick Start
 Here are some quick deployment instructions to set up on Ubuntu 16.04 (The project will work across various distros however). It is recommended to loadbalance the teamserver for production use.
 
+### Fast install
+Note: Fix permissions (i.e. not require sudo) at your leisure
+Optionally remove the new argument if you do not wish to populate the db with defaults.
+
+```
+sudo git clone https://github.com/kcarretto/arsenal /opt/arsenal
+cd /opt/arsenal
+sudo chmod +x install.sh
+./install.sh new
+```
+
 ### Install dependencies
 `sudo apt-get update && sudo apt-get install docker.io git curl`
 
