@@ -5,7 +5,10 @@ services:
     build: teamserver/
     ports:
       - "80:80"
-    environment:
+    sysctls:
+      net.core.somaxconn: 1024
+
+      environment:
       - MODE=DEBUG
       - CELERY_BROKER_URL=redis://arsenal_redis_1:6379/0
       - DB_NAME=arsenal
