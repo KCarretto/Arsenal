@@ -10,6 +10,7 @@ from ..utils import success_response, get_filtered_target, handle_exceptions
 from ..models import Target, Credential, Action, Group
 from ..exceptions import CannotRenameTarget, MembershipError
 
+
 @handle_exceptions
 def create_target(params):
     """
@@ -21,25 +22,19 @@ def create_target(params):
     uuid (unique):      The unique identifier of the target. <str>
     facts (optional):   A dictionary of key,value pairs to store for the target. <dict>
     """
-    name = params['name']
-    uuid = params['uuid']
-    facts = params.get('facts', {})
+    name = params["name"]
+    uuid = params["uuid"]
+    facts = params.get("facts", {})
 
-    target = Target(
-        name=name,
-        uuid=uuid,
-        facts=facts
-    )
+    target = Target(name=name, uuid=uuid, facts=facts)
     target.save(force_insert=True)
 
     # Generate Event
-    if not current_app.config.get('DISABLE_EVENTS', False):
-        events.trigger_event.delay(
-            event='target_create',
-            target=target.document(True, True, True),
-        )
+    if not current_app.config.get("DISABLE_EVENTS", False):
+        events.trigger_event.delay(event="target_create", target=target.document(True, True, True))
 
     return success_response()
+
 
 @handle_exceptions
 def get_target(params):
@@ -55,8 +50,9 @@ def get_target(params):
     include_actions (optional):     Should actions be included, default: False. <bool>
     include_groups (optional):      Should groups be included, default: False. <bool>
     """
-    target = Target.get_by_name(params['name'])
+    target = Target.get_by_name(params["name"])
     return success_response(target=get_filtered_target(target, params))
+
 
 @handle_exceptions
 def rename_target(params):
@@ -68,12 +64,12 @@ def rename_target(params):
     name:       The name of the target to search for. <str>
     new_name:   The new name to assign the target. <str>
     """
-    target = Target.get_by_name(params['name'])
-    new_name = params['new_name']
+    target = Target.get_by_name(params["name"])
+    new_name = params["new_name"]
 
     try:
         Target.get_by_name(new_name)
-        raise CannotRenameTarget('Target with new_name already exists.')
+        raise CannotRenameTarget("Target with new_name already exists.")
     except DoesNotExist:
         pass
 
@@ -121,14 +117,13 @@ def rename_target(params):
         group.save()
 
     # Generate Event
-    if not current_app.config.get('DISABLE_EVENTS', False):
+    if not current_app.config.get("DISABLE_EVENTS", False):
         events.trigger_event.delay(
-            event='target_rename',
-            old_name=params['name'],
-            new_name=new_name,
+            event="target_rename", old_name=params["name"], new_name=new_name
         )
 
     return success_response()
+
 
 @handle_exceptions
 def set_target_facts(params):
@@ -140,14 +135,15 @@ def set_target_facts(params):
     name: The name of the target to update. <str>
     facts: The dictionary of facts to use. <dict>
     """
-    target = Target.get_by_name(params['name'])
+    target = Target.get_by_name(params["name"])
 
-    target.set_facts(params['facts'])
+    target.set_facts(params["facts"])
 
-    return success_response(target={'name': target.name, 'facts': target.facts})
+    return success_response(target={"name": target.name, "facts": target.facts})
+
 
 @handle_exceptions
-def list_targets(params): #pylint: disable=unused-argument
+def list_targets(params):  # pylint: disable=unused-argument
     """
     This API function will return a list of target documents.
 
@@ -157,9 +153,13 @@ def list_targets(params): #pylint: disable=unused-argument
     include_actions (optional):     Should actions be included, Default: False. <bool>
     include_groups (optional):      Should groups be included, Default: False. <bool>
     """
-    return success_response(targets={
-        target.name: get_filtered_target(target, params) for target in Target.list_targets()
-    })
+    return success_response(
+        targets={
+            target.name: get_filtered_target(target, params)
+            for target in Target.list_targets(params)
+        }
+    )
+
 
 @handle_exceptions
 def migrate_target(params):
@@ -172,8 +172,8 @@ def migrate_target(params):
     old_target: The name of the outdated target. <str>
     new_target: The name of the new target to migrate to. <str>
     """
-    old_target = Target.get_by_name(params['old_target'])
-    new_target = Target.get_by_name(params['new_target'])
+    old_target = Target.get_by_name(params["old_target"])
+    new_target = Target.get_by_name(params["new_target"])
 
     new_name = old_target.name
 
@@ -181,12 +181,10 @@ def migrate_target(params):
     old_target.remove()
 
     # Rename new target
-    rename_target({
-        'name': new_target.name,
-        'new_name': new_name
-    })
+    rename_target({"name": new_target.name, "new_name": new_name})
 
     return success_response()
+
 
 @handle_exceptions
 def add_credentials(params):
@@ -200,13 +198,13 @@ def add_credentials(params):
     key: The secret key. This could be the password, or SSH key.
     service(optional): Optionally document what service this is for.
     """
-    target = Target.get_by_name(params['target_name'])
+    target = Target.get_by_name(params["target_name"])
 
     creds = Credential(
         target_name=target.name,
-        user=params['user'],
-        key=params['key'],
-        service=params.get('service')
+        user=params["user"],
+        key=params["key"],
+        service=params.get("service"),
     )
     creds.save()
 
@@ -224,22 +222,22 @@ def invalidate_credentials(params):
     user: The username for the credentials.
     key: The secret key for the credentials.
     """
-    cred = Credential.objects.get( # pylint: disable=no-member
-        target_name=params['target_name'],
-        user=params['user'],
-        key=params['key']
+    cred = Credential.objects.get(  # pylint: disable=no-member
+        target_name=params["target_name"], user=params["user"], key=params["key"]
     )
     cred.valid = False
     cred.save()
 
     return success_response()
 
+
 @handle_exceptions
-def list_credentials(params): # pylint: disable=unused-argument
+def list_credentials(params):  # pylint: disable=unused-argument
     """
     ### Overview
     This API function is used to list valid credentials.
     """
     return success_response(
-        credentials=[creds.document for creds in Credential.objects] # pylint: disable=no-member
+        credentials=[creds.document for creds in Credential.objects]  # pylint: disable=no-member
     )
+
