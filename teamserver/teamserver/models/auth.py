@@ -20,25 +20,18 @@ from ..config import MAX_STR_LEN, MAX_BIGSTR_LEN, API_KEY_SALT
 from ..config import HASH_TIME_PARAM, HASH_MEMORY_PARAM, HASH_PARALLELIZATION_PARAM
 from ..config import COLLECTION_USERS, COLLECTION_ROLES, COLLECTION_APIKEYS
 
+
 class Role(Document):
     """
     This class represents a role, which consists of a list of API calls that are permitted.
     """
-    meta = {
-        'collection': COLLECTION_ROLES,
-        'indexes': [
-            {
-                'fields': ['name'],
-                'unique': True
-            }
-        ]
-    }
+
+    meta = {"collection": COLLECTION_ROLES, "indexes": [{"fields": ["name"], "unique": True}]}
     name = StringField(required=True, null=False, unique=True, max_length=MAX_STR_LEN)
     description = StringField(required=False, max_length=MAX_BIGSTR_LEN)
     allowed_api_calls = ListField(
-        StringField(required=True, null=False, max_length=MAX_STR_LEN),
-        required=True,
-        null=False)
+        StringField(required=True, null=False, max_length=MAX_STR_LEN), required=True, null=False
+    )
     users = ListField(StringField(required=True, null=False, max_length=MAX_STR_LEN))
 
     @staticmethod
@@ -46,14 +39,14 @@ class Role(Document):
         """
         Return a list of role objects.
         """
-        return Role.objects() # pylint: disable=no-member
+        return Role.objects()  # pylint: disable=no-member
 
     @staticmethod
     def get_role(role_name):
         """
         Fetch a role by name.
         """
-        return Role.objects.get(name=role_name) # pylint: disable=no-member
+        return Role.objects.get(name=role_name)  # pylint: disable=no-member
 
     @property
     def document(self):
@@ -61,10 +54,10 @@ class Role(Document):
         This property filters and returns the JSON information for a queried role.
         """
         return {
-            'name': self.name,
-            'description': self.description,
-            'allowed_api_calls': self.allowed_api_calls,
-            'users': self.users,
+            "name": self.name,
+            "description": self.description,
+            "allowed_api_calls": self.allowed_api_calls,
+            "users": self.users,
         }
 
     def add_member(self, username):
@@ -72,21 +65,21 @@ class Role(Document):
         Add a user to this role if it exists.
         """
         user = User.get_user(username)
-        if user.username not in self.users: #pylint: disable=unsupported-membership-test
-            self.users.append(user.username) # pylint: disable=no-member
+        if user.username not in self.users:  # pylint: disable=unsupported-membership-test
+            self.users.append(user.username)  # pylint: disable=no-member
             self.save()
         else:
-            raise RoleException('User is already a member of this role.')
+            raise RoleException("User is already a member of this role.")
 
     def remove_member(self, username):
         """
         Remove a user from this role.
         """
-        if username in self.users: #pylint: disable=unsupported-membership-test
-            self.users.remove(username) #pylint: disable=no-member
+        if username in self.users:  # pylint: disable=unsupported-membership-test
+            self.users.remove(username)  # pylint: disable=no-member
             self.save()
         else:
-            raise RoleException('User is not a member of this role.')
+            raise RoleException("User is not a member of this role.")
 
     def remove(self):
         """
@@ -94,67 +87,60 @@ class Role(Document):
         """
         self.delete()
 
+
 class APIKey(Document):
     """
     This class represents an API key.
     It has it's own unique set of permissions, and an owner.
     """
+
     meta = {
-        'collection': COLLECTION_APIKEYS,
-        'indexes': [
-            {
-                'fields': ['key'],
-                'unique': True
-            }
-        ]
+        "collection": COLLECTION_APIKEYS,
+        "indexes": [{"fields": ["key"], "unique": True}, {"fields": ["owner"]}],
     }
-    key = StringField(
-        required=True,
-        null=False,
-        unique=True,
-        max_length=MAX_BIGSTR_LEN)
+    key = StringField(required=True, null=False, unique=True, max_length=MAX_BIGSTR_LEN)
     owner = StringField(required=True, null=False, max_length=MAX_STR_LEN)
     allowed_api_calls = ListField(
-        StringField(required=True, null=False, max_length=MAX_STR_LEN),
-        required=True,
-        null=False)
+        StringField(required=True, null=False, max_length=MAX_STR_LEN), required=True, null=False
+    )
 
     @staticmethod
     def list_keys(owner):
         """
         List the keys for a user.
         """
-        return APIKey.objects(owner=owner) # pylint: disable=no-member
+        return APIKey.objects(owner=owner)  # pylint: disable=no-member
 
     @staticmethod
     def get_key(key):
         """
         Query for a key from the database.
         """
-        mid_hash = b64encode(argon2_hash(password=key,
-                                         salt=API_KEY_SALT,
-                                         t=HASH_TIME_PARAM,
-                                         m=HASH_MEMORY_PARAM,
-                                         p=HASH_PARALLELIZATION_PARAM)).decode()
-        return APIKey.objects.get(key=API_KEY_SALT + "$" + mid_hash) # pylint: disable=no-member
+        mid_hash = b64encode(
+            argon2_hash(
+                password=key,
+                salt=API_KEY_SALT,
+                t=HASH_TIME_PARAM,
+                m=HASH_MEMORY_PARAM,
+                p=HASH_PARALLELIZATION_PARAM,
+            )
+        ).decode()
+        return APIKey.objects.get(key=API_KEY_SALT + "$" + mid_hash)  # pylint: disable=no-member
 
     @property
     def document(self):
         """
         Returns a document for this object. Does not include the API key itself.
         """
-        return {
-            'owner': self.owner,
-            'allowed_api_calls': self.allowed_api_calls,
-        }
+        return {"owner": self.owner, "allowed_api_calls": self.allowed_api_calls}
 
     def is_permitted(self, api_method):
         """
         Determines if the API key has permissions to execute an API method.
         """
-        if api_method in self.allowed_api_calls: # pylint: disable=unsupported-membership-test
+        if api_method in self.allowed_api_calls:  # pylint: disable=unsupported-membership-test
             return True
-        if '*' in self.allowed_api_calls: # pylint: disable=unsupported-membership-test
+        if "*" in self.allowed_api_calls:  # pylint: disable=unsupported-membership-test
             return True
         return False
 
@@ -164,20 +150,14 @@ class APIKey(Document):
         """
         self.delete()
 
+
 class User(Document):
     """
     This class represents a User.
     It defines user settings and permissions.
     """
-    meta = {
-        'collection': COLLECTION_USERS,
-        'indexes': [
-            {
-                'fields': ['username'],
-                'unique': True
-            }
-        ]
-    }
+
+    meta = {"collection": COLLECTION_USERS, "indexes": [{"fields": ["username"], "unique": True}]}
     username = StringField(required=True, null=False, unique=True, max_length=MAX_STR_LEN)
     password = StringField(required=True, null=False, unique=True, max_length=MAX_STR_LEN)
     administrator = BooleanField(required=True, null=False, default=False)
@@ -187,21 +167,21 @@ class User(Document):
         """
         Return a list of user objects.
         """
-        return User.objects() # pylint: disable=no-member
+        return User.objects()  # pylint: disable=no-member
 
     @staticmethod
     def get_user(username):
         """
         Query for a user by username.
         """
-        return User.objects.get(username=username) # pylint: disable=no-member
+        return User.objects.get(username=username)  # pylint: disable=no-member
 
     @property
     def api_keys(self):
         """
         Return a list of all API keys that belong to this user.
         """
-        return APIKey.objects(owner=self.username) # pylint: disable=no-member
+        return APIKey.objects(owner=self.username)  # pylint: disable=no-member
 
     @property
     def webhooks(self):
@@ -214,13 +194,11 @@ class User(Document):
         """
         This property filters and returns the JSON information for a queried user.
         """
-        resp = {
-            'username': self.username,
-        }
+        resp = {"username": self.username}
         if include_roles:
-            resp['roles'] = [role.document for role in self.roles]
+            resp["roles"] = [role.document for role in self.roles]
         if include_api_calls:
-            resp['allowed_api_calls'] = self.allowed_api_calls
+            resp["allowed_api_calls"] = self.allowed_api_calls
 
         return resp
 
@@ -229,7 +207,7 @@ class User(Document):
         """
         Return all roles that this user is in.
         """
-        return Role.objects(users=self.username) # pylint: disable=no-member
+        return Role.objects(users=self.username)  # pylint: disable=no-member
 
     @staticmethod
     def hash_password(password, salt=None):
@@ -238,11 +216,15 @@ class User(Document):
         """
         if salt is None:
             salt = b64encode(urandom(15)).decode()
-        mid_hash = b64encode(argon2_hash(password=password,
-                                         salt=salt,
-                                         t=HASH_TIME_PARAM,
-                                         m=HASH_MEMORY_PARAM,
-                                         p=HASH_PARALLELIZATION_PARAM)).decode()
+        mid_hash = b64encode(
+            argon2_hash(
+                password=password,
+                salt=salt,
+                t=HASH_TIME_PARAM,
+                m=HASH_MEMORY_PARAM,
+                p=HASH_PARALLELIZATION_PARAM,
+            )
+        ).decode()
         return salt + "$" + mid_hash
 
     @property
@@ -263,7 +245,7 @@ class User(Document):
             return True
 
         allowed_methods = self.allowed_api_calls
-        if isinstance(allowed_methods, list) and '*' in allowed_methods:
+        if isinstance(allowed_methods, list) and "*" in allowed_methods:
             return True
         if isinstance(allowed_methods, list) and api_method in allowed_methods:
             return True
@@ -274,11 +256,11 @@ class User(Document):
         Determines if a user is authenticated given a password.
         Raises an InvalidCredentials exception if the password was incorrect.
         """
-        salt = self.password[:self.password.find("$")]
+        salt = self.password[: self.password.find("$")]
         suspect_hash = User.hash_password(password, salt=salt)
 
         if suspect_hash != self.password:
-            raise InvalidCredentials('Password incorrect.')
+            raise InvalidCredentials("Password incorrect.")
         return True
 
     def update_password(self, current_password, new_password):
