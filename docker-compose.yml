@@ -6,6 +6,7 @@ services:
     ports:
       - "80:80"
     environment:
+      - MODE=DEBUG
       - CELERY_BROKER_URL=amqp://arsenal_rabbitmq_1:5672
       - CELERY_RESULT_BACKEND=amqp://arsenal_rabbitmq_1:5672
       - DB_NAME=arsenal
