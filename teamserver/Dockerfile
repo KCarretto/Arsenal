@@ -6,7 +6,7 @@ EXPOSE 80
 RUN apk add --update python3 python3-dev gcc curl curl-dev make libc-dev libffi-dev linux-headers git
 
 # Install pip dependencies
-RUN mkdir -p /opt/arsenal/
+RUN mkdir -p /opt/arsenal/ && mkdir -p /opt/arsenal/flask_profile
 COPY requirements /opt/arsenal/requirements
 RUN pip3 install --upgrade pip
 RUN pip3 install -r /opt/arsenal/requirements/prod.txt

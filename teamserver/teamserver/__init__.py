@@ -10,7 +10,7 @@ from flask import Flask
 from flask_mongoengine import MongoEngine
 from mongoengine import connect, MongoEngineConnectionError
 
-from .config import MODE
+from .config import MODE, PROFILE_DIR
 from .config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS
 from .config import CELERY_BROKER_URL, CELERY_RESULT_BACKEND
 from .integrations.integration import Integration
@@ -72,7 +72,7 @@ def create_app(**config_overrides):
         from werkzeug.contrib.profiler import ProfilerMiddleware
 
         app.config["PROFILE"] = True
-        app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[50])
+        app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[50], profile_dir=PROFILE_DIR)
 
         # Enable mongodb debug toolbar
         from flask_debugtoolbar import DebugToolbarExtension

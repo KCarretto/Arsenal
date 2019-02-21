@@ -7,8 +7,7 @@ services:
       - "80:80"
     environment:
       - MODE=DEBUG
-      - CELERY_BROKER_URL=amqp://arsenal_rabbitmq_1:5672
-      - CELERY_RESULT_BACKEND=amqp://arsenal_rabbitmq_1:5672
+      - CELERY_BROKER_URL=redis://arsenal_redis_1:6379/0
       - DB_NAME=arsenal
       - DB_HOST=arsenal_mongo_1
       - DB_PORT=27017
@@ -22,6 +21,3 @@ services:
 
   mongo:
     image: mongo
-
-  rabbitmq:
-    image: rabbitmq

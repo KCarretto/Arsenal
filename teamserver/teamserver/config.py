@@ -5,6 +5,7 @@ import os
 
 # GLOBAL SETTINGS
 MODE = os.environ.get("MODE", "PROD")  # production or debug
+PROFILE_DIR = os.environ.get("PROFILE_DIR", "/opt/arsenal/flask_profile")
 
 # CELERY SETTINGS
 CELERY_MAIN_NAME = "arsenal"
