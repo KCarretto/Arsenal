@@ -6,10 +6,11 @@
 """
 import requests
 from requests.exceptions import RequestException
+from teamserver.utils import log
 from .integration import Integration
 
 
-class PwnboardIntegration(Integration): # pylint: disable=too-few-public-methods
+class PwnboardIntegration(Integration):  # pylint: disable=too-few-public-methods
     """
     Configuration:
         URL: the domain that the pwnboard is living on with protocal
@@ -27,7 +28,7 @@ class PwnboardIntegration(Integration): # pylint: disable=too-few-public-methods
         """
         Return the integration name as the string.
         """
-        return 'pwnboard-integration'
+        return "pwnboard-integration"
 
     def run(self, event_data, **kwargs):
         """
@@ -42,16 +43,18 @@ class PwnboardIntegration(Integration): # pylint: disable=too-few-public-methods
         facts = event_data.get("target", {}).get("facts", {})
         # Stolen from cli.getTarget
         ip_addrs = []
-        for iface in facts.get('interfaces', []):
-            for addr in iface.get('ip_addrs', []):
+        for iface in facts.get("interfaces", []):
+            for addr in iface.get("ip_addrs", []):
                 ip_addrs.append(addr)
         if not ip_addrs:
             # If we dont have an IP, then we have nothing to update
             return False
 
-        data = {'ips': ip_addrs, 'type': name}
+        data = {"ips": ip_addrs, "type": name}
         try:
+            log("INFO", f"POSTING TO PWNBOARD: {self.url} | {data}")
             requests.post(self.url, json=data, timeout=3)
+            log("INFO", f"PWNBOARD SUCCESS: {self.url} | {data}")
             return True
         except RequestException:
             return False
